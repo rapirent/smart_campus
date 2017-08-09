@@ -1,0 +1,2 @@
+-r common.txt
+pytest-django==3.1.2
