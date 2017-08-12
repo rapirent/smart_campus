@@ -19,7 +19,7 @@ def get_env_variable(var_name):
     try:
         return os.environ[var_name]
     except KeyError:
-        error_msg = 'Environment variable "{var_name}" should be set!'
+        error_msg = 'Environment variable {} should be set!'.format(var_name)
         raise ImproperlyConfigured(error_msg)
 
 
@@ -48,11 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #app
+    # app
     'app.apps.AppConfig',
-    #postgis
+    # postgis
     'django.contrib.gis',
 ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
