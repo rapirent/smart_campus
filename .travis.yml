@@ -3,7 +3,8 @@ python:
   - "3.5"
   - "3.5-dev" # 3.5 development branch
   - "3.6"
-install: "pip install -r requirements/dev.txt"
+install: 
+  - "pip install -r requirements/dev.txt"
 branches:
   only:
     - /^develop.*$/ #only the develop branches will be tested
@@ -14,6 +15,9 @@ before_script:
   - psql -c 'CREATE EXTENSION postgis;' -U postgres -d travis_test
 addons:
   postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6-postgis-2.3
 # command to run tests
 script: pytest
 
