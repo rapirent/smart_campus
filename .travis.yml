@@ -10,7 +10,7 @@ branches:
 services:
   - postgresql
 before_script:
-  - psql -c 'create databse travis_test;' -U postgres
+  - psql -c 'create database travis_test;' -U postgres
   - psql -c 'CREATE EXTENSION postgis;' -U postgres -d travis_test
 addons:
   postgresql: "9.6"
