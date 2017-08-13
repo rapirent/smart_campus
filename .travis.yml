@@ -19,5 +19,6 @@ addons:
     packages:
     - postgresql-9.6-postgis-2.3
 # command to run tests
-script: pytest
-
+script:
+    - pytest
+    - coveralls
