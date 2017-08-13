@@ -14,8 +14,14 @@
 ```sh
 $ pip install -r requirements/dev.txt
 ```
-
-### Setup Envrionment Variables
+## Setup and Run
+### Develop: Use local settings file
+Define your own `local_settings.py` under `settings/`
+#### Runserver
+```sh
+python manage.py runserver --settings=smart_campus.settings.local_settings
+```
+### Production: Setup Envrionment Variables
 - `SECRET_KEY`
 - `POSTGRESQL_NAME`
 - `POSTGRESQL_USER`
@@ -30,6 +36,10 @@ export POSTGRESQL_USER='user_name'
 export POSTGRESQL_PASSWORD='user_pwd'
 export POSTGRESQL_HOST='db_host'
 export POSTGRESQL_PORT='db_port'
+```
+#### Runserver
+```sh
+python manage.py runserver --settings=smart_campus.settings.production
 ```
 
 
