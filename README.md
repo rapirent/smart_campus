@@ -1,5 +1,8 @@
 # Smart Campus
 
+[![Build Status](https://travis-ci.org/rapirent/smart_campus.svg?branch=develop)](https://travis-ci.org/rapirent/smart_campus?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/github/rapirent/smart_campus/badge.svg?branch=develop)](https://coveralls.io/github/rapirent/smart_campus?branch=develop)
+
 ## Prerequistie
 - Python 3
 - postgres
