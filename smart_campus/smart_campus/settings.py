@@ -19,7 +19,7 @@ def get_env_variable(var_name):
     try:
         return os.environ[var_name]
     except KeyError:
-        error_msg = f'Environment variable "{var_name}" should be set!'
+        error_msg = 'Environment variable {} should be set!'.format(var_name)
         raise ImproperlyConfigured(error_msg)
 
 
@@ -48,6 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # app
+    'app.apps.AppConfig',
+    # postgis
+    'django.contrib.gis',
 ]
 
 MIDDLEWARE = [
@@ -86,9 +90,13 @@ WSGI_APPLICATION = 'smart_campus.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': get_env_variable('POSTGRESQL_NAME'),
+        'USER': get_env_variable('POSTGRESQL_USER'),
+        'PASSWORD': get_env_variable('POSTGRESQL_PASSWORD'),
+        'HOST': get_env_variable('POSTGRESQL_HOST'),
+        'PORT':  get_env_variable('POSTGRESQL_PORT'),
+    },
 }
 
 
