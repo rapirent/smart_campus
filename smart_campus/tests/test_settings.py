@@ -1,7 +1,7 @@
 import pytest
 from django.core.exceptions import ImproperlyConfigured
 
-from smart_campus.settings import get_env_variable
+from smart_campus.settings.test import get_env_variable
 
 
 class TestGetEnvVariable:
