@@ -2,3 +2,4 @@
 omit =
     env/*
     venv/*
+    */virtualenv/*
