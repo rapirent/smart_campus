@@ -30,14 +30,23 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY WARNING: don't run with debug turned on in production!
 SECRET_KEY = get_env_variable('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': get_env_variable('POSTGRESQL_NAME'),
+        'USER': get_env_variable('POSTGRESQL_USER'),
+        'PASSWORD': get_env_variable('POSTGRESQL_PASSWORD'),
+        'HOST': get_env_variable('POSTGRESQL_HOST'),
+        'PORT':  get_env_variable('POSTGRESQL_PORT'),
+    },
+}
 
 # Application definition
 
@@ -83,22 +92,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'smart_campus.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': get_env_variable('POSTGRESQL_NAME'),
-        'USER': get_env_variable('POSTGRESQL_USER'),
-        'PASSWORD': get_env_variable('POSTGRESQL_PASSWORD'),
-        'HOST': get_env_variable('POSTGRESQL_HOST'),
-        'PORT':  get_env_variable('POSTGRESQL_PORT'),
-    },
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
