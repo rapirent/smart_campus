@@ -31,10 +31,22 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = get_env_variable('SECRET_KEY')
+
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': get_env_variable('POSTGRESQL_NAME'),
+        'USER': get_env_variable('POSTGRESQL_USER'),
+        'PASSWORD': get_env_variable('POSTGRESQL_PASSWORD'),
+        'HOST': get_env_variable('POSTGRESQL_HOST'),
+        'PORT':  get_env_variable('POSTGRESQL_PORT'),
+    },
+}
 
 # Application definition
 
