@@ -3,6 +3,7 @@ from django.contrib.auth.base_user import (
     BaseUserManager, AbstractBaseUser
 )
 
+
 class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
     name = models.CharField(max_length=200)
@@ -14,13 +15,14 @@ class Beacon(models.Model):
     def __str__(self):
         return self.name
 
+
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None):
         """
-        Creates and saves a User with the given email and password
+        Create and save a User instance with the given email and password
         """
         if not email:
-            raise ValueError('Users must have an email address')
+            raise ValueError('Email address is needed.')
 
         user = self.model(
             email=self.normalize_email(email),
@@ -29,6 +31,7 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
+
 
 class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True, primary_key=True)
@@ -55,8 +58,8 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = 'email'
 
     def can(self, permissions):
-        return self.role is not None and \
-            (self.role.permissions & permissions) == permissions
+        return (self.role is not None and
+            (self.role.permissions & permissions) == permissions)
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
@@ -66,6 +69,7 @@ class User(AbstractBaseUser):
             email=self.email,
             name=self.nickname
         )
+
 
 class AnonymousUser:
     def __str__(self):
@@ -104,11 +108,13 @@ class AnonymousUser:
     def get_username(self):
         return ""
 
+
 class UserGroup(models.Model):
     name = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
@@ -118,16 +124,19 @@ class Reward(models.Model):
     def __str__(self):
         return self.name
 
+
 class UserReward(models.Model):
     user = models.ForeignKey('User', on_delete=models.CASCADE)
     reward = models.ForeignKey('Reward', on_delete=models.CASCADE)
-    # auto records the time the entry created
+    # Automatically record the time this entry created
     timestamp = models.DateTimeField(auto_now_add=True)
+
 
 class Permission:
     VIEW = 0x01
     EDIT = 0x02
     ADMIN = 0xff
+
 
 class Role(models.Model):
     name = models.TextField(unique=True)
@@ -153,9 +162,11 @@ class Role(models.Model):
     def __str__(self):
         return self.name
 
+
 class QuestionType:
     BINARY = 0x01
     MULTIPLE_CHOICE = 0x02
+
 
 class Question(models.Model):
     content = models.CharField(max_length=254)
@@ -176,15 +187,18 @@ class Question(models.Model):
     def __repr__(self):
         return str(self.id)
 
+
 class Choice(models.Model):
     content = models.CharField(max_length=50)
     def __str__(self):
         return self.content
 
+
 class QuestionChoice(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
     choice = models.ForeignKey('Choice', on_delete=models.CASCADE)
     is_answer = models.BooleanField(default=False)
+
 
 class Station(models.Model):
     name = models.CharField(max_length=254)
@@ -197,6 +211,7 @@ class Station(models.Model):
             category=str(self.category)
         )
 
+
 class StationCategory(models.Model):
     name = models.CharField(max_length=254, primary_key=True)
     description = models.TextField(blank=True)
@@ -204,13 +219,15 @@ class StationCategory(models.Model):
     def __str__(self):
         return self.name
 
+
 class StationImage(models.Model):
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
     image = models.ImageField()
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):
-        return 'Image '+str(self.id)
+        return 'Image {img_id}'.format(img_id=self.id)
+
 
 class TravelPlan(models.Model):
     name = models.CharField(max_length=254)
