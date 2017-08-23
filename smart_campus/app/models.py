@@ -17,7 +17,7 @@ class Beacon(models.Model):
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, nickname=""):
         """
         Create and save a User instance with the given email and password
         """
@@ -26,6 +26,8 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             email=self.normalize_email(email),
+            nickname=nickname,
+            role=Role.objects.get(name='User'),
         )
 
         user.set_password(password)
@@ -59,7 +61,7 @@ class User(AbstractBaseUser):
 
     def can(self, permissions):
         return (self.role is not None and
-            (self.role.permissions & permissions) == permissions)
+                (self.role.permissions & permissions) == permissions)
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
@@ -118,7 +120,7 @@ class UserGroup(models.Model):
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(null=True)
+    image = models.ImageField(null=True, upload_to='app/images/reward/')
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -222,7 +224,7 @@ class StationCategory(models.Model):
 
 class StationImage(models.Model):
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='app/images/station/')
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):

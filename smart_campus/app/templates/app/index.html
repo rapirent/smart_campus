@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %} Smart Campus{% endblock %}</title>
+</head>
+
+<body>
+{% block page_content %}
+  <div>
+    <h1>Manage</h1>
+  </div>
+  <a href="{% url 'logout' %}">Log Out</a>
+{% endblock %}
+
+</body>
+</html>

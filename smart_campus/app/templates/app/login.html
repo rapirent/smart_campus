@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %} Smart Campus Login {% endblock %}</title>
+</head>
+
+<body>
+{% block page_content %}
+  <div>
+    <h1>Login</h1>
+  </div>
+  <div>
+    <form action="{% url 'login' %}" method="POST">
+      {% csrf_token %}
+      <input id="email" name="email" type="text" placeholder="Email" required autofocus>
+      <input id="username" name="password" type="password" placeholder="Password" required>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+{% endblock %}
+
+</body>
+</html>
