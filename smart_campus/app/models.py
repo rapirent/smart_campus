@@ -184,7 +184,7 @@ class Question(models.Model):
         'Choice',
         through='QuestionChoice',
     )
-    linked_beacon = models.ForeignKey('Beacon', null=True, on_delete=models.SET_NULL)
+    linked_station= models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
 
     def __repr__(self):
         return str(self.id)
@@ -206,6 +206,7 @@ class Station(models.Model):
     name = models.CharField(max_length=254)
     content = models.TextField(blank=True)
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
+    location = models.GeometryField(srid=4326, null=True)
 
     def __str__(self):
         return '{name} ({category})'.format(

@@ -1,23 +1,59 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>{% block title %} Smart Campus Login {% endblock %}</title>
-</head>
 
-<body>
-{% block page_content %}
-  <div>
-    <h1>Login</h1>
-  </div>
-  <div>
-    <form action="{% url 'login' %}" method="POST">
-      {% csrf_token %}
-      <input id="email" name="email" type="text" placeholder="Email" required autofocus>
-      <input id="username" name="password" type="password" placeholder="Password" required>
-      <input type="submit" value="Submit">
-    </form>
-  </div>
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %} Smart Campus Login {% endblock %}
+
+
+{% block stylesheet %}{% static "app/css/login.css" %}{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+  <div class="container">  
+            <div class="col-lg-6 col-md-6 col-sm-8  loginbox">
+                <div class=" row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
+                        <img src="/static/app/icon/ncku.png" alt="Logo" class="logo"> 
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6  ">
+                        <span class="singtext">管理後台登入 </span>   
+                    </div>
+                                 
+                </div>
+                <form class="form-signin" action="" method="POST">
+                
+                  {% csrf_token %}
+              
+                <div class=" row loginbox_content ">                        
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-addon">
+                            Email
+                        </span>
+                        <input class="form-control" name="email" type="email" placeholder="Email" required="" autofocus="">
+                    </div>
+                    <br>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-addon">
+                            Password
+                        </span>
+                        <input class="form-control" name="password" type="password" placeholder="Password" required="">
+                    </div>              
+                </div>
+                <div class="row ">                   
+                    <div class="col-lg-8 col-md-8  col-sm-8 col-xs-7 "> 
+                        {% if login_msg %}
+                          <p class='text-danger'>{{login_msg}}</p>
+                        {% endif %}
+                                               
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4  col-xs-5 ">                        
+                    <button type="submit" class="btn btn-primary btn-success btn-block">Log in </button>
+                    </div>
+                </div>
+
+                </form>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-4 "></div>
+
+
+        </div>
 {% endblock %}
 
-</body>
-</html>
