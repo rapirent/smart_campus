@@ -1,0 +1,75 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %} Smart Campus{% endblock %}
+
+{% block stylesheet %}{% static "app/css/add_station.css" %}{% endblock %}
+
+{% block content %}
+<div class="container">
+	<form class="" action="" method="POST">            
+    {% csrf_token %}
+		<div class="row">
+		  <div class="col-md-4">
+		  	<label class="control-label col" for="textinput">名稱</label>  
+			  <div class="col">
+			  	<input id="textinput" name="textinput" type="text" placeholder="站點名稱" class="form-control input-md" required="">
+			  </div>
+			</div>
+		  <div class="col-md-4">
+		  	<label class="control-label col-md-12" for="textinput">類別</label> 
+		  	<select id="selectbasic" name="selectbasic" class="form-control">
+		      <option value="1">Option one</option>
+		      <option value="2">Option two</option>
+		    </select>
+		  </div>
+		</div>
+		<br>
+		<!-- Textarea -->
+		<div class="row">
+		  <div class="col-md-6">
+			  <label class="col control-label" for="textarea">推播內容</label>
+			  <div class="col">                     
+			    <textarea class="form-control" id="textarea" name="textarea"></textarea>
+			  </div>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-4">
+			  <label class="col-md-4 control-label" for="filebutton1">圖片上傳</label>
+			  <div class="col-md-4">
+			  	Photo 1:
+			    <input id="filebutton1" name="filebutton1" class="input-file" type="file">
+			  </div>
+			</div>
+			<div class="col">
+			  <br>
+			  <button id="btn_addimage" name="btn_addimage" class="btn btn-danger">新增照片欄位</button>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+			<div class="col-md-8"> 
+				<label class="col-md-3 control-label" for="checkboxes">選擇主要照片</label>
+		    <label class="radio-inline" for="radios-0">
+		      <input type="radio" name="radios" id="radios-0" value="1" checked="checked">
+		      1
+		    </label> 
+		    <label class="radio-inline" for="radios-1">
+		      <input type="radio" name="radios" id="radios-1" value="2">
+		      2
+		    </label> 
+		    <label class="radio-inline" for="radios-2">
+		      <input type="radio" name="radios" id="radios-2" value="3">
+		      3
+		    </label> 
+		    <label class="radio-inline" for="radios-3">
+		      <input type="radio" name="radios" id="radios-3" value="4">
+		      4
+		    </label>
+		  </div>
+		</div>
+	</form>
+</div>
+{% endblock %}
