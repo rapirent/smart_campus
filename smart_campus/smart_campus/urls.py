@@ -26,4 +26,5 @@ urlpatterns = [
     url(r'^logout/$', app.views.log_out, name='logout'),
     url(r'^$', app.views.index, name='index'),
     url(r'^station_list/$', app.views.station_list, name='Station List'),
+    url(r'^add_station/$', app.views.add_station, name='Add Station'),
 ]

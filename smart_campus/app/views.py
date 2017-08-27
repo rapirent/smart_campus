@@ -4,6 +4,7 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import (
     User, Reward, Permission,
@@ -89,12 +90,11 @@ def log_in(request):
         login(request, user)
         return HttpResponseRedirect('/')
 
-    login_msg = ""
     if user is None and email is not None:
-        login_msg = "帳號或密碼錯誤!!!"
+        messages.warning(request, 'Login failed!')
         email = None
 
-    return render(request, 'app/login.html', {'login_msg': login_msg})
+    return render(request, 'app/login.html')
 
 
 @login_required(login_url='/login/')
@@ -115,32 +115,26 @@ def station_list(request):
     return render(request, 'app/station_list.html', context)
 
 
+@login_required(login_url='/login/')
+def add_station(request):
+    context = {'email': request.user.email}
+    return render(request, 'app/add_station.html', context)
+
+
 @csrf_exempt
 def get_all_rewards(request):
-    """API for retrieving all rewards
-
-    Not personal rewards
-    """
-    data = []
-    for reward in Reward.objects.all():
-        entry = {
-            'id': reward.id,
-            'name': reward.name,
-            'image_url': reward.image.url
-        }
-        data.append(entry)
+    """API for retrieving rewards list"""
+    data = [{'id': reward.id, 'name': reward.name, 'image_url': reward.image.url}
+            for reward in Reward.objects.all()]
 
     return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
 
 
 @csrf_exempt
 def get_all_stations(request):
-    """API for retrieving contents of all Stations
-
-    """
-    data = []
-    for station in Station.objects.all():
-        entry = {
+    """API for retrieving contents of all Stations"""
+    data = [
+        {
             'id': station.id,
             'name': station.name,
             'content': station.content,
@@ -149,6 +143,7 @@ def get_all_stations(request):
             'image': [{'image_url': img.image.url, 'primary': img.is_primary}
                       for img in station.stationimage_set.all()]
         }
-        data.append(entry)
+        for station in Station.objects.all()
+        ]
 
     return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
