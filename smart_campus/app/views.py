@@ -73,7 +73,7 @@ def signout(request):
 
 
 @csrf_exempt
-def log_in(request):
+def login_page(request):
     """Login for Management Backend Page
 
     Render Login page and handle login requests for the Management backend
@@ -98,7 +98,7 @@ def log_in(request):
 
 
 @login_required(login_url='/login/')
-def log_out(request):
+def logout_page(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
@@ -144,6 +144,6 @@ def get_all_stations(request):
                       for img in station.stationimage_set.all()]
         }
         for station in Station.objects.all()
-        ]
+    ]
 
     return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})

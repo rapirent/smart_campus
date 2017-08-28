@@ -22,8 +22,8 @@ import app
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^smart_campus/', include('app.urls')),
-    url(r'^login/$', app.views.log_in, name='login'),
-    url(r'^logout/$', app.views.log_out, name='logout'),
+    url(r'^login/$', app.views.login_page, name='login'),
+    url(r'^logout/$', app.views.logout_page, name='logout'),
     url(r'^$', app.views.index, name='index'),
     url(r'^station_list/$', app.views.station_list, name='Station List'),
     url(r'^add_station/$', app.views.add_station, name='Add Station'),
