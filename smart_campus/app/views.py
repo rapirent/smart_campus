@@ -1,14 +1,14 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from django.contrib.auth import authenticate, login, logout
+from django.contrib import auth
 from django.http import HttpResponseRedirect, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 from .models import (
     User, Reward, Permission,
-    Station,
+    Station, StationCategory
 )
 
 
@@ -37,7 +37,7 @@ def signup(request):
 
 @csrf_exempt
 @require_POST
-def signin(request):
+def login(request):
     """Sign in API for APP users
 
     Handle signin requests from app
@@ -45,9 +45,9 @@ def signin(request):
     """
     email = request.POST.get('email')
     password = request.POST.get('password')
-    user = authenticate(request, username=email, password=password)
+    user = auth.authenticate(request, username=email, password=password)
     if user is not None:
-        login(request, user)
+        auth.login(request, user)
         user_data = {
             'nickname': user.nickname,
             'experience_point': user.experience_point,
@@ -62,13 +62,13 @@ def signin(request):
 
 @csrf_exempt
 @require_POST
-def signout(request):
+def logout(request):
     """Sign out API for APP users
 
     Handle signout requests from app
 
     """
-    logout(request)
+    auth.logout(request)
     return JsonResponse({'status': 'true', 'message': 'Success'})
 
 
@@ -84,40 +84,39 @@ def login_page(request):
 
     email = request.POST.get('email')
     password = request.POST.get('password')
-    user = authenticate(request, username=email, password=password)
+    user = auth.authenticate(request, username=email, password=password)
 
-    if user is not None and user.can(Permission.EDIT):
-        login(request, user)
+    if not user:
+        if request.method == 'POST':        
+            messages.warning(request, 'Login failed!')
+        return render(request, 'app/login.html')
+
+    if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
+        auth.login(request, user)
         return HttpResponseRedirect('/')
 
-    if user is None and email is not None:
-        messages.warning(request, 'Login failed!')
-        email = None
 
-    return render(request, 'app/login.html')
-
-
-@login_required(login_url='/login/')
+@login_required
 def logout_page(request):
-    logout(request)
+    auth.logout(request)
     return HttpResponseRedirect('/login/')
 
 
-@login_required(login_url='/login/')
+@login_required
 def index(request):
     context = {'email': request.user.email}
     return render(request, 'app/index.html', context)
 
 
-@login_required(login_url='/login/')
-def station_list(request):
+@login_required
+def station_list_page(request):
     context = {'email': request.user.email}
     return render(request, 'app/station_list.html', context)
 
 
-@login_required(login_url='/login/')
-def add_station(request):
-    context = {'email': request.user.email}
+@login_required
+def add_station_page(request):
+    context = {'email': request.user.email, 'categories': StationCategory.objects.all()}
     return render(request, 'app/add_station.html', context)
 
 

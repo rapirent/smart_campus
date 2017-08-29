@@ -5,8 +5,8 @@ from . import views
 
 urlpatterns = [
     url('^signup/$', views.signup, name='signup'),
-    url('^signin/$', views.signin, name='signin'),
-    url('^signout/$', views.signout, name='signout'),
+    url('^login/$', views.login, name='login'),
+    url('^logout/$', views.logout, name='logout'),
     url('^get_all_rewards/$', views.get_all_rewards, name='Get All Reward'),
     url('^get_all_stations/$', views.get_all_stations, name='Get All Station')
 ]
