@@ -1,14 +1,17 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %} Smart Campus{% endblock %}
+{% block title %}Smart Campus{% endblock %}
 
-{% block stylesheet %}{% static "app/css/station.css" %}{% endblock %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/station.css" %}" />
+{% endblock %}
 
 {% block content %}
 <div class="container">
   <div class="row">
-    <div class="col-lg-12">
+    <div class="col-lg-3">
       <p>
         <a href="{% url 'Add Station Page' %}" class="btn btn-sq-lg btn-outline-primary">
           <br>
@@ -16,6 +19,18 @@
         </a>        
       </p>
     </div>
+    {% if stations %}
+      {% for station in stations %}
+        <div class="col-lg-3">
+          <p>
+            <a href="{% url 'Edit Station Page' station.id %}" class="btn btn-sq-lg btn-outline-primary">
+              <br>
+              {{ station.name }}
+            </a>        
+          </p>
+        </div>
+      {% endfor %}
+    {% endif %}
   </div>
 </div>
 {% endblock %}

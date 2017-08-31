@@ -6,11 +6,11 @@ from django.contrib.auth.base_user import (
 
 class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=200, blank=True)
     location = models.GeometryField(srid=4326, null=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
-    station = models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
+    station = models.ManyToManyField('Station')
 
     def __str__(self):
         return self.name
@@ -204,10 +204,11 @@ class QuestionChoice(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=254)
+    name = models.CharField(max_length=254, unique=True)
     content = models.TextField(blank=True)
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
     location = models.GeometryField(srid=4326, null=True)
+    owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return '{name} ({category})'.format(
