@@ -96,7 +96,7 @@ def login_page(request):
         if request.user.is_authenticated():
             return HttpResponseRedirect('/')
 
-        return render(request, 'app/login.html')
+    return render(request, 'app/login.html')
 
 
 @login_required
