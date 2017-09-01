@@ -6,18 +6,18 @@ from django.contrib.auth.base_user import (
 
 class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=200, blank=True)
     location = models.GeometryField(srid=4326, null=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
-    station = models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
+    station = models.ManyToManyField('Station')
 
     def __str__(self):
         return self.name
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, nickname=""):
         """
         Create and save a User instance with the given email and password
         """
@@ -26,6 +26,8 @@ class UserManager(BaseUserManager):
 
         user = self.model(
             email=self.normalize_email(email),
+            nickname=nickname,
+            role=Role.objects.get(name='User'),
         )
 
         user.set_password(password)
@@ -59,7 +61,7 @@ class User(AbstractBaseUser):
 
     def can(self, permissions):
         return (self.role is not None and
-            (self.role.permissions & permissions) == permissions)
+                (self.role.permissions & permissions) == permissions)
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
@@ -118,7 +120,7 @@ class UserGroup(models.Model):
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(null=True)
+    image = models.ImageField(null=True, upload_to='app/images/reward/')
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -182,7 +184,7 @@ class Question(models.Model):
         'Choice',
         through='QuestionChoice',
     )
-    linked_beacon = models.ForeignKey('Beacon', null=True, on_delete=models.SET_NULL)
+    linked_station= models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
 
     def __repr__(self):
         return str(self.id)
@@ -190,6 +192,7 @@ class Question(models.Model):
 
 class Choice(models.Model):
     content = models.CharField(max_length=50)
+
     def __str__(self):
         return self.content
 
@@ -201,9 +204,11 @@ class QuestionChoice(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=254)
+    name = models.CharField(max_length=254, unique=True)
     content = models.TextField(blank=True)
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
+    location = models.GeometryField(srid=4326, null=True)
+    owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return '{name} ({category})'.format(
@@ -222,7 +227,7 @@ class StationCategory(models.Model):
 
 class StationImage(models.Model):
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='app/images/station/')
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):

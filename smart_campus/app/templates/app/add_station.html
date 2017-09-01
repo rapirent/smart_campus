@@ -1,0 +1,119 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/add_station.css" %}" />
+{% endblock %}
+
+{% block content %}
+<div class="container content">
+  {% if form.errors %}
+    <p class='text-danger'>請檢查所有欄位!!</p>
+  {% endif %}
+  <form action="" method="POST" enctype="multipart/form-data">            
+    {% csrf_token %}
+    <div class="row">
+      <div class="col-md-4">
+        <label class="control-label col" for="name">名稱</label>  
+        <div class="col">
+          <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{form.cleaned_data.name}}" required="">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="control-label col-md-12" for="select_category">類別</label> 
+        <select id="select_category" name="category" class="custom-select" value="{{form.cleaned_data.category}}" required="">
+          <option value selected>請選擇類別...</option>
+          {% if categories %}
+            {% for category in categories %}
+              <option value="{{category.name}}">{{category.name}}</option>
+            {% endfor %}
+          {% endif %}
+        </select>
+      </div>
+    </div>
+    <br>
+    <!-- Textarea -->
+    <div class="row">
+      <div class="col-md-6">
+        <label class="col control-label" for="content">推播內容</label>
+        <div class="col">                     
+          <textarea class="form-control" id="content" name="content" value="{{form.cleaned_data.content}}"></textarea>
+        </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-4" id="img_upload">
+        <label class="col-md-4 control-label">圖片上傳</label>
+        <div class="col-md-4">
+          Photo 1:
+          <input id="img1" name="img1" class="form-control-file" type="file" accept="image/*">
+        </div>
+      </div>
+      <div class="col">
+        <br>
+        <button type="button" id="btn_addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-8" id='radios-img-select'> 
+        <label class="col-md-3 control-label" >選擇主要照片</label>
+        <label class="radio-inline" for="radios-1">
+          <input type="radio" name="radios" id="radios-1" value="1" checked="checked">
+          1
+        </label>  
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-5">
+        <div class="col-md-12">
+          <label class="control-label col" for="selectbasic">Beacon選擇(請在地圖點選)</label> 
+          <select id="selectbasic" name="beacon" class="custom-select" required="">
+            <option value selected>請在地圖點選...</option>
+            {% if beacons %}
+              {% for beacon in beacons %}
+                <option value="{{beacon.name}}">{{beacon.name}}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+          <br><br><br><br><br><br><br>
+          <label class="control-label col" for="">站點位置(預設為Beacon位置)</label> 
+          緯度:
+          <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" required="">
+          經度:
+          <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" required="">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <label class="control-label col-md-12" for="map">Beacon位置一覽</label>
+        <div id="map" style="height:400px;width:600px"></div>
+      </div>
+    </div>
+    <br>
+    <div class='row'>
+      <button type="submit" class="btn btn-primary btn-success btn-block">SUBMIT</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block script %}
+  {{block.super}}
+  <script>
+  var location_arr = [];
+
+  {% if beacons %}
+    {% for beacon in beacons %}
+      location_arr.push(['{{beacon.name}}', {{beacon.location.y}}, {{beacon.location.x}}])
+    {% endfor %}
+  {% endif %}
+  </script>
+  <script type="text/javascript" src="{% static 'app/js/add_station.js' %}"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+{% endblock %}
