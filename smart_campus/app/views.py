@@ -38,9 +38,9 @@ def signup(request):
 @csrf_exempt
 @require_POST
 def login(request):
-    """Sign in API for APP users
+    """Login API for APP users
 
-    Handle signin requests from app
+    Handle login requests from app
 
     """
     email = request.POST.get('email')
@@ -63,9 +63,9 @@ def login(request):
 @csrf_exempt
 @require_POST
 def logout(request):
-    """Sign out API for APP users
+    """Logout API for APP users
 
-    Handle signout requests from app
+    Handle logout requests from app
 
     """
     auth.logout(request)
@@ -79,21 +79,24 @@ def login_page(request):
     Render Login page and handle login requests for the Management backend
 
     """
-    if request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = auth.authenticate(request, username=email, password=password)
 
-    email = request.POST.get('email')
-    password = request.POST.get('password')
-    user = auth.authenticate(request, username=email, password=password)
-
-    if not user:
-        if request.method == 'POST':        
+        if not user:
             messages.warning(request, 'Login failed!')
-        return render(request, 'app/login.html')
+            return HttpResponseRedirect('/login/')
 
-    if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
-        auth.login(request, user)
-        return HttpResponseRedirect('/')
+        if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
+            auth.login(request, user)
+            return HttpResponseRedirect('/')
+
+    else:
+        if request.user.is_authenticated():
+            return HttpResponseRedirect('/')
+
+        return render(request, 'app/login.html')
 
 
 @login_required
@@ -138,7 +141,7 @@ def get_all_stations(request):
             'name': station.name,
             'content': station.content,
             'category': str(station.category),
-            'location': station.location,
+            'location': station.location.get_coords(),
             'image': [{'image_url': img.image.url, 'primary': img.is_primary}
                       for img in station.stationimage_set.all()]
         }
