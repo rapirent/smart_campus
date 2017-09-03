@@ -120,7 +120,7 @@ class UserGroup(models.Model):
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(null=True, upload_to='app/images/reward/')
+    image = models.ImageField(null=True, upload_to='media/images/reward/')
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -227,7 +227,7 @@ class StationCategory(models.Model):
 
 class StationImage(models.Model):
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='app/images/station/')
+    image = models.ImageField(upload_to='media/images/station/')
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):

@@ -3,13 +3,19 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib import auth
 from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.contrib.gis.geos import Point
 
 from .models import (
     User, Reward, Permission,
-    Station, StationCategory
+    Station, StationCategory,
+    Beacon, StationImage,
 )
+from .forms import StationForm
+
+import os
 
 
 @csrf_exempt
@@ -113,14 +119,145 @@ def index(request):
 
 @login_required
 def station_list_page(request):
-    context = {'email': request.user.email}
+    """Show all stations managed by the user's group"""
+    if request.user.can(Permission.ADMIN):
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    station_data = [
+        {
+            'id': station.id,
+            'name': station.name,
+            'image_url': (
+                '' if not station.stationimage_set.exists()
+                else
+                '/{0}'.format(station.stationimage_set.get(is_primary=True).image.url)
+            )
+        }
+        for station in stations
+    ]
+
+    context = {'email': request.user.email, 'stations': station_data}
+
     return render(request, 'app/station_list.html', context)
 
 
 @login_required
-def add_station_page(request):
-    context = {'email': request.user.email, 'categories': StationCategory.objects.all()}
-    return render(request, 'app/add_station.html', context)
+def station_edit_page(request, pk):
+    station = get_object_or_404(Station, pk=pk)
+    if request.method == 'POST':
+        # Use custom StationForm to validate form datas
+        # is_valid() will be true if received data is good
+        # There'll be error messages in 'form' instance if validation failed
+        # cleaned_data will be the form inputs from the request
+        form = StationForm(request.POST, request.FILES, instance=station)
+        if form.is_valid():
+            data = form.cleaned_data
+            station = form.save(commit=False)
+            station.location = Point(x=data['lng'], y=data['lat'])
+
+            # Clear linked Beacons
+            station.beacon_set.clear()
+            station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
+
+            # Handle change of images
+            if request.POST.get('img_changed') == 'true':
+                # Clear old images
+                for img in StationImage.objects.filter(station=station):
+                    # Clear files on the disk
+                    # Delete model instance won't delete them
+                    if os.path.isfile(img.image.path):
+                        os.remove(img.image.path)
+                    img.delete()
+
+                # Add new images (Max: 4 imgs)
+                for i in range(1, 5):
+                    if data['img{0}'.format(i)]:
+                        StationImage.objects.create(
+                            station=station,
+                            image=data['img{0}'.format(i)],
+                            is_primary=True if i == data['main_img_num'] else False
+                        )
+            station.save()
+
+            return HttpResponseRedirect('/stations/')
+
+        # if the datas failed in validation
+        # save the inputs back for redirection
+        form_data = form.cleaned_data
+    else:
+        form = StationForm()
+
+        # Load datas from the model instance
+        form_data = {
+            'name': station.name,
+            'category': station.category,
+            'content': station.content,
+            'beacon': station.beacon_set.first().name,
+            'lng': station.location.x,
+            'lat': station.location.y
+        }
+
+    if request.user.can(Permission.ADMIN):
+        beacon_set = Beacon.objects.all()
+    else:
+        beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'beacons': beacon_set,
+        'form': form,
+        'form_data': form_data,
+    }
+    return render(request, 'app/station_edit.html', context)
+
+
+@login_required
+def station_new_page(request):
+    if request.method == 'POST':
+        # Use custom StationForm to validate form datas
+        # is_valid() will be true if received data is good
+        # There'll be error messages in 'form' instance if validation failed
+        # cleaned_data will be the form inputs from the request
+        form = StationForm(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            station = form.save(commit=False)
+            station.location = Point(x=data['lng'], y=data['lat'])
+            station.owner_group = request.user.group
+            station.save()
+            # save first
+            # need an instance to add beacons
+            station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
+            station.save()
+
+            # Add images (Max: 4 imgs)
+            # data['imgx'] will be None if not uploaded
+            for img_num in range(1, 5):
+                if data['img{0}'.format(img_num)]:
+                    StationImage.objects.create(
+                        station=station,
+                        image=data['img{0}'.format(img_num)],
+                        is_primary=True if img_num == data['main_img_num'] else False
+                    )
+            return HttpResponseRedirect('/stations/')
+    else:
+        form = StationForm()
+
+    if request.user.can(Permission.ADMIN):
+        beacon_set = Beacon.objects.all()
+    else:
+        beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'beacons': beacon_set,
+        'form': form,
+    }
+    return render(request, 'app/station_new.html', context)
 
 
 @csrf_exempt
@@ -142,10 +279,10 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
-            'image': [{'image_url': img.image.url, 'primary': img.is_primary}
+            'image': [{'image_url': 'http://{0}/{1}'.format(request.get_host(), img.image.url), 'primary': img.is_primary}
                       for img in station.stationimage_set.all()]
         }
         for station in Station.objects.all()
     ]
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')

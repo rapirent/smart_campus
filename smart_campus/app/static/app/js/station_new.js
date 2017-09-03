@@ -5,7 +5,7 @@ function initMap() {
     center: {lat: 22.997496, lng: 120.216508},
     zoom: 14
   });
-  //Add marker of beacons
+  // Add marker of beacons
   for(var i=0; i < location_arr.length ;i++){
     addMarker(location_arr[i][0], location_arr[i][1], location_arr[i][2]);
   }
@@ -28,23 +28,25 @@ function addMarker(title, lat, lng) {
 }
 
 var imgcnt=1;
-
+// Add new file upload field and eadio button 
 $("#btn_addimage").click(function(){
   imgcnt++;
   if(imgcnt<=4)
   {
+    // File Upload
     var imgupload_div = document.getElementById("img_upload");
     var newcontent = document.createElement('div');
 
-    newcontent.innerHTML = "<div class='col-md-4'>Photo "+imgcnt+":<input id=img"+imgcnt+" name=img"+imgcnt+" class='form-control-file' type=file accept=image/*></div>";
+    newcontent.innerHTML = "<div class='col-md-4'>Img "+imgcnt+":<input id=img"+imgcnt+" name=img"+imgcnt+" class='form-control-file' type=file accept=image/*></div>";
 
     while (newcontent.firstChild) {
         imgupload_div.appendChild(newcontent.firstChild);
     }
 
+    // Radio button
     var img_sel_div = document.getElementById("radios-img-select");
     var newcontent = document.createElement('div');
-    newcontent.innerHTML = "<label class=radio-inline for=radios-"+imgcnt+"><input type=radio name=radios id=radios-"+imgcnt+" value="+imgcnt+"> "+imgcnt+" </label>";
+    newcontent.innerHTML = "<label class=radio-inline for=radios-"+imgcnt+"><input type=radio name=main_img_num id=radios-"+imgcnt+" value="+imgcnt+"> "+imgcnt+" </label>";
     while (newcontent.firstChild) {
         img_sel_div.appendChild(newcontent.firstChild);
     }
