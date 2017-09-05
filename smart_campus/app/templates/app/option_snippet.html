@@ -1,6 +1,0 @@
-<!-- Template Snippet loading options -->
-{% if datas %}
-  {% for data in datas %}
-    <option value="{{data.name}}" {% if form_data|stringformat:"s" == data.name|stringformat:"s" %}selected{% endif %} >{{data.name}}</option>
-  {% endfor %}
-{% endif %}

@@ -26,7 +26,7 @@
       {% for station in stations %}
         <div class="col-lg-3">
           <p>
-            <a href="{% url 'Edit Station Page' station.id %}" class="btn btn-sq-lg btn-outline-primary" style="background: url('{{ station.image_url }}'); background-size: 120px auto; background-position: 50% 66%;background-repeat: no-repeat;">
+            <a href="{% url 'Edit Station Page' station.id %}" class="btn btn-sq-lg btn-primary" style="background: url('{{ station.image_url }}'); background-size: auto 125px; background-position: 50% 66%;background-repeat: no-repeat;">
               <label class="text-dark station-block">{{ station.name }}</label>
             </a>        
           </p>

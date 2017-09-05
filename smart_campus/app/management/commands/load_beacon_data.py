@@ -15,14 +15,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             data = pd.read_excel(options['path'][0])
-            for i in range(0, len(data)):
+            for index, datum in data.iterrows():
                 Beacon.objects.update_or_create(
-                    beacon_id=data['Beacon ID'][i],
+                    beacon_id=datum['Beacon ID'],
                     defaults={
-                        'name': data['idname'][i],
-                        'description': data['description'][i],
-                        'location': Point(y=float(data['Latitude'][i]), x=float(data['Longitude'][i])),
-                        'owner_group': UserGroup.objects.filter(name=data['OwnerGroup'][i]).first()
+                        'name': datum['idname'],
+                        'description': datum['description'],
+                        'location': Point(y=float(datum['Latitude']), x=float(datum['Longitude'])),
+                        'owner_group': UserGroup.objects.filter(name=datum['OwnerGroup']).first()
                     }
                 )
         except FileNotFoundError as e:

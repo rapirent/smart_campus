@@ -22,7 +22,7 @@
       <div class="col-md-4">
         <label class="control-label col" for="name">名稱</label>  
         <div class="col">
-          <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{form_data.name}}" required="">
+          <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{ form_data.name }}" required="">
         </div>
       </div>
 
@@ -32,9 +32,16 @@
         <select id="select_category" name="category" class="custom-select" required="">
           <option value>請選擇類別...</option>
           <!-- Template Snippet loading options -->
-          {% include "app/option_snippet.html" with datas=categories form_data=form_data.category %}
+          {% include "app/_option_snippet.html" with datas=categories form_data=form_data.category %}
         </select>
       </div>
+
+      <!-- Delete Station -->
+      <div class="col-md-4">
+        <button type="submit" class="btn btn-danger col-md-4" id="btn_delete" formnovalidate>刪除站點</button>
+        <input type="text" name="delete_confirmed" id="delete_confirmed" value='false' hidden>
+      </div>
+
     </div>
     <br>
 
@@ -43,17 +50,17 @@
       <div class="col-md-6">
         <label class="col control-label" for="content">推播內容</label>
         <div class="col">                     
-          <textarea class="form-control" id="content" name="content">{{form_data.content}}</textarea>
+          <textarea class="form-control" id="content" name="content">{{ form_data.content }}</textarea>
         </div>
       </div>
     </div>
     <br>
 
     <!-- Button : Change Image -->
-    <div class="row" id="img_change">     
+    <div class="row">     
       <div class="col-md-6">
         <label class="col control-label">更改圖片</label>
-        <button type="button" class="btn btn-danger col-md-6">更改上傳圖片</button>
+        <button type="button" class="btn btn-danger col-md-6" id="img_change">更改上傳圖片</button>
         <input type="text" name="img_changed" id="img_changed" value='false' hidden>
       </div>
     </div>
@@ -96,16 +103,16 @@
           <select id="selectbasic" name="beacon" class="custom-select" required="">
             <option value>請在地圖點選...</option>
             <!-- Template Snippet loading options -->
-            {% include "app/option_snippet.html" with datas=beacons form_data=form_data.beacon %}
+            {% include "app/_option_snippet.html" with datas=beacons form_data=form_data.beacon %}
           </select>
           <br><br><br><br><br><br><br>
 
           <!-- Station Location -->
           <label class="control-label col" for="">站點位置(預設為Beacon位置)</label> 
           緯度:
-          <input id="lat_input" name="lat" type="text" placeholder="緯度" class="form-control input-md" required="" value="{{form_data.lat}}">
+          <input id="lat_input" name="lat" type="text" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat }}">
           經度:
-          <input id="lng_input" name="lng" type="text" placeholder="經度" class="form-control input-md" required="" value="{{form_data.lng|stringformat:'f'}}">
+          <input id="lng_input" name="lng" type="text" placeholder="經度" class="form-control input-md" required="" value="{{ form_data.lng|stringformat:'f' }}">
         </div>
       </div>
 
@@ -125,7 +132,7 @@
 {% endblock %}
 
 {% block script %}
-  {{block.super}}
+  {{ block.super }}
   <script>
   $("#img_change").click(function(){
     if( $("#img_changed").val() == 'false'){
@@ -137,6 +144,13 @@
       }    
     }
   });
+
+  $("#btn_delete").click(function(){
+    var check = confirm("確認要刪除站點？");
+    if(check == true){
+      $("#delete_confirmed").val("true");
+    }
+  })
   
   /*Get location(lat, lng) of beacons, 
     In order to show them on the Map*/
@@ -144,7 +158,7 @@
   
   {% if beacons %}
     {% for beacon in beacons %}
-      location_arr.push(['{{beacon.name}}', {{beacon.location.y}}, {{beacon.location.x}}])
+      location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
     {% endfor %}
   {% endif %}
   var MAX_IMGS = {{ max_imgs }};

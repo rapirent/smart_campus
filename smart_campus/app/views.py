@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import os
 
@@ -143,7 +144,17 @@ def station_list_page(request):
 @login_required
 def station_edit_page(request, pk):
     station = get_object_or_404(Station, pk=pk)
+
+    if (not station.owner_group == request.user.group and
+            not request.user.is_administrator()):
+        return HttpResponseForbidden()
+
     if request.method == 'POST':
+        # Delete Station request
+        if request.POST.get('delete_confirmed') == 'true':
+            station.delete()
+            return HttpResponseRedirect('/stations/')
+
         # Use custom StationForm to validate form datas
         # is_valid() will be true if received data is good
         # There'll be error messages in 'form' instance if validation failed
@@ -170,13 +181,13 @@ def station_edit_page(request, pk):
                     img.delete()
 
                 # Add new images
-                for img_num in range(1, settings.MAX_IMGS_UPLOAD + 1):
-                    img_name = 'img{0}'.format(img_num)
-                    if data[img_name]:
+                for key, value in data.items():
+                    if isinstance(value, InMemoryUploadedFile):
+                        is_primary = (key == 'img{0}'.format(data['main_img_num']))
                         StationImage.objects.create(
                             station=station,
-                            image=data[img_name],
-                            is_primary=True if img_num == data['main_img_num'] else False
+                            image=value,
+                            is_primary=is_primary
                         )
 
             return HttpResponseRedirect('/stations/')
@@ -233,17 +244,17 @@ def station_new_page(request):
             # need an instance to add beacons
             station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
             station.save()
-
+ 
             # Add images
-            # data['imgx'] will be None if not uploaded
-            for img_num in range(1, settings.MAX_IMGS_UPLOAD + 1):
-                img_name = 'img{0}'.format(img_num)
-                if data[img_name]:
+            for key, value in data.items():
+                if isinstance(value, InMemoryUploadedFile):
+                    is_primary = (key == 'img{0}'.format(data['main_img_num']))
                     StationImage.objects.create(
                         station=station,
-                        image=data[img_name],
-                        is_primary=True if img_num == data['main_img_num'] else False
+                        image=value,
+                        is_primary=is_primary
                     )
+
             return HttpResponseRedirect('/stations/')
     else:
         form = StationForm()
@@ -253,7 +264,7 @@ def station_new_page(request):
     elif request.user.can(Permission.EDIT):
         beacon_set = Beacon.objects.filter(owner_group=request.user.group)
     else:
-        return HttpResponseForbidden() 
+        return HttpResponseForbidden()
 
     context = {
         'email': request.user.email,
