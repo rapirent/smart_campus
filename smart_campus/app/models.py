@@ -209,6 +209,7 @@ class Station(models.Model):
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
     location = models.GeometryField(srid=4326, null=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
+    primary_image_url = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return '{name} ({category})'.format(
@@ -232,6 +233,14 @@ class StationImage(models.Model):
 
     def __repr__(self):
         return 'Image {img_id}'.format(img_id=self.id)
+
+    def save(self, *args, **kwargs):
+        super(StationImage, self).save(*args, **kwargs)
+
+        # auto save the url of the primary image to the station
+        if self.is_primary == True:
+            self.station.primary_image_url = '/{0}'.format(self.image.url)
+            self.station.save()
 
 
 class TravelPlan(models.Model):

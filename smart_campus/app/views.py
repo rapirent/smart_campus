@@ -2,11 +2,14 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib import auth
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.gis.geos import Point
+from django.conf import settings
+
+import os
 
 from .models import (
     User, Reward, Permission,
@@ -14,8 +17,6 @@ from .models import (
     Beacon, StationImage,
 )
 from .forms import StationForm
-
-import os
 
 
 @csrf_exempt
@@ -61,7 +62,7 @@ def login(request):
             'reward': [reward.id for reward in user.received_rewards.all()],
             'favorite_stations': [station.id for station in user.favorite_stations.all()],
         }
-        return JsonResponse({'status': 'true', 'message': 'Success', 'data': user_data})
+        return JsonResponse({'status': 'true', 'message': 'Success', 'data': user_data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
     return JsonResponse({'status': 'false', 'message': 'Login failed'})
 
@@ -129,11 +130,7 @@ def station_list_page(request):
         {
             'id': station.id,
             'name': station.name,
-            'image_url': (
-                '' if not station.stationimage_set.exists()
-                else
-                '/{0}'.format(station.stationimage_set.get(is_primary=True).image.url)
-            )
+            'image_url': station.primary_image_url,
         }
         for station in stations
     ]
@@ -160,6 +157,7 @@ def station_edit_page(request, pk):
             # Clear linked Beacons
             station.beacon_set.clear()
             station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
+            station.save()
 
             # Handle change of images
             if request.POST.get('img_changed') == 'true':
@@ -171,15 +169,15 @@ def station_edit_page(request, pk):
                         os.remove(img.image.path)
                     img.delete()
 
-                # Add new images (Max: 4 imgs)
-                for i in range(1, 5):
-                    if data['img{0}'.format(i)]:
+                # Add new images
+                for img_num in range(1, settings.MAX_IMGS_UPLOAD + 1):
+                    img_name = 'img{0}'.format(img_num)
+                    if data[img_name]:
                         StationImage.objects.create(
                             station=station,
-                            image=data['img{0}'.format(i)],
-                            is_primary=True if i == data['main_img_num'] else False
+                            image=data[img_name],
+                            is_primary=True if img_num == data['main_img_num'] else False
                         )
-            station.save()
 
             return HttpResponseRedirect('/stations/')
 
@@ -201,8 +199,10 @@ def station_edit_page(request, pk):
 
     if request.user.can(Permission.ADMIN):
         beacon_set = Beacon.objects.all()
-    else:
+    elif request.user.can(Permission.EDIT):
         beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+    else:
+        return HttpResponseForbidden()
 
     context = {
         'email': request.user.email,
@@ -210,6 +210,7 @@ def station_edit_page(request, pk):
         'beacons': beacon_set,
         'form': form,
         'form_data': form_data,
+        'max_imgs': settings.MAX_IMGS_UPLOAD,
     }
     return render(request, 'app/station_edit.html', context)
 
@@ -233,13 +234,14 @@ def station_new_page(request):
             station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
             station.save()
 
-            # Add images (Max: 4 imgs)
+            # Add images
             # data['imgx'] will be None if not uploaded
-            for img_num in range(1, 5):
-                if data['img{0}'.format(img_num)]:
+            for img_num in range(1, settings.MAX_IMGS_UPLOAD + 1):
+                img_name = 'img{0}'.format(img_num)
+                if data[img_name]:
                     StationImage.objects.create(
                         station=station,
-                        image=data['img{0}'.format(img_num)],
+                        image=data[img_name],
                         is_primary=True if img_num == data['main_img_num'] else False
                     )
             return HttpResponseRedirect('/stations/')
@@ -248,14 +250,17 @@ def station_new_page(request):
 
     if request.user.can(Permission.ADMIN):
         beacon_set = Beacon.objects.all()
-    else:
+    elif request.user.can(Permission.EDIT):
         beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+    else:
+        return HttpResponseForbidden() 
 
     context = {
         'email': request.user.email,
         'categories': StationCategory.objects.all(),
         'beacons': beacon_set,
         'form': form,
+        'max_imgs': settings.MAX_IMGS_UPLOAD,
     }
     return render(request, 'app/station_new.html', context)
 
@@ -263,10 +268,10 @@ def station_new_page(request):
 @csrf_exempt
 def get_all_rewards(request):
     """API for retrieving rewards list"""
-    data = [{'id': reward.id, 'name': reward.name, 'image_url': reward.image.url}
+    data = [{'id': reward.id, 'name': reward.name, 'image_url': 'http://{0}/{1}'.format(request.get_host(), reward.image.url)}
             for reward in Reward.objects.all()]
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
 
 @csrf_exempt

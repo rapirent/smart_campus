@@ -123,3 +123,8 @@ STATIC_URL = '/static/'
 AUTH_USER_MODEL = 'app.User'
 
 LOGIN_URL = '/login/'
+
+
+# Custom Settings
+
+MAX_IMGS_UPLOAD = 8

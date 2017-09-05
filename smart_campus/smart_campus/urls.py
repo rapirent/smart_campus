@@ -27,5 +27,5 @@ urlpatterns = [
     url(r'^$', app.views.index, name='index'),
     url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
     url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
-    url(r'^stations/(?P<pk>\d+)/$', app.views.station_edit_page, name='Edit Station Page'),
+    url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
 ]

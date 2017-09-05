@@ -2,11 +2,11 @@ var map;
 function initMap() {
   // Create a map object and specify the DOM element for display.
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 22.997496, lng: 120.216508},
-    zoom: 14
+    center: {lat: 22.998684, lng: 120.218724},
+    zoom: 16
   });
   // Add marker of beacons
-  for(var i=0; i < location_arr.length ;i++){
+  for(var i=0; i < location_arr.length; i++){
     addMarker(location_arr[i][0], location_arr[i][1], location_arr[i][2]);
   }
 }
@@ -30,9 +30,10 @@ function addMarker(title, lat, lng) {
 var imgcnt=1;
 // Add new file upload field and eadio button 
 $("#btn_addimage").click(function(){
-  imgcnt++;
-  if(imgcnt<=4)
+  
+  if(imgcnt <= MAX_IMGS)
   {
+    imgcnt++;
     // File Upload
     var imgupload_div = document.getElementById("img_upload");
     var newcontent = document.createElement('div');

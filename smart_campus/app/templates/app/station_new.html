@@ -34,11 +34,8 @@
         <label class="control-label col-md-12" for="select_category">類別</label> 
         <select id="select_category" name="category" class="custom-select" required="">
           <option value>請選擇類別...</option>
-          {% if categories %}
-            {% for category in categories %}
-              <option value="{{category.name}}" {% if form.cleaned_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{category.name}}</option>
-            {% endfor %}
-          {% endif %}
+          <!-- Template Snippet loading options -->
+          {% include "app/option_snippet.html" with datas=categories form_data=form.cleaned_data.category %}
         </select>
       </div>
     </div>
@@ -92,11 +89,8 @@
           <label class="control-label col" for="selectbasic">Beacon選擇(請在地圖點選)</label> 
           <select id="selectbasic" name="beacon" class="custom-select" required="">
             <option value>請在地圖點選...</option>
-            {% if beacons %}
-              {% for beacon in beacons %}
-                <option value="{{beacon.name}}" {% if form.cleaned_data.beacon|stringformat:"s" == beacon.name|stringformat:"s" %}selected{% endif %}>{{beacon.name}}</option>
-              {% endfor %}
-            {% endif %}
+            <!-- Template Snippet loading options -->
+            {% include "app/option_snippet.html" with datas=beacons form_data=form.cleaned_data.beacon %}
           </select>
           <br><br><br><br><br><br><br>
 
@@ -136,6 +130,8 @@
       location_arr.push(['{{beacon.name}}', {{beacon.location.y}}, {{beacon.location.x}}])
     {% endfor %}
   {% endif %}
+
+  var MAX_IMGS = {{ max_imgs }};
   </script>
   <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
