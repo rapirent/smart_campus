@@ -18,4 +18,4 @@ class StationForm(forms.ModelForm):
 
     class Meta:
         model = Station
-        fields = ('name', 'content', 'category')   
+        fields = ('name', 'content', 'category')
