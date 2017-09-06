@@ -238,7 +238,7 @@ class StationImage(models.Model):
         super(StationImage, self).save(*args, **kwargs)
 
         # auto save the url of the primary image to the station
-        if self.is_primary == True:
+        if self.is_primary is True:
             self.station.primary_image_url = '/{0}'.format(self.image.url)
             self.station.save()
 

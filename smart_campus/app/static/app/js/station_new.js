@@ -28,7 +28,7 @@ function addMarker(title, lat, lng) {
 }
 
 var imgcnt=1;
-// Add new file upload field and eadio button 
+// Add new file upload field and radio button 
 $("#btn_addimage").click(function(){
   
   if(imgcnt <= MAX_IMGS)

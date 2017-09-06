@@ -7,7 +7,7 @@ from app.models import Beacon, UserGroup
 
 
 class Command(BaseCommand):
-    help = 'Insert beacon datas from xls file'
+    help = 'Insert beacon data from xls file'
 
     def add_arguments(self, parser):
         parser.add_argument('path', nargs=1, type=str)
@@ -28,4 +28,4 @@ class Command(BaseCommand):
         except FileNotFoundError as e:
             raise CommandError(e)
 
-        self.stdout.write(self.style.SUCCESS('Successfully updated beacon datas'))
+        self.stdout.write(self.style.SUCCESS('Update beacon data succeeded.'))
