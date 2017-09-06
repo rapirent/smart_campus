@@ -15,7 +15,8 @@ import os
 from .models import (
     User, Reward, Permission,
     Station, StationCategory,
-    Beacon, StationImage,
+    Beacon, StationImage, Question,
+    UserReward
 )
 from .forms import StationForm
 
@@ -33,12 +34,12 @@ def signup(request):
     nickname = request.POST.get('nickname')
 
     if User.objects.filter(email=email).exists():
-        return JsonResponse({'status': 'false', 'message': 'User already exists!'})
+        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User already exists!'})
 
     try:
         User.objects.create_user(email, password, nickname)
     except ValueError as error:
-        return JsonResponse({'status': 'false', 'message': error})
+        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Email address not valid!'})
 
     return JsonResponse({'status': 'true', 'message': 'Success'})
 
@@ -60,7 +61,7 @@ def login(request):
             'nickname': user.nickname,
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
-            'reward': [reward.id for reward in user.received_rewards.all()],
+            'reward': [reward.id for reward in UserReward.objects.filter(user=user).order_by('timestamp')],
             'favorite_stations': [station.id for station in user.favorite_stations.all()],
         }
         return JsonResponse({'status': 'true', 'message': 'Success', 'data': user_data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
@@ -244,7 +245,7 @@ def station_new_page(request):
             # need an instance to add beacons
             station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
             station.save()
- 
+
             # Add images
             for key, value in data.items():
                 if isinstance(value, InMemoryUploadedFile):
@@ -295,10 +296,103 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
-            'image': [{'image_url': 'http://{0}/{1}'.format(request.get_host(), img.image.url), 'primary': img.is_primary}
-                      for img in station.stationimage_set.all()]
+            'image': {
+                'primary': 'http://{0}{1}'.format(request.get_host(), station.primary_image_url),
+                'others': ['http://{0}/{1}'.format(request.get_host(), img.image.url)
+                           for img in StationImage.objects.filter(station=station, is_primary=False)]
+            }
         }
         for station in Station.objects.all()
     ]
 
     return JsonResponse({'status': 'true', 'message': 'Success', 'data': data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+
+
+@csrf_exempt
+@require_POST
+def get_linked_stations(request):
+    """API for retrieving list of stations linked to the Beacon"""
+    beacon_id = request.POST.get('beacon_id')
+
+    stations = Station.objects.filter(beacon__beacon_id=beacon_id)
+    if not stations:
+        return JsonResponse({'status': 'false', 'message': 'No match', 'data': []})
+    else:
+        data = [station.id for station in stations]
+
+        return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+
+
+@csrf_exempt
+@require_POST
+def get_single_question(request):
+    """API requesting a single question"""
+    station_id = request.POST.get('station_id')
+    email = request.POST.get('email')
+
+    station = Station.objects.filter(id=station_id).first()
+    user = User.objects.filter(email=email).first()
+
+    if user is None or station is None:
+        return JsonResponse({'status': 'false', 'code': 1, 'message': 'station or user not exist'})
+
+    questions = Question.objects.filter(linked_station=station)
+    user_answered_questions = Question.objects.filter(user=user)
+
+    # Get a question that the user hasn't answered yet
+    question = questions.difference(user_answered_questions).first()
+
+    if question is not None:
+        ans = question.choices.filter(questionchoice__is_answer=True).first()
+        data = {
+            'content': question.content,
+            'type': question.question_type,
+            'choices': [choice.content for choice in question.choices.all()],
+            'answer': ans.content
+        }
+        # Add to answered questions
+        user.answered_questions.add(question)
+
+        return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+
+    return JsonResponse({'status': 'false', 'code': 2, 'message': 'no more questions available'})
+
+
+@csrf_exempt
+@require_POST
+def update_user_coins(request):
+    coins = request.POST.get('coins')
+    email = request.POST.get('email')
+
+    user = User.objects.filter(email=email).first()
+
+    if user is None or coins is None:
+        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User not exist or no coins data'})
+
+    try:
+        user.earned_coins = coins
+        user.save()
+    except ValueError:
+        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Invalid input of coins'})
+
+    return JsonResponse({'status': 'true', 'message': 'Success', 'data': {'coins': user.earned_coins}})
+
+
+@csrf_exempt
+@require_POST
+def update_user_experience(request):
+    experience = request.POST.get('experience_point')
+    email = request.POST.get('email')
+
+    user = User.objects.filter(email=email).first()
+
+    if user is None or experience is None:
+        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User not exist or no experience_point data'})
+
+    try:
+        user.experience_point = experience
+        user.save()
+    except ValueError:
+        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Invalid input of experience point'})
+
+    return JsonResponse({'status': 'true', 'message': 'Success', 'data': {'experience_point': user.experience_point}})
