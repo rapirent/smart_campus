@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^login/$', app.views.login_page, name='Login Page'),
     url(r'^logout/$', app.views.logout_page, name='Logout Page'),
     url(r'^$', app.views.index, name='index'),
-    url(r'^station_list/$', app.views.station_list_page, name='Station List Page'),
-    url(r'^add_station/$', app.views.add_station_page, name='Add Station Page'),
+    url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
+    url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
+    url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
 ]

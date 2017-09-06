@@ -120,7 +120,7 @@ class UserGroup(models.Model):
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(null=True, upload_to='app/images/reward/')
+    image = models.ImageField(null=True, upload_to='media/images/reward/')
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -209,6 +209,7 @@ class Station(models.Model):
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
     location = models.GeometryField(srid=4326, null=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
+    primary_image_url = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return '{name} ({category})'.format(
@@ -227,11 +228,19 @@ class StationCategory(models.Model):
 
 class StationImage(models.Model):
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='app/images/station/')
+    image = models.ImageField(upload_to='media/images/station/')
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):
         return 'Image {img_id}'.format(img_id=self.id)
+
+    def save(self, *args, **kwargs):
+        super(StationImage, self).save(*args, **kwargs)
+
+        # auto save the url of the primary image to the station
+        if self.is_primary is True:
+            self.station.primary_image_url = '/{0}'.format(self.image.url)
+            self.station.save()
 
 
 class TravelPlan(models.Model):
