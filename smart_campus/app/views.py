@@ -2,7 +2,12 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib import auth
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponseForbidden
+from django.http import (
+    HttpResponseRedirect,
+    JsonResponse,
+    HttpResponseForbidden,
+    HTTPResponse
+)
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -396,3 +401,34 @@ def update_user_experience(request):
         return JsonResponse({'status': 'false', 'code': 2, 'message': 'Invalid input of experience point'})
 
     return JsonResponse({'status': 'true', 'message': 'Success', 'data': {'experience_point': user.experience_point}})
+
+
+@csrf_exempt
+@require_POST
+def update_user_reward(request):
+    # POST a reward id and update the user data
+    email = request.POST.get('email')
+    reward_id = request.POST.get('reward_id')
+
+    user = User.objects.filter(email=email).first()
+    reward = Reward.objects.filter(id=reward_id)
+
+    if not user or not reward:
+        return HTTPResponse('User or reward is not exitst', status=404)
+    try:
+        user.add(reward)
+        user.save()
+    except ValueError:
+        return HTTPResponse('Invalid input of reward id', status=400)
+
+    return JsonResponse({
+            'status': 'true',
+            'message': 'Success',
+            'data': {
+                reward: [reward.id for reward
+                        in UserReward.objects.filter(user=user)]
+            }
+        },
+        status=200
+    )
+
