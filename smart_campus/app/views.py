@@ -6,7 +6,7 @@ from django.http import (
     HttpResponseRedirect,
     JsonResponse,
     HttpResponseForbidden,
-    HTTPResponse
+    HttpResponse
 )
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
@@ -423,12 +423,12 @@ def update_user_reward(request):
     reward = Reward.objects.filter(id=reward_id)
 
     if not user or not reward:
-        return HTTPResponse('User or reward is not exitst', status=404)
+        return HttpResponse('User or reward is not exitst', status=404)
     try:
         user.add(reward)
         user.save()
     except ValueError:
-        return HTTPResponse('Invalid input of reward id', status=400)
+        return HttpResponse('Invalid input of reward id', status=400)
 
     return JsonResponse({
             'status': 'true',
