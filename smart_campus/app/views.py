@@ -16,6 +16,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import os
+import random
 
 from .models import (
     User, Reward, Permission,
@@ -36,17 +37,20 @@ def signup(request):
     """
     email = request.POST.get('email')
     password = request.POST.get('password')
-    nickname = request.POST.get('nickname')
+    nickname = request.POST.get('nickname', '')
+
+    if not email or not password:
+        return HttpResponse('No email or password data', status=400)
 
     if User.objects.filter(email=email).exists():
-        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User already exists!'})
+        return HttpResponse('The email is already taken, try another!', status=400)
 
     try:
         User.objects.create_user(email, password, nickname)
     except ValueError as error:
-        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Email address not valid!'})
+        return HttpResponse('Email address not valid!', status=400)
 
-    return JsonResponse({'status': 'true', 'message': 'Success'})
+    return HttpResponse('Registration succeeded!', status=200)
 
 
 @csrf_exempt
@@ -69,9 +73,9 @@ def login(request):
             'reward': [reward.id for reward in UserReward.objects.filter(user=user).order_by('timestamp')],
             'favorite_stations': [station.id for station in user.favorite_stations.all()],
         }
-        return JsonResponse({'status': 'true', 'message': 'Success', 'data': user_data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+        return JsonResponse(data={'message': 'Login success', 'data': user_data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
-    return JsonResponse({'status': 'false', 'message': 'Login failed'})
+    return HttpResponse('Login failure', status=401)
 
 
 @csrf_exempt
@@ -82,8 +86,11 @@ def logout(request):
     Handle logout requests from app
 
     """
+    email = request.POST.get('email')
+    request.user = User.objects.get(email=email)
+
     auth.logout(request)
-    return JsonResponse({'status': 'true', 'message': 'Success'})
+    return HttpResponse('Logout success', status=200)
 
 
 @csrf_exempt
@@ -288,7 +295,7 @@ def get_all_rewards(request):
     data = [{'id': reward.id, 'name': reward.name, 'image_url': 'http://{0}/{1}'.format(request.get_host(), reward.image.url)}
             for reward in Reward.objects.all()]
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
 
 @csrf_exempt
@@ -310,7 +317,7 @@ def get_all_stations(request):
         for station in Station.objects.all()
     ]
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': data}, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
 
 @csrf_exempt
@@ -321,16 +328,16 @@ def get_linked_stations(request):
 
     stations = Station.objects.filter(beacon__beacon_id=beacon_id)
     if not stations:
-        return JsonResponse({'status': 'false', 'message': 'No match', 'data': []})
+        return HttpResponse('No match stations', status=404)
     else:
         data = [station.id for station in stations]
 
-        return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+        return JsonResponse(data={'data': data}, status=200)
 
 
 @csrf_exempt
 @require_POST
-def get_single_question(request):
+def get_unanswered_question(request):
     """API requesting a single question"""
     station_id = request.POST.get('station_id')
     email = request.POST.get('email')
@@ -338,16 +345,18 @@ def get_single_question(request):
     station = Station.objects.filter(id=station_id).first()
     user = User.objects.filter(email=email).first()
 
-    if user is None or station is None:
-        return JsonResponse({'status': 'false', 'code': 1, 'message': 'station or user not exist'})
+    if not user or not station:
+        return HttpResponse('station or user not exist', status=400)
 
     questions = Question.objects.filter(linked_station=station)
     user_answered_questions = Question.objects.filter(user=user)
 
-    # Get a question that the user hasn't answered yet
-    question = questions.difference(user_answered_questions).first()
+    # Get questions that the user hasn't answered yet
+    questions_not_answered = questions.difference(user_answered_questions)
 
-    if question is not None:
+    if questions_not_answered.exists():
+        # pick 1 question randomly
+        question = random.sample(list(questions_not_answered), 1)[0]
         ans = question.choices.filter(questionchoice__is_answer=True).first()
         data = {
             'content': question.content,
@@ -358,9 +367,9 @@ def get_single_question(request):
         # Add to answered questions
         user.answered_questions.add(question)
 
-        return JsonResponse({'status': 'true', 'message': 'Success', 'data': data})
+        return JsonResponse(data=data, status=200)
 
-    return JsonResponse({'status': 'false', 'code': 2, 'message': 'no more questions available'})
+    return HttpResponse('No more questions available to the user', status=404)
 
 
 @csrf_exempt
@@ -371,36 +380,36 @@ def update_user_coins(request):
 
     user = User.objects.filter(email=email).first()
 
-    if user is None or coins is None:
-        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User not exist or no coins data'})
+    if not user or not coins:
+        return HttpResponse('User not exist or no coins data', status=400)
 
     try:
         user.earned_coins = coins
         user.save()
     except ValueError:
-        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Invalid input of coins'})
+        return HttpResponse('Invalid input of coins', status=400)
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': {'coins': user.earned_coins}})
+    return JsonResponse(data={'message': 'Coins record of {0} successfully updated'.format(email), 'data': {'coins': user.earned_coins}}, status=200)
 
 
 @csrf_exempt
 @require_POST
-def update_user_experience(request):
-    experience = request.POST.get('experience_point')
+def update_user_experience_point(request):
+    experience_point = request.POST.get('experience_point')
     email = request.POST.get('email')
 
     user = User.objects.filter(email=email).first()
 
-    if user is None or experience is None:
-        return JsonResponse({'status': 'false', 'code': 1, 'message': 'User not exist or no experience_point data'})
+    if not user or not experience_point:
+        return HttpResponse('User not exist or no experience_point data', status=400)
 
     try:
-        user.experience_point = experience
+        user.experience_point = experience_point
         user.save()
     except ValueError:
-        return JsonResponse({'status': 'false', 'code': 2, 'message': 'Invalid input of experience point'})
+        return HttpResponse('Invalid input of experience point', status=400)
 
-    return JsonResponse({'status': 'true', 'message': 'Success', 'data': {'experience_point': user.experience_point}})
+    return JsonResponse(data={'message': 'Experience point record of {0} successfully updated'.format(email), 'data': {'experience_point': user.experience_point}}, status=200)
 
 
 @csrf_exempt
@@ -431,4 +440,3 @@ def update_user_reward(request):
         },
         status=200
     )
-
