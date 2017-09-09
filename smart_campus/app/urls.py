@@ -12,5 +12,7 @@ urlpatterns = [
     url('^get_linked_stations/$', views.get_linked_stations, name='Get linked station'),
     url('^get_unanswered_question/$', views.get_unanswered_question, name='Get question'),
     url('^update_user_coins/$', views.update_user_coins, name='Update user coins'),
-    url('^update_user_experience_point/$', views.update_user_experience_point, name='Update User Experience Point')
+    url('^update_user_experience_point/$', views.update_user_experience_point, name='Update User Experience Point'),
+    url('^update_user_favorite_stations/$', views.update_user_favorite_stations, name='Update User favorite stations'),
+    url('^get_all_travel_plans/$', views.get_all_travel_plans, name='Get all travel plans')
 ]

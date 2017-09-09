@@ -17,7 +17,7 @@ from .models import (
     User, Reward, Permission,
     Station, StationCategory,
     Beacon, StationImage, Question,
-    UserReward
+    UserReward, TravelPlan
 )
 from .forms import StationForm
 
@@ -408,3 +408,49 @@ def update_user_experience_point(request):
         return HttpResponse('Invalid input of experience point', status=400)
 
     return JsonResponse(data={'message': 'Experience point record of {0} successfully updated'.format(email), 'data': {'experience_point': user.experience_point}}, status=200)
+
+
+@csrf_exempt
+@require_POST
+def update_user_favorite_stations(request):
+    station_id = request.POST.get('station_id')
+    email = request.POST.get('email')
+    action = request.POST.get('action')
+
+    station = Station.objects.filter(id=station_id).first()
+    user = User.objects.filter(email=email).first()
+
+    if not user or not station:
+        return HttpResponse('station or user not exist', status=400)
+
+    if action == 'add':
+        user.favorite_stations.add(station)
+    elif action == 'remove':
+        user.favorite_stations.remove(station)
+    else:
+        return HttpResponse("Request data 'action' should be 'add'/'remove'", status=400)
+
+    user.save()
+
+    return JsonResponse(
+        data={
+                "message": "Favorite stations update succeed",
+                "stations": [station.id for station in user.favorite_stations.all()]
+        },
+        status=200
+    )
+
+
+@csrf_exempt
+def get_all_travel_plans(request):
+    data = [
+        {
+            'id': plan.id,
+            'name': plan.name,
+            'description': plan.description,
+            'station_sequence': [travelplanstation.station.id for travelplanstation in plan.travelplanstations_set.all().order_by('order')]
+        }
+        for plan in TravelPlan.objects.all()
+    ]
+
+    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
