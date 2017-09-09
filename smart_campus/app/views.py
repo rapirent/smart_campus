@@ -82,7 +82,10 @@ def logout(request):
 
     """
     email = request.POST.get('email')
-    request.user = User.objects.get(email=email)
+    request.user = User.objects.filter(email=email).first()
+
+    if not request.user:
+        return HttpResponse('User not exist', status=404)
 
     auth.logout(request)
     return HttpResponse('Logout success', status=200)
