@@ -26,40 +26,37 @@
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/list.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/message.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/icon.css" %}">
-
+    <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/dropdown.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/transition.css" %}">
 
   {% endblock %}
 </head>
 
 <body>
   {% block nav %}
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">管理後台</a>
-    <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'index' %}">Home <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'Station List Page' %}">站點管理</a>
-        </li>
-      </ul>
-      <ul class="navbar-nav right">
-        {% if email %}
-          <li class="nav-item ">
-            <a class="nav-link disabled" >{{ email }}</a>
-          </li>
-        {% endif %}
-        <li class="nav-item ">
-          <a class="nav-link" href="{% url 'Logout Page' %}">登出</a>
-        </li>
-      </ul>
+  <div class="ui top fixed menu">
+      <a class="header item">成大智慧校園管理平台</a>
+      <div class="ui dropdown item">
+        站點管理
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          {% if datas %}
+            {% for data in datas %}
+              <div class="item" href="{% url 'Edit Station Page' station.id %}">{{ data.name }}</div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+      <div class="right menu">
+        <div class="header item">
+          {% if email %}
+              {{ email }}
+          {% endif %}
+        </div>
+        <a class="item" href="{% url 'Logout Page' %}" >登出</a>
+        <a class="item" href="">Help</a>
+      </div>
     </div>
-  </nav>
   {% endblock %}
 
   {% block content %}{% endblock %}
@@ -76,6 +73,25 @@
     <script src="{% static "Semantic-UI/semantic.min.js" %}"></script>
     <script src="{% static "Semantic-UI/components/form.js" %}"></script>
     <script src="{% static "Semantic-UI/components/transition.js" %}"></script>
+    <script src="{% static "Semantic-UI/components/dropdown.js" %}"></script>
+    <script>
+          $(document)
+            .ready(function () {
+              $('.ui.menu .ui.dropdown').dropdown({
+                on: 'hover'
+              });
+              $('.ui.menu a.item')
+                .on('click', function () {
+                  $(this)
+                    .addClass('active')
+                    .siblings()
+                    .removeClass('active')
+                    ;
+                })
+                ;
+            })
+            ;
+    </script>
   {% endblock %}
 </body>
 </html>

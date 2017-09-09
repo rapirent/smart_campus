@@ -15,8 +15,13 @@ from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+
 import os
 import random
+import logging
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s: %(levelname)s : %(message)s', level=logging.INFO)
 
 from .models import (
     User, Reward, Permission,
@@ -100,6 +105,7 @@ def login_page(request):
     Render Login page and handle login requests for the Management backend
 
     """
+    logger.info('12345')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
@@ -107,16 +113,19 @@ def login_page(request):
 
         if not user:
             messages.warning(request, 'Login failed!')
-            return HttpResponseRedirect('/login/')
+            logger.info('Login failed')
+            return render(request, 'app/login.html')
 
         if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
             auth.login(request, user)
+            logger.info('fuck2')
             return HttpResponseRedirect('/')
 
     else:
         if request.user.is_authenticated():
+            logger.info('fuck')
             return HttpResponseRedirect('/')
-
+    logger.info('123123')
     return render(request, 'app/login.html')
 
 
@@ -128,7 +137,20 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    context = {'email': request.user.email}
+    if request.user.can(Permission.ADMIN):
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    station_data = [
+        {
+            'id': station.id,
+            'name': station.name,
+        }
+        for station in stations
+    ]
+
+    context = {'email': request.user.email, 'stations': stations_data}
     return render(request, 'app/index.html', context)
 
 
@@ -425,6 +447,7 @@ def update_user_reward(request):
     if not user or not reward:
         return HttpResponse('User or reward is not exitst', status=404)
     try:
+        # TODO
         user.add(reward)
         user.save()
     except ValueError:
