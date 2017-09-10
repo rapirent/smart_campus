@@ -105,27 +105,21 @@ def login_page(request):
     Render Login page and handle login requests for the Management backend
 
     """
-    logger.info('12345')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = auth.authenticate(request, username=email, password=password)
 
         if not user:
-            messages.warning(request, 'Login failed!')
-            logger.info('Login failed')
             return render(request, 'app/login.html')
 
         if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
             auth.login(request, user)
-            logger.info('fuck2')
             return HttpResponseRedirect('/')
 
     else:
         if request.user.is_authenticated():
-            logger.info('fuck')
             return HttpResponseRedirect('/')
-    logger.info('123123')
     return render(request, 'app/login.html')
 
 
