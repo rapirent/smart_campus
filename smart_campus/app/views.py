@@ -29,7 +29,7 @@ from .models import (
     Beacon, StationImage, Question,
     UserReward
 )
-from .forms import StationForm
+from .forms import StationForm, CategoryForm
 
 
 @csrf_exempt
@@ -131,20 +131,16 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
-    else:
-        stations = Station.objects.filter(owner_group=request.user.group)
+    categories = StationCategory.objects.all()
 
-    station_data = [
+    categories_data = [
         {
-            'id': station.id,
-            'name': station.name,
+            'name': category.name,
         }
-        for station in stations
+        for category in categories
     ]
 
-    context = {'email': request.user.email, 'stations': station_data}
+    context = {'email': request.user.email, 'categories': categories_data}
     return render(request, 'app/index.html', context)
 
 
@@ -156,6 +152,15 @@ def station_list_page(request):
     else:
         stations = Station.objects.filter(owner_group=request.user.group)
 
+    categories = StationCategory.objects.all()
+
+    categories_data = [
+        {
+            'name': category.name,
+        }
+        for category in categories
+    ]
+
     station_data = [
         {
             'id': station.id,
@@ -165,7 +170,11 @@ def station_list_page(request):
         for station in stations
     ]
 
-    context = {'email': request.user.email, 'stations': station_data}
+    context = {
+        'email': request.user.email,
+        'stations': station_data,
+        'categories': categories_data
+    }
 
     return render(request, 'app/station_list.html', context)
 
@@ -457,3 +466,52 @@ def update_user_reward(request):
         },
         status=200
     )
+
+
+@login_required
+def category_add_page(request):
+
+    if request.method == 'POST':
+        category_form = CategoryForm(request.POST)
+
+        if category_form.is_valid():
+            if request.user.can(Permission.ADMIN):
+                stations = Station.objects.all()
+            elif request.user.can(Permission.EDIT):
+                stations = Station.objects.filter(
+                    owner_group=request.user.group)
+            else:
+                return HttpResponseForbidden()
+
+            category_form.save()
+            context = {
+                'name': category_form.cleaned_data['name'],
+                'station_list': [{
+                        'id': station.id,
+                        'name': station.name,
+                        'image_url': station.primary_image_url
+                    }
+                    for station in stations
+                ]
+            }
+
+            # TODO
+            return HttpResponse('Success', status=200)
+            # return render(request, 'station_list.html', context)
+
+    else:
+        categories = StationCategory.objects.all()
+
+        categories_data = [
+            {
+                'name': category.name,
+            }
+            for category in categories
+        ]
+        context = {
+            'email': request.user.email,
+            'categories': categories_data
+        }
+
+        return render(request, 'app/category_add_page.html', context)
+

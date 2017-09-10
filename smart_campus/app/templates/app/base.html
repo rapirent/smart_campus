@@ -28,26 +28,31 @@
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/icon.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/dropdown.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/transition.css" %}">
-
+    <style type="text/css">
+      .container {
+        margin-top: 3em;
+      }
+    </style>
   {% endblock %}
 </head>
 
 <body>
   {% block nav %}
-  <div class="ui top fixed menu">
-      <a class="header item">成大智慧校園管理平台</a>
+  <div class="ui container">
+    <div class="ui main fixed menu">
+      <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
       <div class="ui dropdown item">
         管理站點及通知
         <i class="dropdown icon"></i>
         <div class="menu">
-          {% if datas %}
-            {% for data in datas %}
-              <div class="item" href="{% url 'Edit Station Page' station.id %}">{{ data.name }}</div>
+          {% if categories %}
+            {% for category in categories %}
+              <div class="item" href="">{{ category.name }}</div>
             {% endfor %}
           {% endif %}
-          <a class="item" href="{% url 'Station List Page' %}">所有類別</a>
+          <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
           <hr>
-          <a class="item" href="">新增類別</a>
+          <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
           <!-- <a class="item" href="">新增站點</a> -->
         </div>
       </div>
@@ -64,6 +69,7 @@
         <a class="item" href="">Help</a>
       </div>
     </div>
+  </div>
   {% endblock %}
 
   {% block content %}{% endblock %}

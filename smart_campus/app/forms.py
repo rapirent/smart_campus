@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station
+from .models import Station, StationCategory
 
 
 class StationForm(forms.ModelForm):
@@ -19,3 +19,9 @@ class StationForm(forms.ModelForm):
     class Meta:
         model = Station
         fields = ('name', 'content', 'category')
+
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = StationCategory
+        fields = '__all__'

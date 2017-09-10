@@ -1,0 +1,28 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+
+{% endblock %}
+{% block content %}
+  <!-- Display Error -->
+<div class="ui left borderless basic segment">
+  <form class="ui big left form" action="" method="POST" id="category_form">
+    {% csrf_token %}
+    <div class="required five wide field">
+      <label>類別名稱</label>
+      <input type="text" name="name" placeholder="類別名稱">
+    </div>
+    <div class="five wide field">
+      <label>類別描述</label>
+      <input  name="description" placeholder="類別描述"></input>
+    </div>
+    <button class="ui submit button" type="submit">新增</button>
+  </form>
+</div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+{% endblock %}
