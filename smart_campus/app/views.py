@@ -144,7 +144,7 @@ def index(request):
         for station in stations
     ]
 
-    context = {'email': request.user.email, 'stations': stations_data}
+    context = {'email': request.user.email, 'stations': station_data}
     return render(request, 'app/index.html', context)
 
 

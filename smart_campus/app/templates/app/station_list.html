@@ -10,30 +10,40 @@
 
 {% block content %}
 <div class="container">
-  <div class="row">
-    <!-- BUTTON : Create new station -->
-    <div class="col-lg-3">
-      <p>
-        <a href="{% url 'Add Station Page' %}" class="btn btn-sq-lg btn-outline-primary">
-          <br>
-          <i class="fa fa-plus-square-o fa-5x" aria-hidden="true" ></i>
-        </a>        
-      </p>
-    </div>
-
-    <!-- List all stations created by the User's Group -->
-    {% if stations %}
-      {% for station in stations %}
-        <div class="col-lg-3">
-          <p>
-            <a href="{% url 'Edit Station Page' station.id %}" class="btn btn-sq-lg btn-primary" style="background: url('{{ station.image_url }}'); background-size: auto 125px; background-position: 50% 66%;background-repeat: no-repeat;">
-              <label class="text-dark station-block">{{ station.name }}</label>
-            </a>        
-          </p>
+  <div class="ui center aligned basic segment">
+  {% if stations %}
+    {% for station in stations %}
+    <div class="ui cards">
+      <div class="card">
+        <div class="content">
+          <img class="right floated tiny ui image" src="{{ station.image_url }}">
+          <div class="header">
+            {{ station.name }}
+          </div>
+          <div class="meta">
+            類別
+          </div>
         </div>
-      {% endfor %}
-    {% endif %}
+        <div class="extra content">
+          <div class="ui two buttons">
+            <div class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</div>
+            <div class="ui basic red button" href="">刪除</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <div class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
+      新增站點
+      <i class="add icon"></i>
+    </div>
   </div>
 </div>
+
+
 
 {% endblock %}
