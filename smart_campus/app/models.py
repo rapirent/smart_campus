@@ -184,7 +184,7 @@ class Question(models.Model):
         'Choice',
         through='QuestionChoice',
     )
-    linked_station= models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
+    linked_station = models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
 
     def __repr__(self):
         return str(self.id)
@@ -246,8 +246,16 @@ class StationImage(models.Model):
 class TravelPlan(models.Model):
     name = models.CharField(max_length=254)
     description = models.TextField(blank=True)
-    travel_time = models.CharField(max_length=50)
-    stations = models.ManyToManyField('Station')
+    stations = models.ManyToManyField(
+        'Station',
+        through='TravelPlanStations'
+    )
 
     def __str__(self):
         return self.name
+
+
+class TravelPlanStations(models.Model):
+    travelplan = models.ForeignKey('TravelPlan', on_delete=models.CASCADE)
+    station = models.ForeignKey('Station', on_delete=models.CASCADE)
+    order = models.IntegerField()
