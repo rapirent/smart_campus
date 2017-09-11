@@ -35,15 +35,15 @@ def signup(request):
     nickname = request.POST.get('nickname', '')
 
     if not email or not password:
-        return HttpResponse('No email or password data', status=400)
+        return HttpResponse('Either email or password input is missing.', status=400)
 
     if User.objects.filter(email=email).exists():
         return HttpResponse('The email is already taken, try another!', status=400)
 
     try:
         User.objects.create_user(email, password, nickname)
-    except ValueError as error:
-        return HttpResponse('Email address not valid!', status=400)
+    except ValueError:
+        return HttpResponse('Invalid email address.', status=400)
 
     return HttpResponse('Registration succeeded!', status=200)
 
@@ -70,7 +70,7 @@ def login(request):
         }
         return JsonResponse(data={'message': 'Login success', 'data': user_data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
-    return HttpResponse('Login failure', status=401)
+    return HttpResponse('Login failed', status=401)
 
 
 @csrf_exempt
@@ -85,10 +85,10 @@ def logout(request):
     request.user = User.objects.filter(email=email).first()
 
     if not request.user:
-        return HttpResponse('User not exist', status=404)
+        return HttpResponse('User does not exist', status=404)
 
     auth.logout(request)
-    return HttpResponse('Logout success', status=200)
+    return HttpResponse('Logout succeeded', status=200)
 
 
 @csrf_exempt
@@ -290,8 +290,14 @@ def station_new_page(request):
 @csrf_exempt
 def get_all_rewards(request):
     """API for retrieving rewards list"""
-    data = [{'id': reward.id, 'name': reward.name, 'image_url': 'http://{0}/{1}'.format(request.get_host(), reward.image.url)}
-            for reward in Reward.objects.all()]
+    data = [
+        {
+            'id': reward.id,
+            'name': reward.name,
+            'image_url': 'http://{0}/{1}'.format(request.get_host(), reward.image.url)
+        }
+        for reward in Reward.objects.all()
+    ]
 
     return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
 
@@ -344,17 +350,17 @@ def get_unanswered_question(request):
     user = User.objects.filter(email=email).first()
 
     if not user or not station:
-        return HttpResponse('station or user not exist', status=400)
+        return HttpResponse('Either user or station does not exist', status=400)
 
     questions = Question.objects.filter(linked_station=station)
     user_answered_questions = Question.objects.filter(user=user)
 
     # Get questions that the user hasn't answered yet
-    questions_not_answered = questions.difference(user_answered_questions)
+    not_answered_questions = questions.difference(user_answered_questions)
 
-    if questions_not_answered.exists():
+    if not_answered_questions.exists():
         # pick 1 question randomly
-        question = random.sample(list(questions_not_answered), 1)[0]
+        question = random.sample(list(not_answered_questions), 1)[0]
         ans = question.choices.filter(questionchoice__is_answer=True).first()
         data = {
             'content': question.content,
@@ -367,7 +373,7 @@ def get_unanswered_question(request):
 
         return JsonResponse(data=data, status=200)
 
-    return HttpResponse('No more questions available to the user', status=404)
+    return HttpResponse('No unanswered question available for the user', status=404)
 
 
 @csrf_exempt
@@ -379,7 +385,7 @@ def update_user_coins(request):
     user = User.objects.filter(email=email).first()
 
     if not user or not coins:
-        return HttpResponse('User not exist or no coins data', status=400)
+        return HttpResponse('Either user does not exist or coins input is not given', status=400)
 
     try:
         user.earned_coins = coins
@@ -387,7 +393,12 @@ def update_user_coins(request):
     except ValueError:
         return HttpResponse('Invalid input of coins', status=400)
 
-    return JsonResponse(data={'message': 'Coins record of {0} successfully updated'.format(email), 'data': {'coins': user.earned_coins}}, status=200)
+    data = {
+        'message': 'Coins record of {0} successfully updated'.format(email),
+        'data': {'coins': user.earned_coins}
+    }
+
+    return JsonResponse(data=data, status=200)
 
 
 @csrf_exempt
@@ -399,7 +410,7 @@ def update_user_experience_point(request):
     user = User.objects.filter(email=email).first()
 
     if not user or not experience_point:
-        return HttpResponse('User not exist or no experience_point data', status=400)
+        return HttpResponse('Either user does not exist or experience_point input is not given', status=400)
 
     try:
         user.experience_point = experience_point
@@ -407,29 +418,51 @@ def update_user_experience_point(request):
     except ValueError:
         return HttpResponse('Invalid input of experience point', status=400)
 
-    return JsonResponse(data={'message': 'Experience point record of {0} successfully updated'.format(email), 'data': {'experience_point': user.experience_point}}, status=200)
+    data = {
+        'message': 'Experience point record of {0} successfully updated'.format(email),
+        'data': {'experience_point': user.experience_point}
+    }
+
+    return JsonResponse(data=data, status=200)
 
 
 @csrf_exempt
 @require_POST
-def update_user_favorite_stations(request):
+def add_user_favorite_stations(request):
     station_id = request.POST.get('station_id')
     email = request.POST.get('email')
-    action = request.POST.get('action')
 
     station = Station.objects.filter(id=station_id).first()
     user = User.objects.filter(email=email).first()
 
     if not user or not station:
-        return HttpResponse('station or user not exist', status=400)
+        return HttpResponse('Either user or station does not exist', status=400)
 
-    if action == 'add':
-        user.favorite_stations.add(station)
-    elif action == 'remove':
-        user.favorite_stations.remove(station)
-    else:
-        return HttpResponse("Request data 'action' should be 'add'/'remove'", status=400)
+    user.favorite_stations.add(station)
+    user.save()
 
+    return JsonResponse(
+        data={
+                "message": "Favorite stations update succeed",
+                "stations": [station.id for station in user.favorite_stations.all()]
+        },
+        status=200
+    )
+
+
+@csrf_exempt
+@require_POST
+def remove_user_favorite_stations(request):
+    station_id = request.POST.get('station_id')
+    email = request.POST.get('email')
+
+    station = Station.objects.filter(id=station_id).first()
+    user = User.objects.filter(email=email).first()
+
+    if not user or not station:
+        return HttpResponse('Either user or station does not exist', status=400)
+
+    user.favorite_stations.remove(station)
     user.save()
 
     return JsonResponse(
@@ -448,7 +481,8 @@ def get_all_travel_plans(request):
             'id': plan.id,
             'name': plan.name,
             'description': plan.description,
-            'station_sequence': [travelplanstation.station.id for travelplanstation in plan.travelplanstations_set.all().order_by('order')]
+            'station_sequence': [travelplanstation.station.id
+                                 for travelplanstation in plan.travelplanstations_set.all().order_by('order')]
         }
         for plan in TravelPlan.objects.all()
     ]
