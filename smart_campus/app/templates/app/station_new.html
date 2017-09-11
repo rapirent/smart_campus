@@ -6,6 +6,12 @@
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/station_new.css" %}" />
+  <!-- Include CSS for icons. -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+
+  <!-- Include Editor style. -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1/css/froala_style.min.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -49,18 +55,7 @@
     <!-- Content Textarea -->
     <div class="field">
       <label>推播內容</label>
-      <div class="ui icon buttons">
-          <button class="ui button active"><i class="align left icon"></i></button>
-          <button class="ui button"><i class="align center icon"></i></button>
-          <button class="ui button"><i class="align right icon"></i></button>
-          <button class="ui button"><i class="align justify icon"></i></button>
-        </div>
-        <div class="ui icon buttons">
-          <button class="ui button"><i class="bold icon"></i></button>
-          <button class="ui button"><i class="underline icon"></i></button>
-          <button class="ui button"><i class="text width icon"></i></button>
-        </div>
-      <textarea rows="3" form="station_form">{{ form.cleaned_data.content }}</textarea>
+      <textarea title="height option" target="_blank" form="station_form">{{ form.cleaned_data.content }}</textarea>
     </div>
     <hr>
     <!-- Image Upload Section -->
@@ -119,6 +114,11 @@
 {% block script %}
   {{ block.super }}
   <script>
+    $(function() {
+      $('textarea').froalaEditor({
+        height: 300
+      })
+    });
     $('.ui.selection.dropdown').dropdown();
     $(".ui.icon.button").click(function() {
       $(this).parent().find("input:file").click();
@@ -146,4 +146,10 @@
   </script>
   <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+  <!-- Include jQuery lib. -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+  <!-- Include Editor JS files. -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1//js/froala_editor.pkgd.min.js"></script>
 {% endblock %}
+

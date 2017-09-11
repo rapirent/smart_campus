@@ -15,7 +15,7 @@ urlpatterns = [
     url('^update_user_experience_point/$', views.update_user_experience_point, name='Update user experience point'),
     url('^add_user_favorite_stations/$', views.add_user_favorite_stations, name='Add user favorite stations'),
     url('^remove_user_favorite_stations/$', views.remove_user_favorite_stations, name='Remove user favorite stations'),
-    url('^get_all_travel_plans/$', views.get_all_travel_plans, name='Get all travel plans')
+    url('^get_all_travel_plans/$', views.get_all_travel_plans, name='Get all travel plans'),
     url('^update_user_reward/$', views.update_user_reward,
         name="Update User Reward")
 ]
