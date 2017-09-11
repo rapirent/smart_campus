@@ -9,19 +9,18 @@
 {% endblock %}
 
 {% block content %}
-  <div class="ui borderless center aligned container">
+  <div class="ui borderless center aligned text container">
   {% if stations %}
     {% for station in stations %}
     <div class="ui cards">
-      <div class="card">
+      <div class="ui centered card">
         <div class="content">
           <img class="right floated tiny ui image" src="{{ station.primary_image }}">
           <div class="header">
-              {{ station.image_url }}
             {{ station.name }}
           </div>
           <div class="meta">
-            類別
+            {{ station.category}}
           </div>
         </div>
         <div class="extra content">

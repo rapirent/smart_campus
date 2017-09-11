@@ -161,10 +161,6 @@ def station_list_page(request):
         for category in categories
     ]
 
-    for station in stations:
-        for station_image in StationImage.objects.filter(station=station,is_primary=True):
-            logger.warning(station_image.image.url)
-
     station_data = [
         {
             'id': station.id,
@@ -172,7 +168,8 @@ def station_list_page(request):
             'primary_image': StationImage.objects.filter(
                 station=station,
                 is_primary=True
-            ).first().image.url
+            ).first().image.url,
+            'category': station.category
         }
         for station in stations
     ]

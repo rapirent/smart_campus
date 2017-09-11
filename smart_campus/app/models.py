@@ -230,20 +230,9 @@ class StationCategory(models.Model):
         return self.name
 
 
-def image_directory_path(instance, filename):
-    # file will be uploaded to MEDIA_ROOT/my_sell/picture/<filename>
-    return u'images/station/{0}'.format(filename)
-
-
 class StationImage(models.Model):
-    image_storage = FileSystemStorage(
-        # Physical file location ROOT
-        location=u'{0}/station/'.format(settings.MEDIA_ROOT),
-        # Url for file
-        base_url=u'{0}station/'.format(settings.MEDIA_URL),
-    )
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to=image_directory_path, storage=image_storage)
+    image = models.ImageField(upload_to='images/station/')
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):
