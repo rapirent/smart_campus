@@ -8,19 +8,19 @@
 {% block content %}
 <div class="container content">
   <!-- Display Error -->
-  {% for field in form %} 
+  {% for field in form %}
     {% for error in field.errors %}
         <li class='text-danger'><strong>{{ field.label }}: {{ error|escape }}</strong></li>
-    {% endfor %}    
+    {% endfor %}
   {% endfor %}
   <!-- Form -->
-  <form action="" method="POST" enctype="multipart/form-data">            
+  <form action="" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
 
       <!-- Station Name -->
       <div class="col-md-4">
-        <label class="control-label col" for="name">名稱</label>  
+        <label class="control-label col" for="name">名稱</label>
         <div class="col">
           <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{ form_data.name }}" required="">
         </div>
@@ -28,7 +28,7 @@
 
       <!-- Category Select -->
       <div class="col-md-4">
-        <label class="control-label col-md-12" for="select_category">類別</label> 
+        <label class="control-label col-md-12" for="select_category">類別</label>
         <select id="select_category" name="category" class="custom-select" required="">
           <option value>請選擇類別...</option>
           <!-- Template Snippet loading options -->
@@ -49,7 +49,7 @@
     <div class="row">
       <div class="col-md-6">
         <label class="col control-label" for="content">推播內容</label>
-        <div class="col">                     
+        <div class="col">
           <textarea class="form-control" id="content" name="content">{{ form_data.content }}</textarea>
         </div>
       </div>
@@ -57,7 +57,7 @@
     <br>
 
     <!-- Button : Change Image -->
-    <div class="row">     
+    <div class="row">
       <div class="col-md-6">
         <label class="col control-label">更改圖片</label>
         <button type="button" class="btn btn-danger col-md-6" id="img_change">更改上傳圖片</button>
@@ -83,12 +83,12 @@
 
     <!-- Choose Primary photo : HIDDEN-->
     <div class="row" id="img_choose_sec" style="display: none;">
-      <div class="col-md-8" id='radios-img-select'> 
+      <div class="col-md-8" id='radios-img-select'>
         <label class="col-md-3 control-label" >選擇主要照片</label>
         <label class="radio-inline" for="radios-1">
           <input type="radio" name="main_img_num" id="radios-1" value="1" checked="checked">
           1
-        </label>  
+        </label>
       </div>
     </div>
     <br>
@@ -99,7 +99,7 @@
         <div class="col-md-12">
 
           <!-- Select linking Beacon from Map -->
-          <label class="control-label col" for="selectbasic">Beacon選擇(請在地圖點選)</label> 
+          <label class="control-label col" for="selectbasic">Beacon選擇(請在地圖點選)</label>
           <select id="selectbasic" name="beacon" class="custom-select" required="">
             <option value>請在地圖點選...</option>
             <!-- Template Snippet loading options -->
@@ -108,7 +108,7 @@
           <br><br><br><br><br><br><br>
 
           <!-- Station Location -->
-          <label class="control-label col" for="">站點位置(預設為Beacon位置)</label> 
+          <label class="control-label col" for="">站點位置(預設為Beacon位置)</label>
           緯度:
           <input id="lat_input" name="lat" type="text" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat }}">
           經度:
@@ -141,7 +141,7 @@
         $("#img_upload_sec").show();
         $("#img_choose_sec").show();
         $("#img_changed").val('true');
-      }    
+      }
     }
   });
 
@@ -151,11 +151,11 @@
       $("#delete_confirmed").val("true");
     }
   })
-  
-  /*Get location(lat, lng) of beacons, 
+
+  /*Get location(lat, lng) of beacons,
     In order to show them on the Map*/
   var location_arr = [];
-  
+
   {% if beacons %}
     {% for beacon in beacons %}
       location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])

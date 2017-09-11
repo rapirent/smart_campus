@@ -496,6 +496,7 @@ def category_add_page(request):
             }
 
             # TODO
+            # add the specified category station list
             return HttpResponse('Success', status=200)
             # return render(request, 'station_list.html', context)
 
@@ -515,3 +516,12 @@ def category_add_page(request):
 
         return render(request, 'app/category_add_page.html', context)
 
+
+@login_required
+def update_reward(request):
+    pass
+
+
+@login_required
+def update_beacon(request):
+    pass

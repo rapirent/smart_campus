@@ -28,9 +28,9 @@ function addMarker(title, lat, lng) {
 }
 
 var imgcnt=1;
-// Add new file upload field and radio button 
+// Add new file upload field and radio button
 $("#btn_addimage").click(function(){
-  
+
   if(imgcnt <= MAX_IMGS)
   {
     imgcnt++;
@@ -51,5 +51,14 @@ $("#btn_addimage").click(function(){
     while (newcontent.firstChild) {
         img_sel_div.appendChild(newcontent.firstChild);
     }
-  }   
+  }
 });
+$("input:text").click(function() {
+  $(this).parent().find("input:file").click();
+});
+
+$('input:file', '.ui.action.input')
+  .on('change', function(e) {
+    var name = e.target.files[0].name;
+    $('input:text', $(e.target).parent()).val(name);
+  });

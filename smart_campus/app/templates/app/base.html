@@ -38,8 +38,8 @@
 
 <body>
   {% block nav %}
-  <div class="ui container">
-    <div class="ui main fixed menu">
+  <!-- <div class="ui main container"> -->
+    <div class="ui borderless main menu">
       <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
       <div class="ui dropdown item">
         管理站點及通知
@@ -59,6 +59,7 @@
       <a class="item" href="">管理使用者</a>
       <a class="item" href="">管理獎勵</a>
       <a class="item" href="">管理挑戰</a>
+      <a class="item" href="">加入beacon</a>
       <div class="right menu">
         <div class="header item">
           {% if email %}
@@ -69,7 +70,7 @@
         <a class="item" href="">Help</a>
       </div>
     </div>
-  </div>
+  <!-- </div> -->
   {% endblock %}
 
   {% block content %}{% endblock %}

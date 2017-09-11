@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-  <div class="ui borderless center aligned basic segment">
+  <div class="ui borderless center aligned container">
   {% if stations %}
     {% for station in stations %}
     <div class="ui cards">
@@ -36,10 +36,10 @@
     <div class="ui horizontal divider">
       OR
     </div>
-    <div class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
+    <a class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
       新增站點
       <i class="add icon"></i>
-    </div>
+    </a>
   </div>
 
 
