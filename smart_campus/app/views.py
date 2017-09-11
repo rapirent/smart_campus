@@ -27,7 +27,7 @@ from .models import (
     User, Reward, Permission,
     Station, StationCategory,
     Beacon, StationImage, Question,
-    UserReward
+    UserReward, UserGroup
 )
 from .forms import StationForm, CategoryForm
 
@@ -470,7 +470,7 @@ def update_user_reward(request):
 
 @login_required
 def category_add_page(request):
-
+    """add the category"""
     if request.method == 'POST':
         category_form = CategoryForm(request.POST)
 
@@ -525,3 +525,26 @@ def update_reward(request):
 @login_required
 def update_beacon(request):
     pass
+
+
+@csrf_exempt
+@require_POST
+def update_station(request):
+
+    email = request.POST.get('email')
+
+    # TODO
+    # add the password check
+    # password = request.POST.get('password')
+
+    station_id = request.POST.get('station_id')
+    action = request.POST.get('action')
+
+    user = User.objects.filter(email=email).first()
+    group = UserGroup.objects.filter(user=user)
+
+    if user:
+        if action == 'add':
+            pass
+        if action == 'remove':
+            pass

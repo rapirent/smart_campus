@@ -36,13 +36,16 @@
           <div class="default text">請選擇類別...</div>
           <div class="menu">
             {% if categories %} {% for category in categories %}
-            <div class="item" data-value="{{ category.name }}">{{ category.name }}</div>
+            <div class="item" value="{{ category.name }}" data-value="{{ category.name }}">
+              {{ category.name }}
+            </div>
             {% endfor %} {% endif %}
           </div>
         </div>
       </div>
-    </div>
 
+    </div>
+    <hr>
     <!-- Content Textarea -->
     <div class="field">
       <label>推播內容</label>
@@ -59,7 +62,7 @@
         </div>
       <textarea rows="3" form="station_form">{{ form.cleaned_data.content }}</textarea>
     </div>
-
+    <hr>
     <!-- Image Upload Section -->
     <div class="five wide field">
       <label>圖片上傳</label>
@@ -81,18 +84,19 @@
         <label>1</label>
       </div>
     </div>
+    <hr>
     <div class="four wide column centered field">
       <label>Beacon位置一覽</label>
       <div id="map" style="height:400px;width:600px"></div>
     </div>
     <div class="field">
-      <label>Beacon選擇(請在地圖點選)</label>
       <select id="selectbasic" name="beacon" class="custom-select" required="">
       <option value>請在地圖點選...</option>
       <!-- Template Snippet loading options -->
       {% include "app/_option_snippet.html" with datas=beacons form_data=form.cleaned_data.beacon %}
       </select>
     </div>
+    <hr>
     <!-- Beacon Information -->
     <div class="field">
       <label>站點位置(預設為Beacon位置)</label>
@@ -115,7 +119,7 @@
 {% block script %}
   {{ block.super }}
   <script>
-    $('select.dropdown').dropdown();
+    $('.ui.selection.dropdown').dropdown();
     $(".ui.icon.button").click(function() {
       $(this).parent().find("input:file").click();
     });
