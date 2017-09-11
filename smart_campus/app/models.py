@@ -2,6 +2,8 @@ from django.contrib.gis.db import models
 from django.contrib.auth.base_user import (
     BaseUserManager, AbstractBaseUser
 )
+from django.core.files.storage import FileSystemStorage
+from django.conf import settings
 
 
 class Beacon(models.Model):
@@ -120,7 +122,10 @@ class UserGroup(models.Model):
 
 class Reward(models.Model):
     name = models.CharField(max_length=50)
-    image = models.ImageField(null=True, upload_to='media/images/reward/')
+    image = models.ImageField(
+        null=True,
+        upload_to='images/reward/'
+    )
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -209,7 +214,6 @@ class Station(models.Model):
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
     location = models.GeometryField(srid=4326, null=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
-    primary_image_url = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return '{name} ({category})'.format(
@@ -226,21 +230,24 @@ class StationCategory(models.Model):
         return self.name
 
 
+def image_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/my_sell/picture/<filename>
+    return u'images/station/{0}'.format(filename)
+
+
 class StationImage(models.Model):
+    image_storage = FileSystemStorage(
+        # Physical file location ROOT
+        location=u'{0}/station/'.format(settings.MEDIA_ROOT),
+        # Url for file
+        base_url=u'{0}station/'.format(settings.MEDIA_URL),
+    )
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='media/images/station/')
+    image = models.ImageField(upload_to=image_directory_path, storage=image_storage)
     is_primary = models.BooleanField(default=False)
 
     def __repr__(self):
         return 'Image {img_id}'.format(img_id=self.id)
-
-    def save(self, *args, **kwargs):
-        super(StationImage, self).save(*args, **kwargs)
-
-        # auto save the url of the primary image to the station
-        if self.is_primary is True:
-            self.station.primary_image_url = '/{0}'.format(self.image.url)
-            self.station.save()
 
 
 class TravelPlan(models.Model):
@@ -251,3 +258,4 @@ class TravelPlan(models.Model):
 
     def __str__(self):
         return self.name
+

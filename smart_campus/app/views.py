@@ -161,11 +161,18 @@ def station_list_page(request):
         for category in categories
     ]
 
+    for station in stations:
+        for station_image in StationImage.objects.filter(station=station,is_primary=True):
+            logger.warning(station_image.image.url)
+
     station_data = [
         {
             'id': station.id,
             'name': station.name,
-            'image_url': station.primary_image_url,
+            'primary_image': StationImage.objects.filter(
+                station=station,
+                is_primary=True
+            ).first().image.url
         }
         for station in stations
     ]
@@ -460,8 +467,10 @@ def update_user_reward(request):
             'status': 'true',
             'message': 'Success',
             'data': {
-                reward: [reward.id for reward
-                        in UserReward.objects.filter(user=user)]
+                reward: [
+                    reward.id
+                    for reward in UserReward.objects.filter(user=user)
+                    ]
             }
         },
         status=200
