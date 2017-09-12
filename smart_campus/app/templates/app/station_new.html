@@ -9,9 +9,6 @@
   <!-- Include CSS for icons. -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
 
-  <!-- Include Editor style. -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1/css/froala_style.min.css" rel="stylesheet" type="text/css" />
 {% endblock %}
 
 {% block content %}
@@ -81,15 +78,15 @@
     </div>
     <hr>
     <div class="four wide column centered field">
-      <label>Beacon位置一覽</label>
+      <label>Beacon位置一覽(請點選beacon)</label>
       <div id="map" style="height:400px;width:600px"></div>
     </div>
     <div class="field">
-      <select id="selectbasic" name="beacon" class="custom-select" required="">
-      <option value>請在地圖點選...</option>
+      <!-- <select id="selectbasic" name="beacon" class="custom-select" required=""> -->
+      <!-- <option value>請在地圖點選...</option> -->
       <!-- Template Snippet loading options -->
-      {% include "app/_option_snippet.html" with datas=beacons form_data=form.cleaned_data.beacon %}
-      </select>
+      <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
+      <!-- </select> -->
     </div>
     <hr>
     <!-- Beacon Information -->
@@ -114,42 +111,35 @@
 {% block script %}
   {{ block.super }}
   <script>
-    $(function() {
-      $('textarea').froalaEditor({
-        height: 300
-      })
-    });
-    $('.ui.selection.dropdown').dropdown();
-    $(".ui.icon.button").click(function() {
-      $(this).parent().find("input:file").click();
-    });
+      /*Get location(lat, lng) of beacons,
+        In order to show them on the Map*/
+        var location_arr = [];
 
-    $('input:file', '.ui.action.input')
-      .on('change', function(e) {
-        var name = e.target.files[0].name;
-        $('input:text', $(e.target).parent()).val(name);
-      });
-      $('.ui.radio.checkbox')
-        .checkbox()
-      ;
-  /*Get location(lat, lng) of beacons,
-    In order to show them on the Map*/
-  var location_arr = [];
+        {% if beacons %}
+          {% for beacon in beacons %}
+            location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
+          {% endfor %}
+        {% endif %}
 
-  {% if beacons %}
-    {% for beacon in beacons %}
-      location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
-    {% endfor %}
-  {% endif %}
+        var MAX_IMGS = {{ max_imgs }};
+    </script>
+    <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $('.ui.selection').dropdown();
+        $(".ui.icon.button").click(function () {
+          $(this).parent().find("input:file").click();
+        });
 
-  var MAX_IMGS = {{ max_imgs }};
-  </script>
-  <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
-  <!-- Include jQuery lib. -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-
-  <!-- Include Editor JS files. -->
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/froala-editor/2.5.1//js/froala_editor.pkgd.min.js"></script>
+        $('input:file', '.ui.action.input')
+          .on('change', function (e) {
+            var name = e.target.files[0].name;
+            $('input:text', $(e.target).parent()).val(name);
+          });
+        $('.ui.radio.checkbox')
+          .checkbox();
+        })
+    </script>
 {% endblock %}
 

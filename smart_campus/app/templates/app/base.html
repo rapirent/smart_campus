@@ -39,9 +39,9 @@
 <body>
   {% block nav %}
   <!-- <div class="ui main container"> -->
-    <div class="ui borderless main menu" id="menu">
+    <div class="ui borderless main menu" id="selection">
       <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
-      <div class="ui dropdown item">
+      <div class="ui dropdown item" id="selection">
         管理站點及通知
         <i class="dropdown icon"></i>
         <div class="menu">
@@ -89,22 +89,21 @@
     <script src="{% static "Semantic-UI/components/transition.js" %}"></script>
     <script src="{% static "Semantic-UI/components/dropdown.js" %}"></script>
     <script>
-          $(document)
-            .ready(function () {
-              $('.ui.menu .ui.dropdown').dropdown({
-                on: 'hover'
-              });
-              $('.ui.menu a.item')
-                .on('click', function () {
-                  $(this)
-                    .addClass('active')
-                    .siblings()
-                    .removeClass('active')
-                    ;
-                })
-                ;
-            })
-            ;
+          $(document).ready(function () {
+            $('.ui.menu .ui.dropdown').dropdown({
+              on: 'hover'
+            });
+            $('.ui.menu a.item')
+              .on('click', function () {
+                $(this)
+                  .addClass('active')
+                  .siblings()
+                  .removeClass('active')
+                  ;
+              })
+              ;
+          })
+          ;
     </script>
   {% endblock %}
 </body>

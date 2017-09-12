@@ -1,4 +1,5 @@
 var map;
+
 function initMap() {
   // Create a map object and specify the DOM element for display.
   map = new google.maps.Map(document.getElementById('map'), {
@@ -7,7 +8,11 @@ function initMap() {
   });
   // Add marker of beacons
   for(var i=0; i < location_arr.length; i++){
-    addMarker(location_arr[i][0], location_arr[i][1], location_arr[i][2]);
+    addMarker(
+      location_arr[i][0],
+      location_arr[i][1],
+      location_arr[i][2]
+    );
   }
 }
 
