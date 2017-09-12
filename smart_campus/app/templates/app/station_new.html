@@ -13,14 +13,18 @@
 
 {% block content %}
 <div class="ui container">
-  <!-- Display Error -->
-  {% for field in form %}
-    {% for error in field.errors %}
-        <li class='text-danger'><strong>{{ field.label }}: {{ error|escape }}</strong></li>
-    {% endfor %}
-  {% endfor %}
+
   <!-- Form -->
-  <form class="ui centered big form" method="POST" enctype="multipart/form-data">
+  <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
+        {% for field in form %}
+          {% if field.errors %}
+          <div class="ui negative message">
+          {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error|escape }}</li>
+          {% endfor %}
+        </div>
+          {% endif %}
+        {% endfor %}
     {% csrf_token %}
     <div class="fields">
 
@@ -52,7 +56,7 @@
     <!-- Content Textarea -->
     <div class="field">
       <label>推播內容</label>
-      <textarea title="height option" target="_blank" form="station_form">{{ form.cleaned_data.content }}</textarea>
+      <textarea title="height option" target="_blank" form="station_form" name="content">{{ form.cleaned_data.content }}</textarea>
     </div>
     <hr>
     <!-- Image Upload Section -->
@@ -106,6 +110,7 @@
       </div>
     </div>
     <button class="ui fluid teal submit button" type="submit">加入站點</button>
+
   </form>
   <br>
 </div>
@@ -143,6 +148,7 @@
           });
         $('.ui.radio.checkbox')
           .checkbox();
+
         })
     </script>
 {% endblock %}
