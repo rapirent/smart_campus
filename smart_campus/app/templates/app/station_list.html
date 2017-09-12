@@ -10,29 +10,37 @@
 
 {% block content %}
   <div class="ui borderless center aligned text container">
+      <div class="ui divided items">
   {% if stations %}
     {% for station in stations %}
-    <div class="ui cards">
-      <div class="ui centered card">
-        <div class="content">
-          <img class="right floated tiny ui image" src="{{ station.primary_image }}">
-          <div class="header">
+      <div class="item">
+        <div class="image">
+          <img src="{{ station.primary_image }}">
+        </div>
+        <div class="ui left aligned segment content">
+          <div class="ui header">
             {{ station.name }}
           </div>
-          <div class="meta">
+          <div class="description">
             {{ station.category}}
           </div>
+          <div class="extra">
+            <div class="ui two primary buttons">
+              <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
+              <a class="ui basic red button" href="">刪除</a>
+            </div>
+          </div>
         </div>
-        <div class="extra content">
+        <!-- <div class="extra content">
           <div class="ui two buttons">
             <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
             <a class="ui basic red button" href="">刪除</a>
           </div>
-        </div>
+        </div> -->
       </div>
-    </div>
     {% endfor %}
   {% endif %}
+</div>
     <div class="ui horizontal divider">
       OR
     </div>

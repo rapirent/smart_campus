@@ -16,7 +16,7 @@
 
   <!-- Form -->
   <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-        {% for field in form %}
+      {% for field in form %}
           {% if field.errors %}
           <div class="ui negative message">
           {% for error in field.errors %}
@@ -28,13 +28,11 @@
     {% csrf_token %}
     <div class="fields">
 
-      <!-- Station Name -->
       <div class="field">
         <label>名稱</label>
         <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form.cleaned_data.name }}" required="">
       </div>
 
-      <!-- Category Select -->
       <div class="field">
         <label>類別</label>
         <div class="ui selection dropdown">
@@ -50,16 +48,15 @@
           </div>
         </div>
       </div>
-
     </div>
     <hr>
-    <!-- Content Textarea -->
+
     <div class="field">
       <label>推播內容</label>
       <textarea title="height option" target="_blank" form="station_form" name="content">{{ form.cleaned_data.content }}</textarea>
     </div>
     <hr>
-    <!-- Image Upload Section -->
+
     <div class="five wide field">
       <label>圖片上傳</label>
       <div id="uiAddImage">

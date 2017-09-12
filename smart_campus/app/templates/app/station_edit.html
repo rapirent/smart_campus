@@ -6,55 +6,41 @@
   <link rel="stylesheet" type="text/css" href="{% static "app/css/station_edit.css" %}" />
 {% endblock %}
 {% block content %}
-<div class="container content">
-  <!-- Display Error -->
-  {% for field in form %}
-    {% for error in field.errors %}
-        <li class='text-danger'><strong>{{ field.label }}: {{ error|escape }}</strong></li>
-    {% endfor %}
-  {% endfor %}
-  <!-- Form -->
-  <form action="" method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div class="row">
+<div class="ui container">
 
-      <!-- Station Name -->
-      <div class="col-md-4">
-        <label class="control-label col" for="name">名稱</label>
-        <div class="col">
-          <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{ form_data.name }}" required="">
+  <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
+    {% for field in form %}
+      {% if field.errors %}
+        <div class="ui negative message">
+          {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error|escape }}</li>
+          {% endfor %}
         </div>
+      {% endif %}
+    {% endfor %}
+    {% csrf_token %}
+    <div class="fields">
+      <div class="field">
+        <label>名稱</label>
+        <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
       </div>
-
-      <!-- Category Select -->
-      <div class="col-md-4">
-        <label class="control-label col-md-12" for="select_category">類別</label>
-        <select id="select_category" name="category" class="custom-select" required="">
-          <option value>請選擇類別...</option>
-          <!-- Template Snippet loading options -->
-          {% include "app/_option_snippet.html" with datas=categories form_data=form_data.category %}
+      <div class="field">
+        <label>類別</label>
+        <select class="ui selection dropdown" placeholder="{{form_data.category}}">
+          {% if categories %} {% for category in categories %}
+          <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
+            {{ category.name }}
+          </option>
+          {% endfor %} {% endif %}
         </select>
       </div>
-
-      <!-- Delete Station -->
-      <div class="col-md-4">
-        <button type="submit" class="btn btn-danger col-md-4" id="btn_delete" formnovalidate>刪除站點</button>
-        <input type="text" name="delete_confirmed" id="delete_confirmed" value='false' hidden>
-      </div>
-
     </div>
-    <br>
-
-    <!-- Content Textarea -->
-    <div class="row">
-      <div class="col-md-6">
-        <label class="col control-label" for="content">推播內容</label>
-        <div class="col">
-          <textarea class="form-control" id="content" name="content">{{ form_data.content }}</textarea>
-        </div>
-      </div>
+    <hr>
+    <div class="field">
+      <label>推播內容</label>
+      <textarea form="station_form" name="content">{{ form.cleaned_data.content }}</textarea>
     </div>
-    <br>
+    <hr>
 
     <!-- Button : Change Image -->
     <div class="row">
@@ -165,4 +151,21 @@
   </script>
   <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $('.ui.selection').dropdown();
+      $(".ui.icon.button").click(function () {
+        $(this).parent().find("input:file").click();
+      });
+
+      $('input:file', '.ui.action.input')
+        .on('change', function (e) {
+          var name = e.target.files[0].name;
+          $('input:text', $(e.target).parent()).val(name);
+        });
+      $('.ui.radio.checkbox')
+        .checkbox();
+
+      })
+  </script>
 {% endblock %}

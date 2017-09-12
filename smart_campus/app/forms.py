@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station, StationCategory
+from .models import Station, StationCategory, Reward
 
 
 class StationForm(forms.ModelForm):
@@ -24,4 +24,10 @@ class StationForm(forms.ModelForm):
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = StationCategory
+        fields = '__all__'
+
+
+class RewardForm(forms.ModelForm):
+    class Meta:
+        model = Reward
         fields = '__all__'
