@@ -172,9 +172,9 @@ def station_list_page(request):
             'id': station.id,
             'name': station.name,
             'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first().image.url,
+                    station=station,
+                    is_primary=True
+                ).first(),
             'category': station.category
         }
         for station in stations

@@ -45,7 +45,7 @@ $("#addimage").click( function(){
       imgCount +   '" readonly="">' +
       '<input id="img' + imgCount +
       '" name="img' + imgCount +
-      '" type="file" accept="image/*" style="display: none;">' +
+      '" type="file" accept="image/*" style="display: none;" required="">' +
       '<div class="ui icon button" id="select' + imgCount +
       'Button"><i class="attach icon"></i></div>' +
       '</div>'

@@ -3,7 +3,7 @@
 
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_edit.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_edit.css" %}">
 {% endblock %}
 {% block content %}
 <div class="ui container">
@@ -127,8 +127,9 @@
   {% endif %}
   var MAX_IMGS = {{ max_imgs }};
   </script>
-  <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
+  <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+  <script type="text/javascript" src="{% static 'app/trix/trix.js' %}"></script>
   <script type="text/javascript">
     $(document).ready(function () {
       const beacon_name = '{{form_data.beacon_name|stringformat:"s"}}'

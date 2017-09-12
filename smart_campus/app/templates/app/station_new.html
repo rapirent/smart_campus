@@ -6,9 +6,8 @@
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/station_new.css" %}" />
-  <!-- Include CSS for icons. -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
-
+  <link rel="stylesheet" type="text/css" href="{% static 'trix/trix.css' %}">
+  <script type="text/javascript" src="{% static 'trix/trix.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -28,12 +27,12 @@
     {% csrf_token %}
     <div class="fields">
 
-      <div class="field">
+      <div class="required field">
         <label>名稱</label>
         <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form.cleaned_data.name }}" required="">
       </div>
 
-      <div class="field">
+      <div class="required field">
         <label>類別</label>
         <div class="ui selection dropdown">
           <input type="hidden" name="category">
@@ -53,11 +52,12 @@
 
     <div class="field">
       <label>推播內容</label>
-      <textarea title="height option" target="_blank" form="station_form" name="content">{{ form.cleaned_data.content }}</textarea>
+      <input id="x" type="hidden" name="content">
+      <trix-editor form="station_form" input="x" >{{ form.cleaned_data.content }}</trix-editor>
     </div>
     <hr>
 
-    <div class="five wide field">
+    <div class="required five wide field">
       <label>圖片上傳</label>
       <div id="uiAddImage">
         <div class="ui action input">
@@ -70,7 +70,6 @@
       </div>
     </div>
 
-    <!-- Choose Primary photo -->
     <div class="grouped fields">
       <label>選擇主要照片</label>
       <div class="field">
@@ -87,21 +86,16 @@
       <div id="map" style="height:400px;width:600px"></div>
     </div>
     <div class="field">
-      <!-- <select id="selectbasic" name="beacon" class="custom-select" required=""> -->
-      <!-- <option value>請在地圖點選...</option> -->
-      <!-- Template Snippet loading options -->
       <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
-      <!-- </select> -->
     </div>
     <hr>
-    <!-- Beacon Information -->
-    <div class="field">
+    <div class="required field">
       <label>站點位置(預設為Beacon位置)</label>
-      <div class="three wide field">
+      <div class="required three wide field">
         <label>緯度</label>
         <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" required="" value="{{ form.cleaned_data.lat }}">
       </div>
-      <div class="three wide field">
+      <div class="required three wide field">
         <label>經度</label>
         <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" required="" value="{{ form.cleaned_data.lng }}">
       </div>
@@ -129,7 +123,7 @@
 
         var MAX_IMGS = {{ max_imgs }};
     </script>
-    <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
+    <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
     <script type="text/javascript">
       $(document).ready(function () {

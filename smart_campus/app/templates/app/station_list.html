@@ -14,9 +14,11 @@
   {% if stations %}
     {% for station in stations %}
       <div class="item">
-        <div class="image">
-          <img src="{{ station.primary_image }}">
-        </div>
+        {% if station.primary_image %}
+          <div class="image">
+            <img src="{{ station.primary_image.image.url }}">
+          </div>
+        {% endif %}
         <div class="ui left aligned segment content">
           <div class="ui header">
             {{ station.name }}
