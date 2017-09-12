@@ -1,0 +1,47 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_list.css" %}" />
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+  {% if rewards %}
+    {% for reward in rewards %}
+    <div class="ui cards">
+      <div class="ui centered card">
+        <div class="content">
+          <img class="right floated tiny ui image" src="{{ station.primary_image }}">
+          <div class="header">
+            {{ reward.name }}
+          </div>
+          <div class="meta">
+            站點
+          </div>
+        </div>
+        <div class="extra content">
+          <div class="ui two buttons">
+            <div class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</div>
+            <div class="ui basic red button" href="">刪除</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  {% endif %}
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="">
+      新增獎勵
+      <i class="add icon"></i>
+    </a>
+  </div>
+
+
+
+{% endblock %}

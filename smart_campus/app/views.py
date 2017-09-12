@@ -463,7 +463,7 @@ def update_user_experience_point(request):
 
 @csrf_exempt
 @require_POST
-def update_user_reward(request):
+def add_user_reward(request):
     # POST a reward id and update the user data
     email = request.POST.get('email')
     reward_id = request.POST.get('reward_id')
@@ -604,3 +604,34 @@ def get_all_travel_plans(request):
     ]
 
     return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+
+
+@login_required
+@require_GET
+def reward_list_page(request):
+    # add the reward
+    categories = StationCategory.objects.all()
+    categories_data = [
+        {
+            'name': category.name,
+        }
+        for category in categories
+    ]
+
+    rewards = Reward.objects.all()
+    rewards_data = [
+        {
+            'id': reward.id,
+            'name': reward.name,
+            'image': reward.image.url
+        }
+        for reward in rewards
+    ]
+
+    context = {
+        'email': request.user.email,
+        'rewards': rewards_data,
+        'categories': categories_data
+    }
+
+    return render(request, 'app/reward_list.html', context)
