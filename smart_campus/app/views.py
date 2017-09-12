@@ -251,9 +251,10 @@ def station_edit_page(request, pk):
             'name': station.name,
             'category': station.category,
             'content': station.content,
-            'beacon': station.beacon_set.first().name,
+            'beacon_name': station.beacon_set.first().name,
             'lng': station.location.x,
-            'lat': station.location.y
+            'lat': station.location.y,
+            'images': StationImage.objects.filter(station_id=station.id)
         }
 
     if request.user.can(Permission.ADMIN):
