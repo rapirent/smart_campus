@@ -32,29 +32,38 @@ function addMarker(title, lat, lng) {
   });
 }
 
-var imgcnt=1;
+let imgCount=1;
 // Add new file upload field and radio button
-$("#btn_addimage").click(function(){
+$("#addimage").click( function(){
 
-  if(imgcnt <= MAX_IMGS)
-  {
-    imgcnt++;
-    // File Upload
-    var imgupload_div = document.getElementById("img_upload");
-    var newcontent = document.createElement('div');
+  if (imgCount <= MAX_IMGS){
+    imgCount++;
 
-    newcontent.innerHTML = "<div class='col-md-4'>Img "+imgcnt+":<input id=img"+imgcnt+" name=img"+imgcnt+" class='form-control-file' type=file accept=image/*></div>";
+    $('#uiAddImage').append(
+      '<div class="ui action input" id="select' + imgCount + '">' +
+      '<input type="text" placeholder="img ' +
+      imgCount +   '" readonly="">' +
+      '<input id="img' + imgCount +
+      '" name="img' + imgCount +
+      '" type="file" accept="image/*" style="display: none;">' +
+      '<div class="ui icon button" id="select' + imgCount +
+      'Button"><i class="attach icon"></i></div>' +
+      '</div>'
+    )
+    $("#select" + imgCount + 'Button').click(function () {
+      $(this).parent().find("input:file").click();
+    });
 
-    while (newcontent.firstChild) {
-        imgupload_div.appendChild(newcontent.firstChild);
-    }
+    $('input:file', '#select' + imgCount)
+      .on('change', function (e) {
+        var name = e.target.files[0].name;
+        $('input:text', $(e.target).parent()).val(name);
+      });
+    $('.grouped.fields').append(
+      '<div class="field"><div class="ui radio checkbox"><input type="radio" name="main_img_num" id="radios-' +
+      imgCount + '" value="' + imgCount + '" tabindex="0" class="hidden"><label>' +
+      '圖片' +  imgCount + '</label></div></div>')
+    $('.ui.radio.checkbox').checkbox()
 
-    // Radio button
-    var img_sel_div = document.getElementById("radios-img-select");
-    var newcontent = document.createElement('div');
-    newcontent.innerHTML = "<label class=radio-inline for=radios-"+imgcnt+"><input type=radio name=main_img_num id=radios-"+imgcnt+" value="+imgcnt+"> "+imgcnt+" </label>";
-    while (newcontent.firstChild) {
-        img_sel_div.appendChild(newcontent.firstChild);
-    }
   }
 });
