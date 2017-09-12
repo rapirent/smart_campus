@@ -36,11 +36,13 @@
         </div>
         <button class="ui fluid large teal submit button" type="submit">登入</button>
       </div>
-      <div class="ui error message">    {% if messages %}
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
-          {% endif %}</div>
+      <div class="ui error message">
+        {% if messages %}
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+        {% endif %}
+      </div>
     </form>
     {% if messages %}
     <div class="ui negative message">

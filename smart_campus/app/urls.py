@@ -16,6 +16,6 @@ urlpatterns = [
     url('^add_user_favorite_stations/$', views.add_user_favorite_stations, name='Add user favorite stations'),
     url('^remove_user_favorite_stations/$', views.remove_user_favorite_stations, name='Remove user favorite stations'),
     url('^get_all_travel_plans/$', views.get_all_travel_plans, name='Get all travel plans'),
-    url('^update_user_reward/$', views.update_user_reward,
+    url('^add_user_reward/$', views.add_user_reward,
         name="Update User Reward")
 ]

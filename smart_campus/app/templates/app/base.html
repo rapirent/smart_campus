@@ -39,7 +39,7 @@
 <body>
   {% block nav %}
   <!-- <div class="ui main container"> -->
-    <div class="ui borderless main menu">
+    <div class="ui borderless main menu" id="menu">
       <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
       <div class="ui dropdown item">
         管理站點及通知
@@ -57,7 +57,7 @@
         </div>
       </div>
       <a class="item" href="">管理使用者</a>
-      <a class="item" href="">管理獎勵</a>
+      <a class="item" href="{% url 'Reward List Page' %}">管理獎勵</a>
       <a class="item" href="">管理挑戰</a>
       <a class="item" href="">加入beacon</a>
       <div class="right menu">

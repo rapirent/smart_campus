@@ -115,12 +115,14 @@ def login_page(request):
         user = auth.authenticate(request, username=email, password=password)
 
         if not user:
+            messages.warning(request, 'Login failed!')
             return render(request, 'app/login.html')
 
         if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
             auth.login(request, user)
             return HttpResponseRedirect('/')
-
+        else:
+            messages.warning(request, 'Login failed!')
     else:
         if request.user.is_authenticated():
             return HttpResponseRedirect('/')
@@ -607,9 +609,8 @@ def get_all_travel_plans(request):
 
 
 @login_required
-@require_GET
 def reward_list_page(request):
-    # add the reward
+    # list all rewards
     categories = StationCategory.objects.all()
     categories_data = [
         {
@@ -634,4 +635,26 @@ def reward_list_page(request):
         'categories': categories_data
     }
 
-    return render(request, 'app/reward_list.html', context)
+    return render(request, 'app/reward_list_page.html', context)
+
+
+@login_required
+def reward_add_page(request):
+    # add the reward
+    if request.method == 'POST':
+        pass
+    else:
+        categories = StationCategory.objects.all()
+
+        categories_data = [
+            {
+                'name': category.name,
+            }
+            for category in categories
+        ]
+        context = {
+            'email': request.user.email,
+            'categories': categories_data
+        }
+
+        return render(request, 'app/reward_add_page.html', context)

@@ -17,11 +17,30 @@
       <label>類別描述</label>
       <textarea  rows="2" form="category_form" name="description" placeholder="類別描述"></textarea>
     </div>
-    <button class="ui submit button" type="submit">新增</button>
+    <button class="ui submit teal button" type="submit">新增</button>
+    <div class="ui error message"></div>
   </form>
+
 </div>
 {% endblock %}
 
 {% block script %}
   {{ block.super }}
+  <script>
+    $(document).ready(function() {
+      $(".ui.form").form({
+        fields: {
+          name: {
+            identifier: "name",
+            rules: [
+              {
+                type: "empty",
+                prompt: "請輸入類別名稱"
+              }
+            ]
+          }
+        }
+      });
+    });
+  </script>
 {% endblock %}
