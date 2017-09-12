@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station, StationCategory, Reward
+from .models import Station, StationCategory, Reward, User
 
 
 class StationForm(forms.ModelForm):
@@ -31,3 +31,9 @@ class RewardForm(forms.ModelForm):
     class Meta:
         model = Reward
         fields = '__all__'
+
+
+class ManagerForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'group', 'role')

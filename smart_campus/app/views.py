@@ -28,9 +28,9 @@ from .models import (
     Station, StationCategory,
     Beacon, StationImage, Question,
     UserReward, UserGroup,
-    TravelPlan
+    TravelPlan, Role
 )
-from .forms import StationForm, CategoryForm
+from .forms import StationForm, CategoryForm, ManagerForm
 
 
 @csrf_exempt
@@ -659,3 +659,96 @@ def reward_add_page(request):
         }
 
         return render(request, 'app/reward_add_page.html', context)
+
+
+@login_required
+def manager_list_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    managers = {
+        'email': manager.email
+        for manager in User.objects.exclude(role__name='User')
+    }
+    context = {
+        'email': request.user.email,
+        'managers': managers
+    }
+
+    return render(request, 'app/manager_list_page.html', context)
+
+
+@login_required
+def manager_add_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = ManagerForm(request.POST)
+        password = request.POST.get('password') 
+        if form.is_valid() and password is not None:
+            data = form.cleaned_data
+            manager = form.save(commit=False)
+            manager.set_password(password)
+            manager.save()
+            
+            return HttpResponseRedirect('/managers/')
+    else:
+        form = ManagerForm() 
+
+    roles = Role.objects.exclude(name='User')
+    groups = UserGroup.objects.all()
+    context = {
+        'roles': roles,
+        'groups': groups,
+        'form': form
+    }
+
+    return render(request, 'app/manager_add_page.html', context)
+
+
+@login_required
+def manager_edit_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    manager = get_object_or_404(User, pk=pk)
+
+    if request.method == 'POST':
+        form = ManagerForm(request.POST, instance=manager)
+        if form.is_valid():
+            data = form.cleaned_data
+            manager = form.save(commit=False)
+            manager.save()
+
+            return HttpResponseRedirect('/managers/')
+    else:
+        form = ManagerForm()
+        
+    form_data = {
+        'email': manager.email,
+        'role': manager.role,
+        'group': manager.group
+    }
+
+    roles = Role.objects.exclude(name='User')
+    groups = UserGroup.objects.all()
+    context = {
+        'roles': roles,
+        'groups': groups,
+        'form': form,
+        'form_data': form_data
+    }
+
+    return render(request, 'app/manager_edit_page.html', context)
+
+
+@login_required
+def manager_delete_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    manager = get_object_or_404(User, pk=pk)
+    manager.delete()
+
+    return HttpResponseRedirect('/managers/')

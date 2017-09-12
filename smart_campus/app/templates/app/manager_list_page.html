@@ -1,0 +1,21 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+  	<!-- Edit/Delete for each manager
+  	<a class="ui basic green button" href="{% url 'Manager Edit Page' <manager email> %}">修改</a>
+    <a class="ui basic red button" href="{% url 'Manager Delete Page' <manager email> %}">刪除</a>
+	-->
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Manager Add Page' %}">
+      新增管理者
+      <i class="add icon"></i>
+    </a>
+  </div>
+
+{% endblock %}

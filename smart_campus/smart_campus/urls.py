@@ -35,7 +35,16 @@ urlpatterns = [
     url(r'rewards/$', app.views.reward_list_page,
         name='Reward List Page'),
     url(r'rewards/new/$', app.views.reward_add_page,
-        name='Reward Add Page')
+        name='Reward Add Page'),
+    url(r'managers/$', app.views.manager_list_page,
+        name='Manager List Page'),
+    url(r'managers/new/$', app.views.manager_add_page,
+        name='Manager Add Page'),
+    url(r'managers/(?P<pk>[\w.@]+)/edit/$', app.views.manager_edit_page,
+        name='Manager Edit Page'),
+    url(r'managers/(?P<pk>[\w.@]+)/delete/$', app.views.manager_delete_page,
+        name='Manager Delete Page'),
+
 ]
 
 if settings.DEBUG:
