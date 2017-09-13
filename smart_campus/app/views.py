@@ -201,11 +201,6 @@ def station_edit_page(request, pk):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        # Delete Station request
-        if request.POST.get('delete_confirmed') == 'true':
-            station.delete()
-            return HttpResponseRedirect('/stations/')
-
         # Use custom StationForm to validate form datas
         # is_valid() will be true if received data is good
         # There'll be error messages in 'form' instance if validation failed
@@ -220,26 +215,15 @@ def station_edit_page(request, pk):
             station.beacon_set.clear()
             station.beacon_set.add(Beacon.objects.get(name=data['beacon']))
             station.save()
-
-            # Handle change of images
-            if request.POST.get('img_changed') == 'true':
-                # Clear old images
-                for img in StationImage.objects.filter(station=station):
-                    # Clear files on the disk
-                    # Delete model instance won't delete them
-                    if os.path.isfile(img.image.path):
-                        os.remove(img.image.path)
-                    img.delete()
-
-                # Add new images
-                for key, value in data.items():
-                    if isinstance(value, InMemoryUploadedFile):
-                        is_primary = (key == 'img{0}'.format(data['main_img_num']))
-                        StationImage.objects.create(
-                            station=station,
-                            image=value,
-                            is_primary=is_primary
-                        )
+            
+            # Add new images
+            for key, value in data.items():
+                if isinstance(value, InMemoryUploadedFile):
+                    StationImage.objects.create(
+                        station=station,
+                        image=value,
+                        is_primary=False
+                    )
 
             return HttpResponseRedirect('/stations/')
 
@@ -254,10 +238,9 @@ def station_edit_page(request, pk):
             'name': station.name,
             'category': station.category,
             'content': station.content,
-            'beacon_name': station.beacon_set.first().name,
+            'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
-            'images': StationImage.objects.filter(station_id=station.id)
         }
 
     if request.user.can(Permission.ADMIN):
@@ -274,8 +257,46 @@ def station_edit_page(request, pk):
         'form': form,
         'form_data': form_data,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
+        'images': StationImage.objects.filter(station_id=station.id)
     }
     return render(request, 'app/station_edit.html', context)
+
+
+@login_required
+def set_primary_station_image(request, pk):
+    image = get_object_or_404(StationImage, pk=pk)
+
+    if (not image.station.owner_group == request.user.group and
+            not request.user.is_administrator()):
+        return HttpResponseForbidden()
+
+    station_images = StationImage.objects.filter(station=image.station)
+    for each_img in station_images:
+        each_img.is_primary=False
+        each_img.save()
+
+    image.is_primary=True
+    image.save()
+
+    return HttpResponseRedirect('/stations/{0}/edit/'.format(image.station.id))
+
+
+@login_required
+def delete_station_image(request, pk):
+    image = get_object_or_404(StationImage, pk=pk)
+
+    if (not image.station.owner_group == request.user.group and
+            not request.user.is_administrator()):
+        return HttpResponseForbidden()
+
+    if not image.is_primary:
+        if os.path.isfile(image.image.path):
+            os.remove(img.image.path)
+        image.delete()
+
+        return HttpResponseRedirect('/stations/{0}/edit/'.format(image.station.id))
+
+    return HttpResponseForbidden()
 
 
 @login_required
@@ -354,8 +375,11 @@ def get_all_stations(request):
             'category': str(station.category),
             'location': station.location.get_coords(),
             'image': {
-                'primary': 'http://{0}{1}'.format(request.get_host(), station.primary_image_url),
-                'others': ['http://{0}/{1}'.format(request.get_host(), img.image.url)
+                'primary': 
+                    'http://{0}{1}'.format(request.get_host(), StationImage.objects.filter(station=station, is_primary=True).first().image.url)
+                    if StationImage.objects.filter(station=station, is_primary=True).exists()
+                    else '',
+                'others': ['http://{0}{1}'.format(request.get_host(), img.image.url)
                            for img in StationImage.objects.filter(station=station, is_primary=False)]
             }
         }
