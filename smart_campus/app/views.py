@@ -475,28 +475,16 @@ def add_user_reward(request):
     reward_id = request.POST.get('reward_id')
 
     user = User.objects.filter(email=email).first()
-    reward = Reward.objects.filter(id=reward_id)
+    reward = Reward.objects.filter(id=reward_id).first()
 
     if not user or not reward:
         return HttpResponse('User or reward is not exitst', status=404)
     try:
-        # TODO
-        user.add(reward)
-        user.save()
+        UserReward.objects.create(user=user, reward=reward)
     except ValueError:
-        return HttpResponse('Invalid input of reward id', status=400)
+        return HttpResponse('Cant Create The Relation', status=400)
 
-# TODO
-    return JsonResponse({
-            'status': 'true',
-            'message': 'Success',
-            'data': {
-                reward: [
-                    reward.id
-                    for reward in UserReward.objects.filter(user=user)
-                    ]
-            }
-    })
+    return HttpResponse('Create Succeeded', status=200)
 
 
 @csrf_exempt
