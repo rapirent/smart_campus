@@ -27,13 +27,7 @@ class CategoryForm(forms.ModelForm):
         fields = '__all__'
 
 
-class RewardForm(forms.ModelForm):
+class PartialRewardForm(forms.ModelForm):
     class Meta:
         model = Reward
-        fields = '__all__'
-
-
-class ManagerForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ('email', 'group', 'role')
+        exclude = ['related_station']

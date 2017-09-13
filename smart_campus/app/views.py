@@ -30,7 +30,7 @@ from .models import (
     UserReward, UserGroup,
     TravelPlan, Role
 )
-from .forms import StationForm, CategoryForm, ManagerForm
+from .forms import StationForm, CategoryForm, PartialRewardForm
 
 
 @csrf_exempt
@@ -544,29 +544,20 @@ def category_add_page(request):
                         'image_url': station.primary_image_url
                     }
                     for station in stations
-                ]
+                ],
+                'categories': StationCategory.objects.all()
             }
 
             # TODO
             # add the specified category station list
             return HttpResponse('Success', status=200)
             # return render(request, 'station_list.html', context)
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
 
-    else:
-        categories = StationCategory.objects.all()
-
-        categories_data = [
-            {
-                'name': category.name,
-            }
-            for category in categories
-        ]
-        context = {
-            'email': request.user.email,
-            'categories': categories_data
-        }
-
-        return render(request, 'app/category_add_page.html', context)
+    return render(request, 'app/category_add_page.html', context)
 
 
 @csrf_exempt
@@ -612,14 +603,6 @@ def get_all_travel_plans(request):
 @login_required
 def reward_list_page(request):
     # list all rewards
-    categories = StationCategory.objects.all()
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
     rewards = Reward.objects.all()
     rewards_data = [
         {
@@ -633,7 +616,7 @@ def reward_list_page(request):
     context = {
         'email': request.user.email,
         'rewards': rewards_data,
-        'categories': categories_data
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/reward_list_page.html', context)
@@ -643,112 +626,22 @@ def reward_list_page(request):
 def reward_add_page(request):
     # add the reward
     if request.method == 'POST':
-        pass
-    else:
-        categories = StationCategory.objects.all()
+        reward_form = PartialRewardForm(request.POST, request.FILES)
 
-        categories_data = [
-            {
-                'name': category.name,
+        if reward_form.is_valid():
+            reward_form.save()
+
+            context = {
+                'rewards': Reward.objects.all(),
+                'email': request.user.email,
+                'categories': StationCategory.objects.all()
             }
-            for category in categories
-        ]
-        context = {
-            'email': request.user.email,
-            'categories': categories_data
-        }
+            # messages.info(request, 'Three credits remain in your account.')
+            # return HttpResponse('Success', status=200)
+            return render(request, 'app/reward_list_page.html', context)
 
-        return render(request, 'app/reward_add_page.html', context)
-
-
-@login_required
-def manager_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
-    managers = {
-        'email': manager.email
-        for manager in User.objects.exclude(role__name='User')
-    }
     context = {
         'email': request.user.email,
-        'managers': managers
+        'categories': StationCategory.objects.all()
     }
-
-    return render(request, 'app/manager_list_page.html', context)
-
-
-@login_required
-def manager_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
-    if request.method == 'POST':
-        form = ManagerForm(request.POST)
-        password = request.POST.get('password') 
-        if form.is_valid() and password is not None:
-            data = form.cleaned_data
-            manager = form.save(commit=False)
-            manager.set_password(password)
-            manager.save()
-            
-            return HttpResponseRedirect('/managers/')
-    else:
-        form = ManagerForm() 
-
-    roles = Role.objects.exclude(name='User')
-    groups = UserGroup.objects.all()
-    context = {
-        'roles': roles,
-        'groups': groups,
-        'form': form
-    }
-
-    return render(request, 'app/manager_add_page.html', context)
-
-
-@login_required
-def manager_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
-    manager = get_object_or_404(User, pk=pk)
-
-    if request.method == 'POST':
-        form = ManagerForm(request.POST, instance=manager)
-        if form.is_valid():
-            data = form.cleaned_data
-            manager = form.save(commit=False)
-            manager.save()
-
-            return HttpResponseRedirect('/managers/')
-    else:
-        form = ManagerForm()
-        
-    form_data = {
-        'email': manager.email,
-        'role': manager.role,
-        'group': manager.group
-    }
-
-    roles = Role.objects.exclude(name='User')
-    groups = UserGroup.objects.all()
-    context = {
-        'roles': roles,
-        'groups': groups,
-        'form': form,
-        'form_data': form_data
-    }
-
-    return render(request, 'app/manager_edit_page.html', context)
-
-
-@login_required
-def manager_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
-    manager = get_object_or_404(User, pk=pk)
-    manager.delete()
-
-    return HttpResponseRedirect('/managers/')
+    return render(request, 'app/reward_add_page.html', context)

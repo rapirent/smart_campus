@@ -127,6 +127,12 @@ class Reward(models.Model):
         upload_to='images/reward/'
     )
     description = models.TextField(blank=True)
+    related_station = models.ForeignKey(
+        'Station',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name

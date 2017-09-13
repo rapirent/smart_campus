@@ -10,6 +10,13 @@
 
 {% block content %}
   <div class="ui borderless center aligned text container">
+    {% if messages %}
+      {% for message in messages %}
+    <div class="ui info message">
+          {{ message }}
+    </div>
+      {% endfor %}
+    {% endif %}
   {% if rewards %}
     {% for reward in rewards %}
     <div class="ui cards">
@@ -25,7 +32,7 @@
         </div>
         <div class="extra content">
           <div class="ui two buttons">
-            <div class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</div>
+            <div class="ui basic green button" href="">修改</div>
             <div class="ui basic red button" href="">刪除</div>
           </div>
         </div>
