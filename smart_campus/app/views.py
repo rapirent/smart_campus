@@ -594,19 +594,10 @@ def get_all_travel_plans(request):
 @login_required
 def reward_list_page(request):
     # list all rewards
-    rewards = Reward.objects.all()
-    rewards_data = [
-        {
-            'id': reward.id,
-            'name': reward.name,
-            'image': reward.image.url
-        }
-        for reward in rewards
-    ]
 
     context = {
         'email': request.user.email,
-        'rewards': rewards_data,
+        'rewards': Reward.objects.all(),
         'categories': StationCategory.objects.all()
     }
 
