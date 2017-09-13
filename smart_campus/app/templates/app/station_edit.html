@@ -145,7 +145,7 @@
       const element = document.querySelector("trix-editor")
       element.editor.setSelectedRange([0, 0])
       element.editor.insertHTML( "{{ form_data.content|safe|escape }}")
-      const beacon_name = '{{form_data.beacon_name|stringformat:"s"}}'
+      const beacon_name = '{{form_data.beacon|stringformat:"s"}}'
       $("#selectbasic").val( beacon_name )
       $("#lat_input").val( {{ form_data.lat|stringformat:'f'}} )
       $("#lng_input").val( {{ form_data.lng|stringformat:'f' }} )
@@ -166,5 +166,6 @@
       $('.field .image').dimmer({
         on: 'hover'
       });
+    })
   </script>
 {% endblock %}

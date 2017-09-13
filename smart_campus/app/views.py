@@ -235,7 +235,7 @@ def station_edit_page(request, pk):
             'name': station.name,
             'category': station.category,
             'content': station.content,
-            'beacon_name': station.beacon_set.first().name,
+            'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
         }
