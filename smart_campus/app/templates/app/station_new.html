@@ -8,6 +8,11 @@
   <link rel="stylesheet" type="text/css" href="{% static "app/css/station_new.css" %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'trix/trix.css' %}">
   <script type="text/javascript" src="{% static 'trix/trix.js' %}"></script>
+  <style rel="stylesheet" type="text/css">
+    .ui.container {
+      margin-bottom: 1em;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -101,9 +106,7 @@
       </div>
     </div>
     <button class="ui fluid teal submit button" type="submit">加入站點</button>
-
   </form>
-  <br>
 </div>
 
 {% endblock %}

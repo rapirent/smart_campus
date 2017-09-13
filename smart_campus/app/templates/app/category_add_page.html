@@ -3,7 +3,12 @@
 
 {% block stylesheet %}
   {{ block.super }}
-
+  <style rel="stylesheet" type="text/css">
+    .ui.text.container {
+      margin-bottom: 1em;
+    }
+  </style>
+  {% block cont
 {% endblock %}
 {% block content %}
 <div class="ui text container">
