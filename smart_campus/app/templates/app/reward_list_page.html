@@ -5,7 +5,11 @@
 
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_list.css" %}" />
+  <style rel="stylesheet" type="text/css">
+    .ui.borderless.center.aligned.text.container {
+      margin-bottom: 1em;
+    }
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -21,20 +25,18 @@
     {% for reward in rewards %}
     <div class="ui cards">
       <div class="ui centered card">
+        <div class="image">
+            <img src="{{ reward.image }}">
+        </div>
         <div class="content">
-          <img class="right floated tiny ui image" src="{{ station.primary_image }}">
+          <!-- <img class="right floated tiny ui image" src="{{ reward.image }}"> -->
           <div class="header">
             {{ reward.name }}
           </div>
-          <div class="meta">
-            站點
-          </div>
         </div>
         <div class="extra content">
-          <div class="ui two buttons">
-            <div class="ui basic green button" href="">修改</div>
-            <div class="ui basic red button" href="">刪除</div>
-          </div>
+          <div class="ui basic green left floated button">修改</div>
+          <div class="ui basic red right floated button">刪除</div>
         </div>
       </div>
     </div>
