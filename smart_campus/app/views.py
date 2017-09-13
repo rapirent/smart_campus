@@ -175,7 +175,10 @@ def station_list_page(request):
                     station=station,
                     is_primary=True
                 ).first(),
-            'category': station.category
+            'category': station.category,
+            'beacon': Beacon.objects.filter(
+                station=station
+            ).first()
         }
         for station in stations
     ]
