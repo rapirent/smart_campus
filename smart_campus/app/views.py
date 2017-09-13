@@ -164,15 +164,6 @@ def station_list_page(request):
     else:
         stations = Station.objects.filter(owner_group=request.user.group)
 
-    categories = StationCategory.objects.all()
-
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
     station_data = [
         {
             'id': station.id,
@@ -192,7 +183,7 @@ def station_list_page(request):
     context = {
         'email': request.user.email,
         'stations': station_data,
-        'categories': categories_data
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/station_list.html', context)
@@ -244,7 +235,7 @@ def station_edit_page(request, pk):
             'name': station.name,
             'category': station.category,
             'content': station.content,
-            'beacon': station.beacon_set.first().name,
+            'beacon_name': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
         }
@@ -746,3 +737,128 @@ def manager_delete_page(request, pk):
     manager.delete()
 
     return HttpResponseRedirect('/managers/')
+
+
+@login_required
+def beacon_list_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    context = {
+        'email': request.user.email,
+        'beacons': Beacon.objects.all(),
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/beacon_list_page.html', context)
+
+
+@login_required
+def beacon_add_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = BeaconForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            beacon = form.save(commit=False)
+            beacon.location = Point(x=data['lng'], y=data['lat'])
+            beacon.save()
+            return HttpResponseRedirect('/beacons/')
+    else:
+        form = BeaconForm()
+
+    context = {
+        'groups': UserGroup.objects.all(),
+        'form': form
+    }
+
+    return render(request, 'app/beacon_add_page.html', context)
+
+
+@login_required
+def beacon_edit_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    beacon = get_object_or_404(Beacon, pk=pk)
+
+    if request.method == 'POST':
+        form = BeaconForm(request.POST, instance=beacon)
+        if form.is_valid():
+            data = form.cleaned_data
+            beacon = form.save(commit=False)
+            beacon.location = Point(x=data['lng'], y=data['lat'])
+            beacon.save()
+            return HttpResponseRedirect('/beacons/')
+    else:
+        form = BeaconForm()
+
+    form_data = {
+        'beacon_id': beacon.beacon_id,
+        'name': beacon.name,
+        'description': beacon.description,
+        'lat': beacon.location.y,
+        'lng': beacon.location.x,
+        'owner_group': beacon.owner_group
+    }
+
+    context = {
+        'groups': UserGroup.objects.all(),
+        'form': form,
+        'form_data': form_data
+    }
+
+    return render(request, 'app/beacon_edit_page.html', context)
+
+
+@login_required
+def beacon_delete_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    beacon = get_object_or_404(Beacon, pk=pk)
+    beacon.delete()
+
+    return HttpResponseRedirect('/beacons/')
+
+
+@login_required
+def station_delete_page(request, pk):
+    station = get_object_or_404(Station, pk=pk)
+
+    if (not station.owner_group == request.user.group and
+            not request.user.is_administrator()):
+        return HttpResponseForbidden()
+
+    station.delete()
+
+    if request.user.can(Permission.ADMIN):
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    station_data = [
+        {
+            'id': station.id,
+            'name': station.name,
+            'primary_image': StationImage.objects.filter(
+                    station=station,
+                    is_primary=True
+                ).first(),
+            'category': station.category,
+            'beacon': Beacon.objects.filter(
+                station=station
+            ).first()
+        }
+        for station in stations
+    ]
+
+    context = {
+        'email': request.user.email,
+        'stations': station_data,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/station_list.html', context)

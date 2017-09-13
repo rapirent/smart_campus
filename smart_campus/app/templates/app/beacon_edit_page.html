@@ -1,0 +1,63 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="ui text container">
+  <form class="ui big borderless form" action="" method="POST" id="category_form">
+    {% csrf_token %}
+    <div class="required five wide field">
+      <label>Beacon ID</label>
+      <input type="text" name="beacon_id" placeholder="801-xxxxx-xxxxx" value="{{ form_data.beacon_id }}" readonly="">
+    </div>
+    <div class="field">
+      <label>名稱</label>
+      <input type="text" name="name" value="{{ form_data.name }}">
+    </div>
+    <div class="field">
+      <label>描述</label>
+      <input type="text" name="description" value="{{ form_data.description }}">
+    </div>
+    <div class="required five wide field">
+      <label>緯度</label>
+      <input name="lat" type="number" step="any" placeholder="緯度"required="" value="{{ form_data.lat }}">
+    </div>
+    <div class="required five wide field">
+      <label>經度</label>
+      <input name="lng" type="number" step="any" placeholder="經度" required="" value="{{ form_data.lng }}">
+    </div>
+    <div class="field">
+      <label>管理群組</label>
+      <div class="ui selection dropdown">
+        <input type="hidden" name="owner_group" value="{{ form_data.owner_group }}">
+        <i class="dropdown icon"></i>
+        <div class="default text">請選擇群組...</div>
+        <div class="menu">
+          {% if groups %} {% for group in groups %}
+          <div class="item" value="{{ group.id }}" data-value="{{ group.id }}">
+            {{ group.name }}
+          </div>
+          {% endfor %} {% endif %}
+        </div>
+      </div>
+    </div>
+    <button class="ui submit teal button" type="submit">儲存</button>
+    <div class="ui error message"></div>
+  </form>
+
+</div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script>
+    $('.ui.selection.dropdown').dropdown();
+
+    $(document).ready(function() {
+      $(".ui.form").form({
+        fields: {
+          
+        }
+      });
+    });
+  </script>
+{% endblock %}

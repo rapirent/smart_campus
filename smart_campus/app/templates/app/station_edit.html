@@ -1,9 +1,10 @@
 {% extends 'app/base.html' %}
 {% load static %}
 
+{% block title %}Smart Campus{% endblock %}
+
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_edit.css" %}">
   <link rel="stylesheet" type="text/css" href="{% static 'trix/trix.css' %}">
   <script type="text/javascript" src="{% static 'trix/trix.js' %}"></script>
   <style rel="stylesheet" type="text/css">
@@ -144,7 +145,7 @@
       const element = document.querySelector("trix-editor")
       element.editor.setSelectedRange([0, 0])
       element.editor.insertHTML( "{{ form_data.content|safe|escape }}")
-      const beacon_name = '{{form_data.beacon|stringformat:"s"}}'
+      const beacon_name = '{{form_data.beacon_name|stringformat:"s"}}'
       $("#selectbasic").val( beacon_name )
       $("#lat_input").val( {{ form_data.lat|stringformat:'f'}} )
       $("#lng_input").val( {{ form_data.lng|stringformat:'f' }} )
@@ -162,8 +163,6 @@
         });
       $('.ui.radio.checkbox')
         .checkbox();
-
-      })
       $('.field .image').dimmer({
         on: 'hover'
       });

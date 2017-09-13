@@ -1,7 +1,7 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station, StationCategory, Reward, User
+from .models import Station, StationCategory, Reward, User, Beacon
 
 
 class StationForm(forms.ModelForm):
@@ -31,3 +31,22 @@ class PartialRewardForm(forms.ModelForm):
     class Meta:
         model = Reward
         exclude = ['related_station']
+
+
+class ManagerForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'group', 'role')
+
+
+class BeaconForm(forms.ModelForm):
+    lat = forms.FloatField()
+    lng = forms.FloatField()
+
+    class Meta:
+        model = Beacon
+        fields = ('beacon_id', 'name', 'description', 'owner_group')
+
+    def __init__(self, *args, **kwargs):
+        super(BeaconForm, self).__init__(*args, **kwargs)
+        self.fields['owner_group'].required = False
