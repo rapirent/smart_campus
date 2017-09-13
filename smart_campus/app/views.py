@@ -658,7 +658,8 @@ def manager_list_page(request):
 
     context = {
         'email': request.user.email,
-        'managers': User.objects.exclude(role__name='User')
+        'managers': User.objects.exclude(role__name='User'),
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -686,7 +687,8 @@ def manager_add_page(request):
     context = {
         'roles': roles,
         'groups': groups,
-        'form': form
+        'form': form,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_add_page.html', context)
@@ -722,7 +724,8 @@ def manager_edit_page(request, pk):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'form_data': form_data
+        'form_data': form_data,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_edit_page.html', context)
