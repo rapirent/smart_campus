@@ -30,7 +30,7 @@ from .models import (
     UserReward, UserGroup,
     TravelPlan
 )
-from .forms import StationForm, CategoryForm
+from .forms import StationForm, CategoryForm, PartialRewardForm
 
 
 @csrf_exempt
@@ -544,29 +544,20 @@ def category_add_page(request):
                         'image_url': station.primary_image_url
                     }
                     for station in stations
-                ]
+                ],
+                'categories': StationCategory.objects.all()
             }
 
             # TODO
             # add the specified category station list
             return HttpResponse('Success', status=200)
             # return render(request, 'station_list.html', context)
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
 
-    else:
-        categories = StationCategory.objects.all()
-
-        categories_data = [
-            {
-                'name': category.name,
-            }
-            for category in categories
-        ]
-        context = {
-            'email': request.user.email,
-            'categories': categories_data
-        }
-
-        return render(request, 'app/category_add_page.html', context)
+    return render(request, 'app/category_add_page.html', context)
 
 
 @csrf_exempt
@@ -612,14 +603,6 @@ def get_all_travel_plans(request):
 @login_required
 def reward_list_page(request):
     # list all rewards
-    categories = StationCategory.objects.all()
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
     rewards = Reward.objects.all()
     rewards_data = [
         {
@@ -633,7 +616,7 @@ def reward_list_page(request):
     context = {
         'email': request.user.email,
         'rewards': rewards_data,
-        'categories': categories_data
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/reward_list_page.html', context)
@@ -643,19 +626,22 @@ def reward_list_page(request):
 def reward_add_page(request):
     # add the reward
     if request.method == 'POST':
-        pass
-    else:
-        categories = StationCategory.objects.all()
+        reward_form = PartialRewardForm(request.POST, request.FILES)
 
-        categories_data = [
-            {
-                'name': category.name,
+        if reward_form.is_valid():
+            reward_form.save()
+
+            context = {
+                'rewards': Reward.objects.all(),
+                'email': request.user.email,
+                'categories': StationCategory.objects.all()
             }
-            for category in categories
-        ]
-        context = {
-            'email': request.user.email,
-            'categories': categories_data
-        }
+            # messages.info(request, 'Three credits remain in your account.')
+            # return HttpResponse('Success', status=200)
+            return render(request, 'app/reward_list_page.html', context)
 
-        return render(request, 'app/reward_add_page.html', context)
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+    return render(request, 'app/reward_add_page.html', context)
