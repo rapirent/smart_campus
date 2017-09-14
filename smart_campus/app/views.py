@@ -862,3 +862,15 @@ def station_delete_page(request, pk):
     }
 
     return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def travelplan_list_page(requset):
+    # list the travelplan on teh page
+    context = {
+        'categories': StationCategory.objects.all(),
+        'email': requset.user.email,
+        'travelplans': TravelPlan.objects.all()
+    }
+
+    return render(requset, 'app/travelplan_list_page.html', context)
