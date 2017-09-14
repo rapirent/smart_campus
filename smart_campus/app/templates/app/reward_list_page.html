@@ -1,15 +1,9 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}Smart Campus{% endblock %}
-
 {% block stylesheet %}
   {{ block.super }}
-  <style rel="stylesheet" type="text/css">
-    .ui.borderless.center.aligned.text.container {
-      margin-bottom: 1em;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="{% static " app/css/list.css " %}">
 {% endblock %}
 
 {% block content %}
@@ -17,7 +11,7 @@
     {% if messages %}
       {% for message in messages %}
     <div class="ui info message">
-          {{ message }}
+      {{ message }}
     </div>
       {% endfor %}
     {% endif %}
@@ -26,10 +20,9 @@
     <div class="ui cards">
       <div class="ui centered card">
         <div class="image">
-            <img src="{{ reward.image.url }}">
+          <img src="{{ reward.image.url }}">
         </div>
         <div class="content">
-          <!-- <img class="right floated tiny ui image" src="{{ reward.image }}"> -->
           <div class="header">
             {{ reward.name }}
           </div>

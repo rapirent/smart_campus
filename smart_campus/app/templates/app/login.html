@@ -1,20 +1,21 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}Smart Campus Login {% endblock %}
+{% block title %}
+Smart Campus Login
+{% endblock %}
 
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/login.css" %}" />
 {% endblock %}
-
-{% block nav %}{% endblock %}
+{% block nav %}
+{% endblock %}
 
 {% block content %}
 <div class="ui middle aligned center aligned grid">
   <div class="column">
     <h2 class="ui teal header">
-      <!-- <img src="{% static 'app/icon/ncku.png' %}" class="logo"> -->
       <div class="content">
         成功大學智慧校園管理系統
       </div>
@@ -58,35 +59,6 @@
 
 {% block script %}
 {{ block.super }}
-<script
-<script>
-$(document).ready(function() {
-  $(".ui.form").form({
-    fields: {
-      email: {
-        identifier: "email",
-        rules: [
-          {
-            type: "empty",
-            prompt: "請輸入email"
-          },
-          {
-            type: "email",
-            prompt: "錯誤的email格式"
-          }
-        ]
-      },
-      password: {
-        identifier: "password",
-        rules: [
-          {
-            type: "empty",
-            prompt: "請輸入密碼"
-          }
-        ]
-      }
-    }
-  });
-});
-</script>
+<script src="{% static "app/js/login.js" %}"></script>
+
 {% endblock %}

@@ -538,7 +538,7 @@ def add_user_favorite_stations(request):
 def category_add_page(request):
     """add the category"""
     if request.method == 'POST':
-        category_form = CategoryForm(request.POST)
+        category_form = StationCategoryForm(request.POST)
 
         if category_form.is_valid():
             if request.user.can(Permission.ADMIN):
