@@ -269,7 +269,7 @@ class Station(models.Model):
 
 
 class StationCategory(models.Model):
-    name = models.CharField(max_length=254)
+    name = models.CharField(max_length=254, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
