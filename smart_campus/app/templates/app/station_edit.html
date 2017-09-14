@@ -29,11 +29,13 @@
       <div class="field">
         <label>類別</label>
         <select class="ui selection dropdown" placeholder="{{form_data.category}}">
-          {% if categories %} {% for category in categories %}
-          <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
-            {{ category.name }}
-          </option>
-          {% endfor %} {% endif %}
+          {% if categories %}
+            {% for category in categories %}
+            <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
+              {{ category.name }}
+            </option>
+            {% endfor %}
+          {% endif %}
         </select>
       </div>
       <div class="left floated field">
@@ -122,9 +124,6 @@
 {% block script %}
   {{ block.super }}
   <script>
-
-  /*Get location(lat, lng) of beacons,
-    In order to show them on the Map*/
   var location_arr = [];
 
   {% if beacons %}

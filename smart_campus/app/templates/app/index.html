@@ -1,43 +1,11 @@
-{% extends 'app/base.html' %} {% load static %} {% block stylesheet %} {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
-{% endblock %} {% block content %}
-<div class="ui grid">
-  <div class="row">
-    <div class="four wide column centered">
-      <div class="ui small info message">
-        <i class="close icon"></i>
-        <div class="header">
-          改版資訊
-        </div>
-        <ul class="list">
-          <li>終於給index加了一些東西</li>
-          <li>讚讚讚</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-  <div class="row">
-    <div class="four wide column centered">
-      <div class="ui small info message">
-        <i class="close icon"></i>
-        <div class="header">
-          改版資訊
-        </div>
-        <ul class="list">
-          <li>終於給index加了一些東西</li>
-          <li>讚讚讚</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-{% endblock %} {% block script %} {{ block.super }}
-<script>
-  $('.message .close')
-    .on('click', function () {
-      $(this)
-        .closest('.message')
-        .transition('fade');
-    });
-</script>
+{% extends 'app/base.html' %}
+{% load static %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
+  {% endblock %}
+{% block content %}
+{% endblock %}
+  {% block script %}
+  {{ block.super }}
 {% endblock %}

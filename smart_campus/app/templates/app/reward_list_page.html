@@ -1,8 +1,6 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}Smart Campus{% endblock %}
-
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static " app/css/list.css " %}">
@@ -22,10 +20,9 @@
     <div class="ui cards">
       <div class="ui centered card">
         <div class="image">
-            <img src="{{ reward.image.url }}">
+          <img src="{{ reward.image.url }}">
         </div>
         <div class="content">
-          <!-- <img class="right floated tiny ui image" src="{{ reward.image }}"> -->
           <div class="header">
             {{ reward.name }}
           </div>

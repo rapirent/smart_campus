@@ -5,7 +5,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>{% block title %}Smart Campus{% endblock %}</title>
+  <title>
+    {% block title %}
+      Smart Campus
+    {% endblock %}
+  </title>
   {% block stylesheet %}
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/semantic.min.css">
@@ -33,56 +37,56 @@
 </head>
 
 <body>
-  {% block nav %}
-    <div class="ui borderless main menu" id="selection">
-      <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
-      <div class="ui dropdown item" id="selection">
-        管理站點及通知
-        <i class="dropdown icon"></i>
-        <div class="menu">
-          {% if categories %}
-            {% for category in categories %}
-              <div class="item" href="">{{ category.name }}</div>
-            {% endfor %}
-          {% endif %}
-          <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
-          <hr>
-          <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
-        </div>
-      </div>
-      <a class="item" href="">管理使用者</a>
-      <a class="item" href="{% url 'Reward List Page' %}">管理獎勵</a>
-      <a class="item" href="">管理挑戰</a>
-      <a class="item" href="">加入beacon</a>
-      <div class="right menu">
-        <div class="header item">
-          {% if email %}
-              {{ email }}
-          {% endif %}
-        </div>
-        <a class="item" href="{% url 'Logout Page' %}" >登出</a>
-        <a class="item" href="">Help</a>
+{% block nav %}
+  <div class="ui borderless main menu" id="selection">
+    <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
+    <div class="ui dropdown item" id="selection">
+      管理站點及通知
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        {% if categories %}
+          {% for category in categories %}
+            <div class="item" href="">{{ category.name }}</div>
+          {% endfor %}
+        {% endif %}
+        <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
+        <hr>
+        <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
       </div>
     </div>
-  <!-- </div> -->
+    <a class="item" href="">管理使用者</a>
+    <a class="item" href="{% url 'Reward List Page' %}">管理獎勵</a>
+    <a class="item" href="">管理挑戰</a>
+    <a class="item" href="">加入beacon</a>
+    <div class="right menu">
+      <div class="header item">
+        {% if email %}
+          {{ email }}
+        {% endif %}
+      </div>
+      <a class="item" href="{% url 'Logout Page' %}" >登出</a>
+      <a class="item" href="">Help</a>
+    </div>
+  </div>
   {% endblock %}
 
-  {% block content %}{% endblock %}
+  {% block content %}
+  {% endblock %}
 
   {% block script %}
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-    <script
-      src="https://code.jquery.com/jquery-3.1.1.min.js"
-      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-      crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/semantic.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/form.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/transition.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/dropdown.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/dimmer.min.js"></script>
-    <script src="{% static "app/js/base.js" %}"></script>
-  {% endblock %}
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/semantic.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/form.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/transition.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/dropdown.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/dimmer.min.js"></script>
+  <script src="{% static "app/js/base.js" %}"></script>
+{% endblock %}
 </body>
 </html>

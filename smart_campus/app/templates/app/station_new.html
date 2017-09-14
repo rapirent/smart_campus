@@ -1,21 +1,16 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}Smart Campus{% endblock %}
-
 {% block stylesheet %}
   {{ block.super }}>
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.js"></script>
   <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
-
-
 {% endblock %}
 
 {% block content %}
 <div class="ui container">
 
-  <!-- Form -->
   <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
       {% for field in form %}
           {% if field.errors %}
@@ -41,11 +36,13 @@
           <i class="dropdown icon"></i>
           <div class="default text">請選擇類別...</div>
           <div class="menu">
-            {% if categories %} {% for category in categories %}
-            <div class="item" value="{{ category.name }}" data-value="{{ category.name }}">
-              {{ category.name }}
-            </div>
-            {% endfor %} {% endif %}
+            {% if categories %}
+              {% for category in categories %}
+              <div class="item" value="{{ category.name }}" data-value="{{ category.name }}">
+                {{ category.name }}
+              </div>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
       </div>
@@ -111,8 +108,6 @@
 {% block script %}
   {{ block.super }}
   <script>
-      /*Get location(lat, lng) of beacons,
-        In order to show them on the Map*/
         var location_arr = [];
 
         {% if beacons %}
