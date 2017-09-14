@@ -68,7 +68,9 @@ urlpatterns = [
     url(r'^travelplans/$', app.views.travelplan_list_page,
         name='TravelPlan List Page'),
     url(r'^travelplans/new$', app.views.travelplan_add_page,
-        name='TravelPlan Add Page')
+        name='TravelPlan Add Page'),
+    url(r'^travelplans/(?P<pk>\d+)/edit/$', app.views.travelplan_edit_page,
+        name='TravelPlan Edit Page')
 ]
 
 if settings.DEBUG:

@@ -63,3 +63,9 @@ class PartialTravelPlanForm(forms.ModelForm):
     class Meta:
         model = TravelPlan
         exclude = ['stations']
+
+
+class TravelPlanForm(forms.ModelForm):
+    class Meta:
+        model = TravelPlan
+        fields = '__all__'

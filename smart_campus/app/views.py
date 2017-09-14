@@ -36,7 +36,8 @@ from .forms import (
     ManagerForm,
     PartialRewardForm,
     BeaconForm,
-    PartialTravelPlanForm
+    PartialTravelPlanForm,
+    TravelPlanForm
 )
 
 
@@ -866,40 +867,63 @@ def station_delete_page(request, pk):
 
 
 @login_required
-def travelplan_list_page(requset):
+def travelplan_list_page(request):
     # list the travelplan on teh page
     context = {
         'categories': StationCategory.objects.all(),
-        'email': requset.user.email,
+        'email': request.user.email,
         'travelplans': TravelPlan.objects.all()
     }
 
-    return render(requset, 'app/travelplan_list_page.html', context)
+    return render(request, 'app/travelplan_list_page.html', context)
 
 
 @login_required
-def travelplan_add_page(requset):
+def travelplan_add_page(request):
     # add the travelplan using partialtravelplanform
-    if requset.method == 'POST':
-        travelplan_form = PartialTravelPlanForm(requset.POST, requset.FILES)
+    if request.method == 'POST':
+        travelplan_form = PartialTravelPlanForm(request.POST, request.FILES)
 
         if travelplan_form.is_valid():
             travelplan_form.save()
 
             context = {
                 'categories': StationCategory.objects.all(),
-                'email': requset.user.email,
+                'email': request.user.email,
                 'travelplans': TravelPlan.objects.all()
             }
 
-            return render(requset, 'app/travelplan_list_page.html', context)
+            return render(request, 'app/travelplan_list_page.html', context)
     else:
         travelplan_form = PartialTravelPlanForm()
 
     context = {
         'categories': StationCategory.objects.all(),
-        'email': requset.user.email,
+        'email': request.user.email,
         'form': travelplan_form
     }
 
-    return render(requset, 'app/travelplan_add_page.html', context)
+    return render(request, 'app/travelplan_add_page.html', context)
+
+
+@login_required
+def travelplan_edit_page(request, pk):
+    # edit the travelplan content using travelplanform
+
+    # use pk to get the travelplan
+    travelplan = get_object_or_404(TravelPlan, pk=pk)
+
+    if request.method == 'POST':
+        # instance varible to specify the travelplan being edited
+        travelplan_form = TravelPlanForm(
+                                request.POST,
+                                request.FILES,
+                                isinstance=travelplan
+                            )
+
+        if travelplan_form.is_valid():
+            pass
+    context = {
+        'email': request.user.email,
+    }
+    return render(request, 'app/travelplan_edit_page.html', context)
