@@ -1,9 +1,5 @@
 {% extends 'app/base.html' %} {% load static %} {% block stylesheet %} {{ block.super }}
-<style type="text/css">
-  .segment {
-    max-width: 300px;
-  }
-</style>
+<link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
 {% endblock %} {% block content %}
 <div class="ui grid">
   <div class="row">
