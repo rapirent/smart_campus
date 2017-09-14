@@ -21,7 +21,7 @@ class StationForm(forms.ModelForm):
         fields = ('name', 'content', 'category')
 
 
-class CategoryForm(forms.ModelForm):
+class StationCategoryForm(forms.ModelForm):
     class Meta:
         model = StationCategory
         fields = '__all__'
