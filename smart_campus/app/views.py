@@ -419,6 +419,7 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
+            'rewards': [station.id for station in station.reward_set.all()],
             'image': {
                 'primary':
                     '{0}{1}{2}'.format(
