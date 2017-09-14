@@ -35,7 +35,8 @@ from .forms import (
     CategoryForm,
     ManagerForm,
     PartialRewardForm,
-    BeaconForm
+    BeaconForm,
+    PartialTravelPlanForm
 )
 
 
@@ -874,3 +875,31 @@ def travelplan_list_page(requset):
     }
 
     return render(requset, 'app/travelplan_list_page.html', context)
+
+
+@login_required
+def travelplan_add_page(requset):
+    # add the travelplan using partialtravelplanform
+    if requset.method == 'POST':
+        travelplan_form = PartialTravelPlanForm(requset.POST, requset.FILES)
+
+        if travelplan_form.is_valid():
+            travelplan_form.save()
+
+            context = {
+                'categories': StationCategory.objects.all(),
+                'email': requset.user.email,
+                'travelplans': TravelPlan.objects.all()
+            }
+
+            return render(requset, 'app/travelplan_list_page.html', context)
+    else:
+        travelplan_form = PartialTravelPlanForm()
+
+    context = {
+        'categories': StationCategory.objects.all(),
+        'email': requset.user.email,
+        'form': travelplan_form
+    }
+
+    return render(requset, 'app/travelplan_add_page.html', context)

@@ -1,0 +1,69 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block stylesheet %}
+	{{ block.super }}
+{% endblock %}
+<style rel="stylesheet" type="text/css">
+	.ui.text.container {
+		margin-bottom: 1em;
+	}
+</style>
+{% block content%}
+<div class="ui text container">
+	<form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="travelplan_form">
+		{% csrf_token %}
+		<div class="required five wide field">
+			<label>行程名稱</label>
+			<input type="text" name="name" placeholder="類別名稱">
+		</div>
+		<div class="field">
+			<label>行程描述</label>
+			<textarea rows="2" form="travelplan_form" name="description" placeholder="類別描述"></textarea>
+		</div>
+		<div class="five wide field">
+			<label>圖片上傳</label>
+			<div class="ui action input">
+				<input type="text" placeholder="圖片" readonly="">
+				<input id="image" name="image" type="file" accept="image/*" style="display: none;">
+				<div class="ui icon button">
+					<i class="attach icon"></i>
+				</div>
+			</div>
+		</div>
+		<button class="ui submit teal button" type="submit">新增</button>
+		<div class="ui error message"></div>
+	</form>
+</div>
+{% endblock %}
+
+{% block script %}
+	{{ block.super }}
+	<script>
+		$(".ui.icon.button").click(function () {
+			$(this).parent().find("input:file").click();
+		});
+
+		$('input:file', '.ui.action.input')
+			.on('change', function (e) {
+				var name = e.target.files[0].name;
+				$('input:text', $(e.target).parent()).val(name);
+			});
+		$('.ui.radio.checkbox')
+			.checkbox();
+    $(document).ready(function() {
+      $(".ui.form").form({
+        fields: {
+          name: {
+            identifier: "name",
+            rules: [
+              {
+                type: "empty",
+                prompt: "請輸入行程名稱"
+              }
+            ]
+          }
+        }
+      });
+    });
+	</script>
+{% endblock %}

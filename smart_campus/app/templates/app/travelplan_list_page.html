@@ -44,7 +44,7 @@
   <div class="ui horizontal divider">
       OR
   </div>
-  <a class="ui teal labeled icon button" href="">
+  <a class="ui teal labeled icon button" href="{% url 'TravelPlan Add Page' %}">
       新增行程
     <i class="add icon"></i>
   </a>
@@ -57,5 +57,4 @@
   {{ block.super }}
   <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
-  <script type="text/javascript" src="http://rubaxa.github.io/Sortable/Sortable.js"></script>
 {% endblock %}
