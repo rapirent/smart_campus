@@ -5,19 +5,9 @@
 
 {% block stylesheet %}
   {{ block.super }}
-<<<<<<< HEAD
-  <link rel="stylesheet" type="text/css" href="{% static 'trix/trix.css' %}">
-  <script type="text/javascript" src="{% static 'trix/trix.js' %}"></script>
-  <style rel="stylesheet" type="text/css">
-    .ui.container {
-      margin-bottom: 1em;
-    }
-  </style>
-=======
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.js"></script>
 	<link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
->>>>>>> develop-API-kuoteng
 {% endblock %}
 {% block content %}
 <div class="ui container">
@@ -40,12 +30,6 @@
       </div>
       <div class="field">
         <label>類別</label>
-<<<<<<< HEAD
-        <select class="ui selection dropdown" name="category">
-          {% if categories %} {% for category in categories %}
-          <option value="{{ category.name }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
-          {% endfor %} {% endif %}
-=======
         <select class="ui selection dropdown" placeholder="{{form_data.category}}">
           {% if categories %}
             {% for category in categories %}
@@ -54,7 +38,6 @@
             </option>
             {% endfor %}
           {% endif %}
->>>>>>> develop-API-kuoteng
         </select>
       </div>
       <div class="left floated field">
