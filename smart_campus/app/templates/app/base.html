@@ -53,23 +53,23 @@
         <hr>
         <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
       </div>
-      <a class="item" href="{% url 'Manager List Page' %}">管理使用者</a>
-      <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
-      <a class="item" href="">管理挑戰</a>
-      <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>
-      <a class="item" href="{% url 'TravelPlan List Page' %}">管理行程</a>
-      <div class="right menu">
-        <div class="header item">
-          {% if email %}
-            {{ email }}
-          {% endif %}
-        </div>
-        <a class="item" href="{% url 'Logout Page' %}" >登出</a>
-        <a class="item" href="">Help</a>
+    </div>
+    <a class="item" href="{% url 'Manager List Page' %}">管理使用者</a>
+    <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
+    <a class="item" href="">管理挑戰</a>
+    <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>
+    <a class="item" href="{% url 'TravelPlan List Page' %}">管理行程</a>
+    <div class="right menu">
+      <div class="header item">
+        {% if email %}
+          {{ email }}
+        {% endif %}
       </div>
       <a class="item" href="{% url 'Logout Page' %}" >登出</a>
       <a class="item" href="">Help</a>
     </div>
+    <a class="item" href="{% url 'Logout Page' %}" >登出</a>
+    <a class="item" href="">Help</a>
   </div>
   {% endblock %}
 

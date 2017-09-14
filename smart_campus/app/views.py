@@ -32,7 +32,7 @@ from .models import (
 )
 from .forms import (
     StationForm,
-    CategoryForm,
+    StationCategoryForm,
     ManagerForm,
     PartialRewardForm,
     BeaconForm,
