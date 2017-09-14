@@ -392,7 +392,6 @@ def get_all_rewards(request):
 @csrf_exempt
 def get_all_stations(request):
     """API for retrieving contents of all Stations"""
-    print(request.get_host())
     data = [
         {
             'id': station.id,
@@ -400,6 +399,7 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
+            'rewards': [station.id for station in station.reward_set.all()],
             'image': {
                 'primary':
                     'http://{0}{1}'.format(request.get_host(), StationImage.objects.filter(station=station, is_primary=True).first().image.url)
