@@ -21,7 +21,10 @@ import random
 import logging
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s : %(message)s', level=logging.INFO)
+logging.basicConfig(
+            format='%(asctime)s: %(levelname)s : %(message)s',
+            level=logging.INFO
+        )
 
 from .models import (
     User, Reward, Permission,
@@ -35,7 +38,8 @@ from .forms import (
     CategoryForm,
     ManagerForm,
     PartialRewardForm,
-    BeaconForm
+    BeaconForm,
+    PartialTravelPlanForm
 )
 
 
@@ -862,3 +866,44 @@ def station_delete_page(request, pk):
     }
 
     return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def travelplan_list_page(request):
+    # list all travelplans in page
+    context = {
+        'travelplans': TravelPlan.objects.all(),
+        'categories': StationCategory.objects.all(),
+        'email': request.user.email
+    }
+
+    return render(request, 'app/travelplan_list_page.html', context)
+
+
+@login_required
+def travelplan_add_page(request):
+    # user travelplan form to add an travelplan rows to db
+    if request.method == 'POST':
+        travelplan_form = PartialTravelPlanForm(request.POST, request.FILES)
+
+        if travelplan_form.is_valid():
+            travelplan_form.save()
+
+            context = {
+                'categories': StationCategory.objects.all(),
+                'email': request.user.email,
+                'travelplans': TravelPlan.objects.all()
+            }
+
+            return render(request, 'app/travelplan_list_page.html', context)
+    else:
+        travelplan_form = PartialTravelPlanForm()
+
+    # TODO
+    # add the stations option
+    context = {
+        'categories': StationCategory.objects.all(),
+        'email': request.user.email,
+        'form': travelplan_form
+    }
+    return render(request, 'app/travelplan_add_page.html', context)

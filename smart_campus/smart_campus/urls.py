@@ -64,7 +64,11 @@ urlpatterns = [
     url(r'^beacons/(?P<pk>[^/]+)/edit/$', app.views.beacon_edit_page,
         name='Beacon Edit Page'),
     url(r'^beacons/(?P<pk>[^/]+)/delete/$', app.views.beacon_delete_page,
-        name='Beacon Delete Page')
+        name='Beacon Delete Page'),
+    url(r'^travelplans/$', app.views.travelplan_list_page,
+        name='List TravelPlan Page'),
+    url(r'^travelplans/new$', app.views.travelplan_add_page,
+        name='Add TravelPlan Page')
 ]
 
 if settings.DEBUG:

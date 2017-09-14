@@ -15,29 +15,25 @@
 {% block content %}
 <div class="ui borderless center aligned text container">
   <div class="ui divided items">
-    {% if stations %}
-      {% for station in stations %}
+    {% if travelplans %}
+      {% for travelplan in travelplans %}
         <div class="item">
-          {% if station.primary_image %}
+          {% if travelplan.image %}
             <div class="image">
-              <img src="{{ station.primary_image.image.url }}">
+              <img src="{{ travelplan.image.url }}">
             </div>
           {% endif %}
           <div class="ui left aligned segment content">
             <div class="ui header">
-              {{ station.name }}
+              {{ travelplan.name }}
             </div>
-            <div class="meta">
-              {{ station.beacon.name}}
+            <div class="description">
+              {{ travelplan.description }}
             </div>
             <div class="extra">
-              <div class="ui label">
-                <i class="globe icon"></i>
-                {{ station.category}}
-              </div>
               <div class="ui right floated buttons">
-                <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
-                <a class="ui basic red button" href="{% url 'Delete Station Page' station.id %}">刪除</a>
+                <a class="ui basic green button" href="">修改</a>
+                <a class="ui basic red button" href="">刪除</a>
               </div>
             </div>
           </div>
@@ -48,8 +44,8 @@
   <div class="ui horizontal divider">
       OR
   </div>
-  <a class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
-      新增站點
+  <a class="ui teal labeled icon button" href="{% url 'Add TravelPlan Page' %}">
+      新增行程
     <i class="add icon"></i>
   </a>
 </div>

@@ -1,0 +1,147 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static 'app/css/edit.css' %}">
+{% endblock %}
+{% block content %}
+<div class="ui container">
+
+  <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="travelplan_form">
+    {% for field in form %}
+      {% if field.errors %}
+        <div class="ui negative message">
+          {% for error in field.errors %}
+            <li>{{ field.label }}: {{ error|escape }}</li>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endfor %}
+    {% csrf_token %}
+    <div class="five wide field">
+      <label>路線名稱</label>
+      <input id="name" name="name" type="text" placeholder="路線名稱" value="{{ form_data.name }}" required="">
+    </div>
+    <hr>
+    <div class="field">
+      <label>路線描述</label>
+      <textarea name="description" form="station_form" row="2"></textarea>
+    </div>
+    <hr>
+
+    <!-- Button : Change Image -->
+    <div class="field">
+      <label>更新圖片</label>
+      {% if images %}
+        {% for image in images %}
+        <div class="ui centered card">
+          <div class="ui medium image">
+            <div class="ui dimmer">
+              <div class="content">
+                <div class="center">
+                  {% if image.is_primary %}
+                    <h2>刪除前請先將其他圖片設為主要圖片</h2>
+                  {% else %}
+                    <a class="ui small teal button" href="{% url 'Set Primary Station Image' image.id %}">選為主要圖片</a>
+                    <a class="ui small red button" href="{% url 'Delete Station Image' image.id %}">刪除</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <img src="{{ image.image.url }}">
+          </div>
+        </div>
+        {% endfor %}
+      {% endif %}
+      <div class="ui center aligned grid">
+        <div class="five wide field">
+          <div id="uiAddImage">
+            <div class="ui action input">
+              <input type="text" placeholder="img 1" readonly="">
+              <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
+              <div class="ui icon button">
+                <i class="attach icon"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ui center aligned grid">
+        <div class="column">
+          <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+        </div>
+      </div>
+    </div>
+    <hr>
+    <div class="field">
+      <label>路線規劃</label>
+
+      <div class="ui borderless center aligned container">
+        <div class="ui centered vertical steps" id="sortable">
+          <div class="completed step">
+            <i class="truck icon"></i>
+            <div class="content">
+              <div class="title">Shipping</div>
+              <div class="description">Choose your shipping options</div>
+            </div>
+          </div>
+          <div class="completed step">
+            <i class="credit card icon"></i>
+            <div class="content">
+              <div class="title">Billing</div>
+              <div class="description">Enter billing information</div>
+            </div>
+          </div>
+          <div class="active step">
+            <i class="info icon"></i>
+            <div class="content">
+              <div class="title">Confirm Order</div>
+              <div class="description">Verify order details</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>
+        <div class="ui inline floating dropdown labeled search icon button">
+          <i class="search icon"></i>
+          <input type="hidden" name="country">
+          <i class="dropdown icon"></i>
+          <div class="default text">選擇站點</div>
+          <div class="menu">
+            <div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
+            <div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
+            <div class="item" data-value="al"><i class="al flag"></i>Albania</div>
+            <div class="item" data-value="dz"><i class="dz flag"></i>Algeria</div>
+            <div class="item" data-value="as"><i class="as flag"></i>American Samoa</div>
+            <div class="item" data-value="ad"><i class="ad flag"></i>Andorra</div>
+            <div class="item" data-value="ao"><i class="ao flag"></i>Angola</div>
+            <div class="item" data-value="ai"><i class="ai flag"></i>Anguilla</div>
+          </div>
+        </div>
+        <div class="right attached ui left labeled icon button">
+          <i class="add icon"></i>
+          來新增
+        </div>
+      </h3>
+
+    </div>
+    <button class="ui fluid teal submit button" type="submit">儲存行程資訊</button>
+  </form>
+</div>
+
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
+  <script>
+    let list = document.getElementById('sortable');
+    Sortable.create(list, { /* options */ });
+
+    $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown()
+  </script>
+{% endblock %}

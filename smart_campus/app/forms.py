@@ -1,7 +1,14 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station, StationCategory, Reward, User, Beacon
+from .models import (
+    Station,
+    StationCategory,
+    Reward,
+    User,
+    Beacon,
+    TravelPlan
+)
 
 
 class StationForm(forms.ModelForm):
@@ -50,3 +57,9 @@ class BeaconForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BeaconForm, self).__init__(*args, **kwargs)
         self.fields['owner_group'].required = False
+
+
+class PartialTravelPlanForm(forms.ModelForm):
+    class Meta:
+        model = TravelPlan
+        exclude = ['stations']
