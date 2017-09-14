@@ -7,11 +7,9 @@
   {{ block.super }}>
   <link rel="stylesheet" type="text/css" href="{% static 'trix/trix.css' %}">
   <script type="text/javascript" src="{% static 'trix/trix.js' %}"></script>
-  <style rel="stylesheet" type="text/css">
-    .ui.container {
-      margin-bottom: 1em;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="{% static 'app/css/edit.css' %}">
+
+
 {% endblock %}
 
 {% block content %}
@@ -127,22 +125,6 @@
     </script>
     <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
-    <script type="text/javascript">
-      $(document).ready(function () {
-        $('.ui.selection').dropdown();
-        $(".ui.icon.button").click(function () {
-          $(this).parent().find("input:file").click();
-        });
-
-        $('input:file', '.ui.action.input')
-          .on('change', function (e) {
-            var name = e.target.files[0].name;
-            $('input:text', $(e.target).parent()).val(name);
-          });
-        $('.ui.radio.checkbox')
-          .checkbox();
-
-        })
-    </script>
+    <script type="text/javascript" src="{% static 'app/js/station_add_page.js' %}"></script>
 {% endblock %}
 

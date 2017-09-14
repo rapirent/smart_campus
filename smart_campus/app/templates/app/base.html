@@ -28,11 +28,7 @@
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/icon.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/dropdown.css" %}">
     <link rel="stylesheet" type="text/css" href="{% static "Semantic-UI/components/transition.css" %}">
-    <style type="text/css">
-      .container {
-        margin-top: 3em;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static "app/css/base.css" %}">
   {% endblock %}
 </head>
 
@@ -89,23 +85,7 @@
     <script src="{% static "Semantic-UI/components/transition.js" %}"></script>
     <script src="{% static "Semantic-UI/components/dropdown.js" %}"></script>
     <script src="{% static "Semantic-UI/components/dimmer.js" %}"></script>
-    <script>
-          $(document).ready(function () {
-            $('.ui.menu .ui.dropdown').dropdown({
-              on: 'hover'
-            });
-            $('.ui.menu a.item')
-              .on('click', function () {
-                $(this)
-                  .addClass('active')
-                  .siblings()
-                  .removeClass('active')
-                  ;
-              })
-              ;
-          })
-          ;
-    </script>
+    <script src="{% static "app/js/base.js" %}"></script>
   {% endblock %}
 </body>
 </html>

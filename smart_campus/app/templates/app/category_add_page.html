@@ -3,11 +3,7 @@
 
 {% block stylesheet %}
   {{ block.super }}
-  <style rel="stylesheet" type="text/css">
-    .ui.text.container {
-      margin-bottom: 1em;
-    }
-  </style>
+  <link rel="stylesheet" type="text/css" href="{% static " app/css/edit.css " %}">
   {% block cont
 {% endblock %}
 {% block content %}
