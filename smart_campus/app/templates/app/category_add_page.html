@@ -3,8 +3,7 @@
 
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static " app/css/edit.css " %}">
-  {% block cont
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
 {% block content %}
 <div class="ui text container">
@@ -16,7 +15,7 @@
     </div>
     <div class="field">
       <label>類別描述</label>
-      <textarea  rows="2" form="category_form" name="description" placeholder="類別描述"></textarea>
+      <textarea rows="2" form="category_form" name="description" placeholder="類別描述"></textarea>
     </div>
     <button class="ui submit teal button" type="submit">新增</button>
     <div class="ui error message"></div>
@@ -26,21 +25,5 @@
 
 {% block script %}
   {{ block.super }}
-  <script>
-    $(document).ready(function() {
-      $(".ui.form").form({
-        fields: {
-          name: {
-            identifier: "name",
-            rules: [
-              {
-                type: "empty",
-                prompt: "請輸入類別名稱"
-              }
-            ]
-          }
-        }
-      });
-    });
-  </script>
+  <script src="{% static 'app/js/category_add_page.js' %}"></script>
 {% endblock %}
