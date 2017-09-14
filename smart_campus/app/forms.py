@@ -1,7 +1,14 @@
 from django import forms
 from django.conf import settings
 
-from .models import Station, StationCategory, Reward, User, Beacon
+from .models import (
+    Station,
+    StationCategory,
+    Reward,
+    User,
+    Beacon,
+    Question
+)
 
 
 class StationForm(forms.ModelForm):
@@ -33,6 +40,17 @@ class PartialRewardForm(forms.ModelForm):
         exclude = ['related_station']
 
 
+class RewardForm(forms.ModelForm):
+    class Meta:
+        model = Reward
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(RewardForm, self).__init__(*args, **kwargs)
+        self.fields['image'].required = False
+        self.fields['related_station'].required = False
+
+
 class ManagerForm(forms.ModelForm):
     class Meta:
         model = User
@@ -50,3 +68,19 @@ class BeaconForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(BeaconForm, self).__init__(*args, **kwargs)
         self.fields['owner_group'].required = False
+
+
+class QuestionForm(forms.ModelForm):
+    choice1 = forms.CharField()
+    choice2 = forms.CharField()
+    choice3 = forms.CharField()
+    choice4 = forms.CharField()
+    answer = forms.CharField()
+
+    class Meta:
+        model = Question
+        fields = ('content', 'linked_station')
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionForm, self).__init__(*args, **kwargs)
+        self.fields['linked_station'].required = False

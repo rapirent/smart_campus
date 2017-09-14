@@ -47,7 +47,7 @@
         <div class="menu">
           {% if categories %}
             {% for category in categories %}
-              <div class="item" href="">{{ category.name }}</div>
+              <a class="item" href="{% url 'Station List By Category Page' category.id %}">{{ category.name }}</a>
             {% endfor %}
           {% endif %}
           <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
@@ -58,7 +58,7 @@
       </div>
       <a class="item" href="{% url 'Manager List Page' %}">管理使用者</a>
       <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
-      <a class="item" href="">管理挑戰</a>
+      <a class="item" href="{% url 'Question List Page' %}">管理挑戰</a>
       <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>
       <a class="item" href="">管理行程</a>
       <div class="right menu">

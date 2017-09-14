@@ -36,7 +36,7 @@
         <label>類別</label>
         <select class="ui selection dropdown" name="category">
           {% if categories %} {% for category in categories %}
-          <option value="{{ category.name }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
+          <option value="{{ category.id }}" {% if form_data.category == category.id %}selected{% endif %} >{{ category.name }}</option>
           {% endfor %} {% endif %}
         </select>
       </div>
