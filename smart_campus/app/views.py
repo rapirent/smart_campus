@@ -890,7 +890,7 @@ def travelplan_add_page(request):
                 'travelplans': TravelPlan.objects.all()
             }
 
-            return render(request, 'app/travelplan_list_page.html', context)
+            return HttpResponseRedirect('/travelplans/')
     else:
         travelplan_form = PartialTravelPlanForm()
 
@@ -985,4 +985,18 @@ def travelplan_edit_page(request, pk):
         'form_data': form_data,
         'categories': StationCategory.objects.all()
     }
+
     return render(request, 'app/travelplan_edit_page.html', context)
+
+
+@login_required
+def travelplan_delete_page(request, pk):
+    # Delete the travelplan and its travelplan_stations
+
+    travelplan = get_object_or_404(TravelPlan, pk=pk)
+    travelplan_stations = TravelPlanStations.objects.filter(travelplan_id=pk)
+
+    travelplan_stations.delete()
+    travelplan.delete()
+
+    return HttpResponseRedirect('/travelplans/')

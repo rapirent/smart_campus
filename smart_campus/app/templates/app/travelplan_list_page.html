@@ -5,7 +5,7 @@
 
 {% block stylesheet %}
   {{ block.super }}
-	<link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
 {% endblock %}
 
 {% block content %}
@@ -29,7 +29,7 @@
             <div class="extra">
               <div class="ui right floated buttons">
                 <a class="ui basic green button" href="{% url 'TravelPlan Edit Page' travelplan.id %}">修改</a>
-                <a class="ui basic red button" href="">刪除</a>
+                <a class="ui basic red button" href="{% url 'TravelPlan Delete Page' travelplan.id %}">刪除</a>
               </div>
             </div>
           </div>
@@ -45,9 +45,6 @@
     <i class="add icon"></i>
   </a>
 </div>
-
-
-
 {% endblock %}
 {% block script %}
   {{ block.super }}
