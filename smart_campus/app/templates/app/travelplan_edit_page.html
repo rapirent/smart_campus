@@ -82,7 +82,7 @@
       <div class="ui center aligned grid">
         <div class="column">
           <div class="ui vertical steps" id="sortable">
-            <div class="completed step" id="travelplan">
+            <div class="completed step" id="travelplan" data-id='1'>
               <div class="content" id="category">
                 <div class="title">Shipping</div>
                 <div class="description">
@@ -90,7 +90,7 @@
                 </div>
               </div>
             </div>
-            <div class="completed step" id="travelplan">
+            <div class="completed step" id="travelplan" data-id='2'>
               <div class="content" id="category">
                 <div class="title">Billing</div>
                 <div class="description" id="category">
@@ -98,7 +98,7 @@
                 </div>
               </div>
             </div>
-            <div class="completed step" id="travelplan">
+            <div class="completed step" id="travelplan" data-id='3'>
               <div class="content" id="category">
                 <div class="title">Confirm Order</div>
                 <div class="description">
@@ -174,8 +174,7 @@
           * @returns {Array}
           */
         get: function (sortable) {
-          var order = localStorage.getItem(sortable.options.group.name);
-          return order ? order.split('|') : [];
+          return sortable.toArray()
         },
 
         /**
@@ -183,8 +182,7 @@
           * @param {Sortable}  sortable
           */
         set: function (sortable) {
-          var order = sortable.toArray();
-          localStorage.setItem(sortable.options.group.name, order.join('|'));
+          var order = sortable.toArray()
         }
       }
     })
