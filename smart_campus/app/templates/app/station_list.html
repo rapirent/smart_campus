@@ -7,47 +7,44 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui borderless center aligned text container">
-  <div class="ui divided items">
-    {% if stations %}
-      {% for station in stations %}
-        <div class="item">
-          {% if station.primary_image %}
-            <div class="image">
-              <img src="{{ station.primary_image.image.url }}">
-            </div>
-          {% endif %}
-          <div class="ui left aligned segment content">
-            <div class="ui header">
-              {{ station.name }}
-            </div>
-            <div class="meta">
-              {{ station.beacon.name}}
-            </div>
-            <div class="extra">
-              <div class="ui label">
-                <i class="globe icon"></i>
-                {{ station.category}}
+  <div class="ui borderless center aligned text container">
+    <div class="ui divided items">
+      {% if stations %}
+        {% for station in stations %}
+          <div class="item">
+            {% if station.primary_image %}
+              <div class="image">
+                <img src="{{ station.primary_image.image.url }}">
               </div>
-              <div class="ui right floated buttons">
-                <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
-                <a class="ui basic red button" href="">刪除</a>
+            {% endif %}
+            <div class="ui left aligned segment content">
+              <div class="ui header">
+                {{ station.name }}
+              </div>
+              <div class="meta">
+                {{ station.beacon.name}}
+              </div>
+              <div class="extra">
+                <div class="ui label">
+                  <i class="globe icon"></i>
+                  {{ station.category}}
+                </div>
+                <div class="ui right floated buttons">
+                  <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
+                  <a class="ui basic red button" href="">刪除</a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      {% endfor %}
-    {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="ui horizontal divider">
+        OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
+        新增站點
+      <i class="add icon"></i>
+    </a>
   </div>
-  <div class="ui horizontal divider">
-      OR
-  </div>
-  <a class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
-      新增站點
-    <i class="add icon"></i>
-  </a>
-</div>
-
-
-
 {% endblock %}

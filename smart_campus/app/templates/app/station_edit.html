@@ -8,117 +8,115 @@
 	<link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
 {% block content %}
-<div class="ui container">
-
-  <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-    {% for field in form %}
-      {% if field.errors %}
-        <div class="ui negative message">
-          {% for error in field.errors %}
-            <li>{{ field.label }}: {{ error|escape }}</li>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endfor %}
-    {% csrf_token %}
-    <div class="fields">
-      <div class="field">
-        <label>名稱</label>
-        <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
-      </div>
-      <div class="field">
-        <label>類別</label>
-        <select class="ui selection dropdown" placeholder="{{form_data.category}}">
-          {% if categories %}
-            {% for category in categories %}
-            <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
-              {{ category.name }}
-            </option>
+  <div class="ui container">
+    <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
+      {% for field in form %}
+        {% if field.errors %}
+          <div class="ui negative message">
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error|escape }}</li>
             {% endfor %}
-          {% endif %}
-        </select>
-      </div>
-      <div class="left floated field">
-          <label>綁定收藏品</label>
-          <select class="ui selection dropdown" placeholder="">
+          </div>
+        {% endif %}
+      {% endfor %}
+      {% csrf_token %}
+      <div class="fields">
+        <div class="field">
+          <label>名稱</label>
+          <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
+        </div>
+        <div class="field">
+          <label>類別</label>
+          <select class="ui selection dropdown" placeholder="{{form_data.category}}">
+            {% if categories %}
+              {% for category in categories %}
+              <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
+                {{ category.name }}
+              </option>
+              {% endfor %}
+            {% endif %}
           </select>
         </div>
-    </div>
-    <hr>
-    <div class="field">
-      <label>推播內容</label>
-      <input id="x" type="hidden" name="content">
-      <trix-editor form="station_form" input="x"></trix-editor>
-    </div>
-    <hr>
+        <div class="left floated field">
+            <label>綁定收藏品</label>
+            <select class="ui selection dropdown" placeholder="">
+            </select>
+          </div>
+      </div>
+      <hr>
+      <div class="field">
+        <label>推播內容</label>
+        <input id="x" type="hidden" name="content">
+        <trix-editor form="station_form" input="x"></trix-editor>
+      </div>
+      <hr>
 
-    <!-- Button : Change Image -->
-    <div class="field">
-      <label>更新圖片</label>
-      {% if form_data.images %}
-        {% for image in  form_data.images %}
-        <div class="ui centered card">
-          <div class="ui medium image">
-            <div class="ui dimmer">
-              <div class="content">
-                <div class="center">
-                  {% if image.is_primary %}
-                    <h2>刪除前請先將其他圖片設為主要圖片</h2>
-                  {% else %}
-                    <a class="ui small teal button" href="">選為主要圖片</a>
-                    <a class="ui small red button" href="">刪除</a>
-                  {% endif %}
+      <!-- Button : Change Image -->
+      <div class="field">
+        <label>更新圖片</label>
+        {% if form_data.images %}
+          {% for image in  form_data.images %}
+          <div class="ui centered card">
+            <div class="ui medium image">
+              <div class="ui dimmer">
+                <div class="content">
+                  <div class="center">
+                    {% if image.is_primary %}
+                      <h2>刪除前請先將其他圖片設為主要圖片</h2>
+                    {% else %}
+                      <a class="ui small teal button" href="">選為主要圖片</a>
+                      <a class="ui small red button" href="">刪除</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <img src="{{ image.image.url }}">
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        <div class="ui center aligned grid">
+          <div class="five wide field">
+            <div id="uiAddImage">
+              <div class="ui action input">
+                <input type="text" placeholder="img 1" readonly="">
+                <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
+                <div class="ui icon button">
+                  <i class="attach icon"></i>
                 </div>
               </div>
             </div>
-            <img src="{{ image.image.url }}">
           </div>
         </div>
-        {% endfor %}
-      {% endif %}
-      <div class="ui center aligned grid">
-        <div class="five wide field">
-          <div id="uiAddImage">
-            <div class="ui action input">
-              <input type="text" placeholder="img 1" readonly="">
-              <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
-              <div class="ui icon button">
-                <i class="attach icon"></i>
-              </div>
-            </div>
-          </div>
+        <div class="ui center aligned grid">
+          <div class="column">
+            <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
         </div>
       </div>
-      <div class="ui center aligned grid">
-        <div class="column">
-          <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+      <hr>
+      <div class="four wide column centered field">
+        <label>Beacon位置一覽(請點選beacon)</label>
+        <div id="map" style="height:400px;width:600px"></div>
       </div>
-    </div>
-    <hr>
-    <div class="four wide column centered field">
-      <label>Beacon位置一覽(請點選beacon)</label>
-      <div id="map" style="height:400px;width:600px"></div>
-    </div>
-    <div class="field">
-      <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
-    </div>
-    <hr>
-    <div class="field">
-      <label>站點位置(預設為Beacon位置)</label>
-      <br>
-      <div class="three wide field">
-        <label>緯度</label>
-        <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat|stringformat:'f' }}">
+      <div class="field">
+        <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
       </div>
-      <div class="three wide field">
-        <label>經度</label>
-        <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" required="" value="{{ form_data.lng|stringformat:'f' }}">
+      <hr>
+      <div class="field">
+        <label>站點位置(預設為Beacon位置)</label>
+        <br>
+        <div class="three wide field">
+          <label>緯度</label>
+          <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat|stringformat:'f' }}">
+        </div>
+        <div class="three wide field">
+          <label>經度</label>
+          <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" required="" value="{{ form_data.lng|stringformat:'f' }}">
+        </div>
       </div>
-    </div>
-    <button class="ui fluid teal submit button" type="submit">儲存站點資訊</button>
-  </form>
-</div>
-
+      <button class="ui fluid teal submit button" type="submit">儲存站點資訊</button>
+    </form>
+  </div>
 {% endblock %}
 
 {% block script %}

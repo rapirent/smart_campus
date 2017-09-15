@@ -18,10 +18,6 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import os
 import random
-import logging
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s : %(message)s', level=logging.INFO)
 
 from .models import (
     User, Reward, Permission,
@@ -172,9 +168,9 @@ def station_list_page(request):
             'id': station.id,
             'name': station.name,
             'primary_image': StationImage.objects.filter(
-                    station=station,
-                    is_primary=True
-                ).first(),
+                station=station,
+                is_primary=True
+            ).first(),
             'category': station.category,
             'beacon': Beacon.objects.filter(
                 station=station
@@ -478,11 +474,12 @@ def add_user_reward(request):
     reward = Reward.objects.filter(id=reward_id).first()
 
     if not user or not reward:
-        return HttpResponse('User or reward is not exitst', status=404)
+        return HttpResponse('Either user or reward does not exist.', status=404)
+
     try:
         UserReward.objects.create(user=user, reward=reward)
     except ValueError:
-        return HttpResponse('Cant Create The Relation', status=400)
+        return HttpResponse('Add user reward failed.', status=400)
 
     return HttpResponse('Create Succeeded', status=200)
 
@@ -513,7 +510,7 @@ def add_user_favorite_stations(request):
 
 @login_required
 def category_add_page(request):
-    """add the category"""
+    # Add a new category.
     if request.method == 'POST':
         category_form = StationCategoryForm(request.POST)
 
@@ -522,14 +519,16 @@ def category_add_page(request):
                 stations = Station.objects.all()
             elif request.user.can(Permission.EDIT):
                 stations = Station.objects.filter(
-                    owner_group=request.user.group)
+                    owner_group=request.user.group
+                )
             else:
                 return HttpResponseForbidden()
 
             category_form.save()
             context = {
                 'name': category_form.cleaned_data['name'],
-                'station_list': [{
+                'station_list': [
+                    {
                         'id': station.id,
                         'name': station.name,
                         'image_url': station.primary_image_url
@@ -542,7 +541,7 @@ def category_add_page(request):
             # TODO
             # add the specified category station list
             return HttpResponse('Success', status=200)
-            # return render(request, 'station_list.html', context)
+
     context = {
         'email': request.user.email,
         'categories': StationCategory.objects.all()
@@ -593,7 +592,7 @@ def get_all_travel_plans(request):
 
 @login_required
 def reward_list_page(request):
-    # list all rewards
+    # List all rewards.
 
     context = {
         'email': request.user.email,
@@ -606,7 +605,7 @@ def reward_list_page(request):
 
 @login_required
 def reward_add_page(request):
-    # add the reward
+    # Add a reward
     if request.method == 'POST':
         reward_form = PartialRewardForm(request.POST, request.FILES)
 
@@ -618,12 +617,12 @@ def reward_add_page(request):
                 'email': request.user.email,
                 'categories': StationCategory.objects.all()
             }
-            # messages.info(request, 'Three credits remain in your account.')
-            # return HttpResponse('Success', status=200)
+
             return render(request, 'app/reward_list_page.html', context)
 
     context = {
         'email': request.user.email,
         'categories': StationCategory.objects.all()
     }
+
     return render(request, 'app/reward_add_page.html', context)
