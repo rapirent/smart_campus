@@ -952,7 +952,7 @@ def travelplan_edit_page(request, pk):
                 'travelplans': TravelPlan.objects.all()
             }
 
-            return render(request, 'app/travelplan_list_page.html', context)
+            return HttpResponseRedirect('/travelplans/')
 
         form_data = travelplan_form.cleaned_data
 
