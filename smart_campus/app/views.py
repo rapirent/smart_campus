@@ -917,8 +917,7 @@ def travelplan_edit_page(request, pk):
                                 request.FILES,
                                 instance=travelplan
                             )
-        print(request.POST)
-        print(travelplan_form)
+
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
 
@@ -939,7 +938,16 @@ def travelplan_edit_page(request, pk):
                     changed_travelplan.first().order = order
                     changed_travelplan.first().save()
 
+            context = {
+                'categories': StationCategory.objects.all(),
+                'email': request.user.email,
+                'travelplans': TravelPlan.objects.all()
+            }
+
+            return render(request, 'app/travelplan_list_page.html', context)
+
         form_data = travelplan_form.cleaned_data
+
     else:
         form_data = {
             'name': travelplan.name,
