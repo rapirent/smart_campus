@@ -917,26 +917,34 @@ def travelplan_edit_page(request, pk):
                                 request.FILES,
                                 instance=travelplan
                             )
-
+        print(request.POST)
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
 
             json_order = json.loads(request.POST['order'])
-            for order, station_id in enumerate(json_order):
-                changed_travelplan = TravelPlanStations.objects.filter(
-                                            travelplan_id=pk,
-                                            station_id=station_id
-                                        )
 
-                if not changed_travelplan:
-                    TravelPlanStations.objects.create(
-                        travelplan_id=pk,
-                        station_id=station_id,
-                        order=order
-                    )
-                else:
-                    changed_travelplan.first().order = order
-                    changed_travelplan.first().save()
+            if not json_order:
+                for travelplan_station in TravelPlanStations.objects.filter(
+                                                travelplan_id=pk
+                                            ):
+                    travelplan_station.delete()
+
+            else:
+                for order, station_id in enumerate(json_order):
+                    changed_travelplan = TravelPlanStations.objects.filter(
+                                                travelplan_id=pk,
+                                                station_id=station_id
+                                            )
+
+                    if not changed_travelplan:
+                        TravelPlanStations.objects.create(
+                            travelplan_id=pk,
+                            station_id=station_id,
+                            order=order
+                        )
+                    else:
+                        changed_travelplan.first().order = order
+                        changed_travelplan.first().save()
 
             context = {
                 'categories': StationCategory.objects.all(),

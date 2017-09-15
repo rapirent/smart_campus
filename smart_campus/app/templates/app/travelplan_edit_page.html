@@ -11,7 +11,7 @@
   <link rel="stylesheet" type="text/css" href="{% static "app/css/travelplan_edit_page.css" %}">
 {% endblock %}
 {% block content %}
-<div class="ui container">
+<div class="ui text container">
 
   <div class="ui centered big form" enctype="multipart/form-data" id="travelplan_form">
     {% for field in form %}
@@ -66,12 +66,7 @@
     </div>
     <hr>
     <div class="field">
-      <label>行程站點規劃</label>
-      <div class="ui center aligned text container">
-        <div class="column">
-          <i class="angle down icon"></i>
-        </div>
-      </div>
+      <label>行程站點規劃 (拖曳決定順序，由上而下)</label>
       <div class="ui center aligned grid">
         <div class="column">
           <div class="ui vertical big steps" id="sortable">
@@ -85,7 +80,7 @@
                       {{ station.category}}
                     </div>
                     <div class="meta">
-                      <a class="ui mini basic red button" id="deleteStep">刪除</a>
+                      <a class="ui mini basic red button" id="deleteStep" num="{{ station.id }}">刪除</a>
                     </div>
                   </div>
                 </div>

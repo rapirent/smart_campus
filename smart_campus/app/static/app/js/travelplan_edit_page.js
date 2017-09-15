@@ -45,8 +45,12 @@ $(document).ready(function() {
       data: postData,
       cache: false,
       contentType: false,
-      processData: false
+      processData: false,
+      success: function() {
+        window.location ='/travelplans/'
+      }
     })
+
   })
 
   $('[id=travelplan]').each( function() {
@@ -61,15 +65,27 @@ $(document).ready(function() {
       $(this).addClass("completed step")
     })
   })
+  $('[id=deleteStep]').each( function() {
+    $(this).on( "click", function() {
+      let index = order.indexOf($(this).attr('num'))
+      if (index > -1) {
+        order.splice(index, 1)
+      }
+      $('div[data-id=' + $(this).attr('num') + ']').remove()
+    })
+  })
   $('#addStationButton').on('click', function() {
     if(/^[\d\.]$/.test(selectedId)) {
       $('#sortable').append(
           '<div class="completed step" id="travelplan" data-id="' + selectedId +
           '"><i class="sort icon"></i><div class="content" id="category"><div class="title">' +
             selectedStationName + '</div><div class="description">' +
-            selectedCategory + '</div><div class="meta"><a class="ui mini basic red button" id="deleteStep">刪除</a></div></div></div>'
+            selectedCategory + '</div><div class="meta">' +
+            '<a class="ui mini basic red button" id="deleteStep" num="' +
+            selectedId + '">刪除</a></div></div></div>'
         )
       let selector = "div[data-id=" + selectedId + "]"
+      let removeButtonSelector = "a[num=" +  selectedId + "]"
       $('.item.active.selected').remove()
       $('#selectedStationId').empty()
       $(document).on('mouseover', selector, function() {
@@ -79,6 +95,13 @@ $(document).ready(function() {
       $(document).on('mouseout', selector, function() {
         $(this).removeClass("active step")
         $(this).addClass("completed step")
+      })
+      $(document).on('click', removeButtonSelector, function() {
+        let index = order.indexOf($(this).attr('num'))
+        if (index > -1) {
+          order.splice(index, 1)
+        }
+        $('div[data-id=' + $(this).attr('num') + ']').remove()
       })
       order.push(selectedId)
     }
