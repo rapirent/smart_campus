@@ -915,14 +915,15 @@ def travelplan_edit_page(request, pk):
 
     if request.method == 'POST':
         # instance varible to specify the travelplan being edited
-        travelplan_form = TravelPlanForm(
+        travelplan_form = PartialTravelPlanForm(
                                 request.POST,
                                 request.FILES,
                                 isinstance=travelplan
                             )
-
         if travelplan_form.is_valid():
-            pass
+            data = travelplan_form.cleaned_data
+            edited_travelplan = travelplan_form.save(commit=False)
+            edited_travelplan.stations.clear()
     context = {
         'email': request.user.email,
     }
