@@ -28,7 +28,8 @@ from .models import (
     Station, StationCategory,
     Beacon, StationImage, Question,
     UserReward, UserGroup,
-    TravelPlan, Role
+    TravelPlan, Role,
+    TravelPlanStations
 )
 from .forms import (
     StationForm,
@@ -923,8 +924,29 @@ def travelplan_edit_page(request, pk):
         if travelplan_form.is_valid():
             data = travelplan_form.cleaned_data
             edited_travelplan = travelplan_form.save(commit=False)
-            edited_travelplan.stations.clear()
+
+            # delete all the connection
+            edited_travelplan.travelplanstations_set.clear()
+
+    travelplanstations = TravelPlanStations.objects.filter(
+                                                        travelplan_id=pk
+                                                    ).order_by('order')
+
+    selected_stations_id = [
+        travelplanstation.station_id for travelplanstation
+        in travelplanstations
+    ]
+
+    selected_stations = [
+        Station.objects.get(id=station_id) for station_id
+        in selected_stations_id
+    ]
+
     context = {
         'email': request.user.email,
+        'stations': Station.objects.all(),
+        'travelplan': travelplan,
+        'travelplanstations': travelplanstations,
+        'selected_stations': selected_stations
     }
     return render(request, 'app/travelplan_edit_page.html', context)

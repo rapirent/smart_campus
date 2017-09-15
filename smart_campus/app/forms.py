@@ -7,7 +7,7 @@ from .models import(
     Reward,
     User,
     Beacon,
-    TravelPlan
+    TravelPlan,
 )
 
 

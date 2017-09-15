@@ -37,26 +37,19 @@
     <!-- Button : Change Image -->
     <div class="field">
       <label>更新圖片</label>
-      {% if images %}
-        {% for image in images %}
+      {% if travelplan.image %}
         <div class="ui centered card">
           <div class="ui medium image">
             <div class="ui dimmer">
               <div class="content">
                 <div class="center">
-                  {% if image.is_primary %}
-                    <h2>刪除前請先將其他圖片設為主要圖片</h2>
-                  {% else %}
-                    <a class="ui small teal button" href="{% url 'Set Primary Station Image' image.id %}">選為主要圖片</a>
-                    <a class="ui small red button" href="{% url 'Delete Station Image' image.id %}">刪除</a>
-                  {% endif %}
+                    <a class="ui small red button" href="">刪除</a>
                 </div>
               </div>
             </div>
-            <img src="{{ image.image.url }}">
+            <img src="{{ travelplan.image.url }}">
           </div>
         </div>
-        {% endfor %}
       {% endif %}
       <div class="ui center aligned grid">
         <div class="five wide field">
@@ -71,10 +64,6 @@
           </div>
         </div>
       </div>
-      <div class="ui center aligned grid">
-        <div class="column">
-          <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
-      </div>
     </div>
     <hr>
     <div class="field">
@@ -82,14 +71,18 @@
       <div class="ui center aligned grid">
         <div class="column">
           <div class="ui vertical steps" id="sortable">
-            <div class="completed step" id="travelplan" data-id='1'>
-              <div class="content" id="category">
-                <div class="title">Shipping</div>
-                <div class="description">
-                  Choose your shipping options
+            {% if selected_stations %}
+              {% for station in selected_stations %}
+                <div class="completed step" id="travelplan" data-id='{{ station.id }}'>
+                  <div class="content" id="category">
+                    <div class="title">{{ station.name }}</div>
+                    <div class="description">
+                      {{ station.category}}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              {% endfor %}
+            {% endif %}
             <div class="completed step" id="travelplan" data-id='2'>
               <div class="content" id="category">
                 <div class="title">Billing</div>
@@ -113,12 +106,18 @@
         <div class="column">
         <div class="ui inline floating dropdown labeled search icon button">
           <i class="search icon"></i>
-          <span class="text">選擇站點</span>
-          <div class="menu">
-            <div class="item" data-value="rw"></i>Rwanda</div>
+          <span class="text" id="selectedStationId">選擇站點</span>
+          <div class="menu" id="selectionMenu">
+            {% if stations %}
+              {% for station in stations %}
+                <div class="item" data-value="{{ station.id }}" category="{{ station.category }}">
+                  {{ station.name }}
+                </div>
+              {% endfor %}
+            {% endif %}
           </div>
         </div>
-        <div class="right attached ui labeled icon button">
+        <div class="right attached ui labeled icon button" id="addStationButton">
           <i class="plus icon"></i>
           來新增
         </div>
@@ -136,31 +135,50 @@
   <script src="//cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
   <script type="text/javascript">
     $(document).ready(function() {
-      $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown()
+      let selectedId, selectedStationName, selectedCategory
+      $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown({
+        onChange: function(value, text, $selectedItem) {
+                    console.log(value)
+                    console.log(text)
+                    console.log($selectedItem.attr('category'))
+                    selectedId = value
+                    selectedStationName = text
+                    selectedCategory = $selectedItem.attr('category')
+                  }
+      })
+
       $('[id=travelplan]').each( function() {
         $(this).on( "mouseover", function() {
-          if(this.className === "completed step") {
-            $(this).removeClass("completed step")
-            $(this).addClass("active step")
-          }
-          else {
-            $(this).removeClass("active step")
-            $(this).addClass("completed step")
-          }
+          $(this).removeClass("completed step")
+          $(this).addClass("active step")
         })
       })
       $('[id=travelplan]').each( function() {
         $(this).on( "mouseout", function() {
-          if(this.className === "completed step") {
-            $(this).removeClass("completed step")
-            $(this).addClass("active step")
-          }
-          else {
-            $(this).removeClass("active step")
-            $(this).addClass("completed step")
-          }
+          $(this).removeClass("active step")
+          $(this).addClass("completed step")
         })
       })
+      $('#addStationButton').on('click', function() {
+        $('#sortable').append(
+            '<div class="completed step" id="travelplan" data-id="' + selectedId +
+            '"><div class="content" id="category"><div class="title">' +
+              selectedStationName + '</div><div class="description">' +
+              selectedCategory + '</div></div></div>'
+          )
+        let selector = "div[data-id=" + selectedId + "]"
+        $('.item.active.selected').remove()
+        $('#selectedStationId').empty()
+        $(document).on('mouseover', selector, function() {
+          $(this).removeClass("completed step")
+          $(this).addClass("active step")
+        })
+        $(document).on('mouseout', selector, function() {
+          $(this).removeClass("active step")
+          $(this).addClass("completed step")
+        })
+      })
+
     })
 
     let el = document.getElementById('sortable');
