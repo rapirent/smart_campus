@@ -13,7 +13,7 @@
 {% block content %}
 <div class="ui container">
 
-  <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="travelplan_form">
+  <div class="ui centered big form" enctype="multipart/form-data" id="travelplan_form">
     {% for field in form %}
       {% if field.errors %}
         <div class="ui negative message">
@@ -23,7 +23,6 @@
         </div>
       {% endif %}
     {% endfor %}
-    {% csrf_token %}
     <div class="field">
       <label>行程名稱</label>
       <input id="name" name="name" type="text" placeholder="行程名稱" value="{{ form_data.name }}" required="">
@@ -56,7 +55,7 @@
           <div id="uiAddImage">
             <div class="ui action input">
               <input type="text" placeholder="img 1" readonly="">
-              <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
+              <input id="image" name="image" type="file" accept="image/*" style="display: none;">
               <div class="ui icon button">
                 <i class="attach icon"></i>
               </div>
@@ -68,6 +67,11 @@
     <hr>
     <div class="field">
       <label>行程站點規劃</label>
+      <div class="ui center aligned text container">
+        <div class="column">
+          <i class="angle down icon"></i>
+        </div>
+      </div>
       <div class="ui center aligned grid">
         <div class="column">
           <div class="ui vertical steps" id="sortable">
@@ -83,23 +87,12 @@
                 </div>
               {% endfor %}
             {% endif %}
-            <div class="completed step" id="travelplan" data-id='2'>
-              <div class="content" id="category">
-                <div class="title">Billing</div>
-                <div class="description" id="category">
-                  Enter billing information
-                </div>
-              </div>
-            </div>
-            <div class="completed step" id="travelplan" data-id='3'>
-              <div class="content" id="category">
-                <div class="title">Confirm Order</div>
-                <div class="description">
-                    123
-                </div>
-              </div>
-            </div>
           </div>
+        </div>
+      </div>
+      <div class="ui center aligned grid">
+        <div class="column">
+          <i class="angle double down icon"></i>
         </div>
       </div>
       <div class="ui center aligned grid">
@@ -124,8 +117,8 @@
       </div>
     </div>
     <hr>
-    <button class="ui fluid teal submit button" type="submit">儲存站點資訊</button>
-  </form>
+    <div class="ui fluid teal submit button" id="submitButton">儲存站點資訊</div>
+  </div>
 </div>
 
 {% endblock %}
@@ -134,17 +127,56 @@
   {{ block.super }}
   <script src="//cdn.jsdelivr.net/npm/sortablejs@1.6.1/Sortable.min.js"></script>
   <script type="text/javascript">
+    window.CSRF_TOKEN = "{{ csrf_token }}"
     $(document).ready(function() {
       let selectedId, selectedStationName, selectedCategory
       $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown({
         onChange: function(value, text, $selectedItem) {
-                    console.log(value)
-                    console.log(text)
-                    console.log($selectedItem.attr('category'))
                     selectedId = value
                     selectedStationName = text
                     selectedCategory = $selectedItem.attr('category')
                   }
+      })
+
+      let el = document.getElementById('sortable')
+      let order = {}
+      Sortable.create(el, {
+        store: {
+          /**
+            * Get the order of elements. Called once during initialization.
+            * @param   {Sortable}  sortable
+            * @returns {Array}
+            */
+          get: function (sortable) {
+            return order = sortable.toArray()
+          },
+          /**
+            * Save the order of elements. Called onEnd (when the item is dropped).
+            * @param {Sortable}  sortable
+            */
+          set: function (sortable) {
+            order = sortable.toArray()
+          }
+        }
+      })
+
+      $('#submitButton').on('click', function() {
+        let postData = new FormData()
+        postData.append('name', $('#name').val())
+        postData.append('description', $('textarea').val())
+        if($('input[type=file]')[0].files[0]) {
+          postData.append('image', $('input[type=file]')[0].files[0])
+        }
+        postData.append('order', JSON.stringify(order))
+        postData.append('csrfmiddlewaretoken', window.CSRF_TOKEN)
+        $.ajax({
+          url: window.location.pathname,
+          type: 'POST',
+          data: postData,
+          cache: false,
+          contentType: false,
+          processData: false
+        })
       })
 
       $('[id=travelplan]').each( function() {
@@ -160,49 +192,28 @@
         })
       })
       $('#addStationButton').on('click', function() {
-        $('#sortable').append(
-            '<div class="completed step" id="travelplan" data-id="' + selectedId +
-            '"><div class="content" id="category"><div class="title">' +
-              selectedStationName + '</div><div class="description">' +
-              selectedCategory + '</div></div></div>'
-          )
-        let selector = "div[data-id=" + selectedId + "]"
-        $('.item.active.selected').remove()
-        $('#selectedStationId').empty()
-        $(document).on('mouseover', selector, function() {
-          $(this).removeClass("completed step")
-          $(this).addClass("active step")
-        })
-        $(document).on('mouseout', selector, function() {
-          $(this).removeClass("active step")
-          $(this).addClass("completed step")
-        })
+        if(/^[\d\.]$/.test(selectedId)) {
+          $('#sortable').append(
+              '<div class="completed step" id="travelplan" data-id="' + selectedId +
+              '"><div class="content" id="category"><div class="title">' +
+                selectedStationName + '</div><div class="description">' +
+                selectedCategory + '</div></div></div>'
+            )
+          let selector = "div[data-id=" + selectedId + "]"
+          $('.item.active.selected').remove()
+          $('#selectedStationId').empty()
+          $(document).on('mouseover', selector, function() {
+            $(this).removeClass("completed step")
+            $(this).addClass("active step")
+          })
+          $(document).on('mouseout', selector, function() {
+            $(this).removeClass("active step")
+            $(this).addClass("completed step")
+          })
+          order.push(selectedId)
+        }
       })
 
-    })
-
-    let el = document.getElementById('sortable');
-    store = {}
-    Sortable.create(el, {
-      group: "localStorage-example",
-      store: {
-        /**
-          * Get the order of elements. Called once during initialization.
-          * @param   {Sortable}  sortable
-          * @returns {Array}
-          */
-        get: function (sortable) {
-          return sortable.toArray()
-        },
-
-        /**
-          * Save the order of elements. Called onEnd (when the item is dropped).
-          * @param {Sortable}  sortable
-          */
-        set: function (sortable) {
-          var order = sortable.toArray()
-        }
-      }
     })
   </script>
 {% endblock %}

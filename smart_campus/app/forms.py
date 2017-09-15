@@ -60,12 +60,8 @@ class BeaconForm(forms.ModelForm):
 
 
 class PartialTravelPlanForm(forms.ModelForm):
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = TravelPlan
         exclude = ['stations']
-
-
-class TravelPlanForm(forms.ModelForm):
-    class Meta:
-        model = TravelPlan
-        fields = '__all__'

@@ -18,10 +18,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 
 import os
 import random
-import logging
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(format='%(asctime)s: %(levelname)s : %(message)s', level=logging.INFO)
+import json
 
 from .models import (
     User, Reward, Permission,
@@ -37,8 +34,7 @@ from .forms import (
     ManagerForm,
     PartialRewardForm,
     BeaconForm,
-    PartialTravelPlanForm,
-    TravelPlanForm
+    PartialTravelPlanForm
 )
 
 
@@ -919,18 +915,40 @@ def travelplan_edit_page(request, pk):
         travelplan_form = PartialTravelPlanForm(
                                 request.POST,
                                 request.FILES,
-                                isinstance=travelplan
+                                instance=travelplan
                             )
+        print(request.POST)
+        print(travelplan_form)
         if travelplan_form.is_valid():
-            data = travelplan_form.cleaned_data
-            edited_travelplan = travelplan_form.save(commit=False)
+            edited_travelplan = travelplan_form.save()
 
-            # delete all the connection
-            edited_travelplan.travelplanstations_set.clear()
+            json_order = json.loads(request.POST['order'])
+            for order, station_id in enumerate(json_order):
+                changed_travelplan = TravelPlanStations.objects.filter(
+                                            travelplan_id=pk,
+                                            station_id=station_id
+                                        )
+
+                if not changed_travelplan:
+                    TravelPlanStations.objects.create(
+                        travelplan_id=pk,
+                        station_id=station_id,
+                        order=order
+                    )
+                else:
+                    changed_travelplan.first().order = order
+                    changed_travelplan.first().save()
+
+        form_data = travelplan_form.cleaned_data
+    else:
+        form_data = {
+            'name': travelplan.name,
+            'description': travelplan.description
+        }
 
     travelplanstations = TravelPlanStations.objects.filter(
-                                                        travelplan_id=pk
-                                                    ).order_by('order')
+                                travelplan_id=pk
+                            ).order_by('order')
 
     selected_stations_id = [
         travelplanstation.station_id for travelplanstation
@@ -947,6 +965,8 @@ def travelplan_edit_page(request, pk):
         'stations': Station.objects.all(),
         'travelplan': travelplan,
         'travelplanstations': travelplanstations,
-        'selected_stations': selected_stations
+        'selected_stations': selected_stations,
+        'form_data': form_data,
+        'categories': StationCategory.objects.all()
     }
     return render(request, 'app/travelplan_edit_page.html', context)
