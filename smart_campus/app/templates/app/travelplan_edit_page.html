@@ -23,7 +23,7 @@
         </div>
       {% endif %}
     {% endfor %}
-    <div class="field">
+    <div class="four wide field">
       <label>行程名稱</label>
       <input id="name" name="name" type="text" placeholder="行程名稱" value="{{ form_data.name }}" required="">
     </div>
@@ -74,14 +74,18 @@
       </div>
       <div class="ui center aligned grid">
         <div class="column">
-          <div class="ui vertical steps" id="sortable">
+          <div class="ui vertical big steps" id="sortable">
             {% if selected_stations %}
               {% for station in selected_stations %}
                 <div class="completed step" id="travelplan" data-id='{{ station.id }}'>
+                  <i class="sort icon"></i>
                   <div class="content" id="category">
                     <div class="title">{{ station.name }}</div>
                     <div class="description">
                       {{ station.category}}
+                    </div>
+                    <div class="meta">
+                      <a class="ui mini basic red button" id="deleteStep">刪除</a>
                     </div>
                   </div>
                 </div>

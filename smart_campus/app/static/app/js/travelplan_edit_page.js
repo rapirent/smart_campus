@@ -65,9 +65,9 @@ $(document).ready(function() {
     if(/^[\d\.]$/.test(selectedId)) {
       $('#sortable').append(
           '<div class="completed step" id="travelplan" data-id="' + selectedId +
-          '"><div class="content" id="category"><div class="title">' +
+          '"><i class="sort icon"></i><div class="content" id="category"><div class="title">' +
             selectedStationName + '</div><div class="description">' +
-            selectedCategory + '</div></div></div>'
+            selectedCategory + '</div><div class="meta"><a class="ui mini basic red button" id="deleteStep">刪除</a></div></div></div>'
         )
       let selector = "div[data-id=" + selectedId + "]"
       $('.item.active.selected').remove()
