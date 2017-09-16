@@ -36,26 +36,26 @@
         {% if beacons.has_other_pages %}
           <tr class="center aligned collapsing">
             <th colspan="3">
-            <div class="ui pagination menu">
-              {% if beacons.has_previous %}
-                <a class="icon item" href="?page={{ beacons.previous_page_number }}">
-                  <i class="left chevron icon"></i>
-                </a>
-              {% endif %}
-              {% for page in beacons.paginator.page_range %}
-                {% if beacons.number == page %}
-                  <div class="active item">{{ page }}</div>
-                {% else %}
-                  <a class="item" href="?page={{ page }}">{{ page }}</a>
+              <div class="ui pagination menu">
+                {% if beacons.has_previous %}
+                  <a class="icon item" href="?page={{ beacons.previous_page_number }}">
+                    <i class="left chevron icon"></i>
+                  </a>
                 {% endif %}
-              {% endfor %}
-              {% if beacons.has_next %}
-                <a class="icon item" href="?page={{ beacons.next_page_number }}">
-                  <i class="right chevron icon"></i>
-                </a>
-              {% endif%}
-            </div>
-          </th>
+                {% for page in beacons.paginator.page_range %}
+                  {% if beacons.number == page %}
+                    <div class="active item">{{ page }}</div>
+                  {% else %}
+                    <a class="item" href="?page={{ page }}">{{ page }}</a>
+                  {% endif %}
+                {% endfor %}
+                {% if beacons.has_next %}
+                  <a class="icon item" href="?page={{ beacons.next_page_number }}">
+                    <i class="right chevron icon"></i>
+                  </a>
+                {% endif%}
+              </div>
+            </th>
           </tr>
         {% endif %}
       </tfoot>

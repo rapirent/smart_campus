@@ -54,7 +54,18 @@
         <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
       </div>
     </div>
-    <a class="item" href="{% url 'Manager List Page' %}">管理使用者</a>
+    <div class="ui dropdown item" id="selection">
+      使用者管理
+      <i class="dropdown icon"></i>
+      <div class="menu">
+        <a class="item" href="{% url 'Manager List Page' %}">
+          管理者清單
+        </a>
+        <a class="item" href="">
+          管理群組清單
+        </a>
+      </div>
+    </div>
     <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
     <a class="item" href="">管理挑戰</a>
     <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>

@@ -655,12 +655,27 @@ def reward_add_page(request):
 
 @login_required
 def manager_list_page(request):
+    # List the manager on the page
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
+    manager_list = User.objects.exclude(role__name='User').order_by('email')
+    paginator = Paginator(manager_list, 10)
+
+    # Try to get the page number
+    page = request.GET.get('page', 1)
+    try:
+        managers = paginator.page(page)
+    except PageNotAnInteger:
+        managers = paginator.page(1)
+    except EmptyPage:
+        # Page Number is out of range
+        managers = paginator.page(paginator.num_pages)
+
     context = {
         'email': request.user.email,
-        'managers': User.objects.exclude(role__name='User')
+        'managers': managers,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -674,12 +689,15 @@ def manager_add_page(request):
     if request.method == 'POST':
         form = ManagerForm(request.POST)
         password = request.POST.get('password')
+
         if form.is_valid() and password is not None:
             data = form.cleaned_data
             manager = form.save(commit=False)
             manager.set_password(password)
             manager.save()
+
             return HttpResponseRedirect('/managers/')
+
     else:
         form = ManagerForm()
 
@@ -688,7 +706,8 @@ def manager_add_page(request):
     context = {
         'roles': roles,
         'groups': groups,
-        'form': form
+        'form': form,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_add_page.html', context)
@@ -748,9 +767,9 @@ def beacon_list_page(request):
         return HttpResponseForbidden()
 
     beacon_list = Beacon.objects.all().order_by('beacon_id')
-    paginator = Paginator(beacon_list, 20)
+    paginator = Paginator(beacon_list, 10)
 
-    # Try to get the page
+    # Try to get the page number
     page = request.GET.get('page', 1)
     try:
         beacons = paginator.page(page)
