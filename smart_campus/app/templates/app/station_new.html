@@ -12,18 +12,17 @@
 <div class="ui container">
 
   <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-      {% for field in form %}
-          {% if field.errors %}
-          <div class="ui negative message">
+    {% for field in form %}
+      {% if field.errors %}
+        <div class="ui negative message">
           {% for error in field.errors %}
-              <li>{{ field.label }}: {{ error|escape }}</li>
+            <li>{{ field.label }}: {{ error|escape }}</li>
           {% endfor %}
         </div>
-          {% endif %}
-        {% endfor %}
+      {% endif %}
+    {% endfor %}
     {% csrf_token %}
     <div class="fields">
-
       <div class="required field">
         <label>名稱</label>
         <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form.cleaned_data.name }}" required="">

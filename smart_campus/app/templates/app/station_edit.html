@@ -7,7 +7,7 @@
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.js"></script>
-	<link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
 {% block content %}
 <div class="ui container">
@@ -41,10 +41,10 @@
         </select>
       </div>
       <div class="left floated field">
-          <label>綁定收藏品</label>
-          <select class="ui selection dropdown" placeholder="">
-          </select>
-        </div>
+        <label>綁定收藏品</label>
+        <select class="ui selection dropdown" placeholder="">
+        </select>
+      </div>
     </div>
     <hr>
     <div class="field">
@@ -94,6 +94,7 @@
       <div class="ui center aligned grid">
         <div class="column">
           <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+        </div>
       </div>
     </div>
     <hr>

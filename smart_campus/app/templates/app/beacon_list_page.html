@@ -1,18 +1,13 @@
-{% extends "app/base.html" %}
-{% load static %}
+{% extends "app/base.html" %} {% load static %} {% block title %}Smart Campus{% endblock %} {% block content %}
+<div class="ui borderless center aligned text container">
 
-{% block title %}Smart Campus{% endblock %}
-
-{% block content %}
-  <div class="ui borderless center aligned text container">
-  	
-    <div class="ui horizontal divider">
-      OR
-    </div>
-    <a class="ui teal labeled icon button" href="{% url 'Beacon Add Page' %}">
+  <div class="ui horizontal divider">
+    OR
+  </div>
+  <a class="ui teal labeled icon button" href="{% url 'Beacon Add Page' %}">
       新增Beacon
       <i class="add icon"></i>
     </a>
-  </div>
+</div>
 
 {% endblock %}
