@@ -42,7 +42,12 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=128)
     nickname = models.CharField(max_length=254, blank=True)
     role = models.ForeignKey('Role', null=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey('UserGroup', null=True, blank=True, on_delete=models.SET_NULL)
+    group = models.ForeignKey(
+        'UserGroup',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
 
     experience_point = models.IntegerField(default=0)
     earned_coins = models.IntegerField(default=0)

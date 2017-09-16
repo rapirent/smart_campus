@@ -12,7 +12,7 @@
     <div class="required five wide field">
       <label>管理者權限</label>
       <div class="ui selection dropdown">
-        <input type="hidden" name="role" value="{{ form_data.role }}">
+        <input type="hidden" name="role" value="{{ form_data.role.id }}">
         <i class="dropdown icon"></i>
         <div class="default text">請選擇權限...</div>
         <div class="menu">
@@ -29,7 +29,7 @@
     <div class="field">
       <label>管理者群組</label>
       <div class="ui selection dropdown">
-        <input type="hidden" name="group" value="{{ form_data.group }}">
+        <input type="hidden" name="group" value="{{ form_data.group.id }}">
         <i class="dropdown icon"></i>
         <div class="default text">請選擇群組...</div>
         <div class="menu">

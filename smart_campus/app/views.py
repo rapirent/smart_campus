@@ -721,13 +721,11 @@ def manager_edit_page(request, pk):
     manager = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
-        print(request.POST)
         form = ManagerForm(request.POST, instance=manager)
 
         if form.is_valid():
             data = form.cleaned_data
-            manager = form.save()
-            print('123')
+            form.save()
 
             return HttpResponseRedirect('/managers/')
 

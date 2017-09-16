@@ -41,6 +41,7 @@ class PartialRewardForm(forms.ModelForm):
 
 
 class ManagerForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = ('email', 'group', 'role')
