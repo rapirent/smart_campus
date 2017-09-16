@@ -160,9 +160,11 @@ def index(request):
 def station_list_page(request):
     """Show all stations managed by the user's group"""
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
+        stations = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(
+            owner_group=request.user.group
+        ).order_by('id')
 
     station_data = [
         {
@@ -884,7 +886,7 @@ def travelplan_list_page(request):
     context = {
         'categories': StationCategory.objects.all(),
         'email': request.user.email,
-        'travelplans': TravelPlan.objects.all()
+        'travelplans': TravelPlan.objects.all().order_by('id')
     }
 
     return render(request, 'app/travelplan_list_page.html', context)
