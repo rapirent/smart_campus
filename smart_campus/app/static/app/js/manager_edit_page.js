@@ -17,15 +17,6 @@ $(document).ready(function() {
             }
           ]
         },
-        password: {
-          identifier: "password",
-          rules: [
-            {
-              type: "empty",
-              prompt: "請輸入密碼"
-            }
-          ]
-        },
         role: {
           identifier: "role",
           rules: [

@@ -721,13 +721,16 @@ def manager_edit_page(request, pk):
     manager = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
+        print(request.POST)
         form = ManagerForm(request.POST, instance=manager)
+
         if form.is_valid():
             data = form.cleaned_data
-            manager = form.save(commit=False)
-            manager.save()
+            manager = form.save()
+            print('123')
 
             return HttpResponseRedirect('/managers/')
+
     else:
         form = ManagerForm()
 
@@ -743,7 +746,8 @@ def manager_edit_page(request, pk):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'form_data': form_data
+        'form_data': form_data,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_edit_page.html', context)
