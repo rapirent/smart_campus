@@ -14,6 +14,7 @@ from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
 import os
@@ -740,13 +741,27 @@ def manager_delete_page(request, pk):
 
 @login_required
 def beacon_list_page(request):
+    # List the Beacon on the page
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
+    beacon_list = Beacon.objects.all().order_by('beacon_id')
+    paginator = Paginator(beacon_list, 20)
+
+    # Try to get the page
+    page = request.GET.get('page', 1)
+    try:
+        beacons = paginator.page(page)
+    except PageNotAnInteger:
+        beacons = paginator.page(1)
+    except EmptyPage:
+        # Page number is out of range
+        beacons = paginator.page(paginator.num_pages)
+
     context = {
         'email': request.user.email,
-        'beacons': Beacon.objects.all(),
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all(),
+        'beacons': beacons
     }
 
     return render(request, 'app/beacon_list_page.html', context)
