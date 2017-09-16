@@ -122,14 +122,14 @@
 {% block script %}
   {{ block.super }}
   <script>
-  var location_arr = [];
+    var location_arr = [];
 
-  {% if beacons %}
-    {% for beacon in beacons %}
-      location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
-    {% endfor %}
-  {% endif %}
-  var MAX_IMGS = {{ max_imgs }};
+    {% if beacons %}
+      {% for beacon in beacons %}
+        location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
+      {% endfor %}
+    {% endif %}
+    var MAX_IMGS = {{ max_imgs }};
   </script>
   <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>

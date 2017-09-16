@@ -39,18 +39,18 @@
         </div>
         <div class="ui error message">
           {% if messages %}
-              {% for message in messages %}
-                {{ message }}
-              {% endfor %}
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
           {% endif %}
         </div>
       </form>
       {% if messages %}
-      <div class="ui negative message">
-        {% for message in messages %}
-          {{ message }}
-        {% endfor %}
-      </div>
+        <div class="ui negative message">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
       {% endif %}
     </div>
   </div>

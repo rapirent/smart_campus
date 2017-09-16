@@ -10,31 +10,31 @@
   <div class="ui borderless center aligned text container">
     {% if messages %}
       {% for message in messages %}
-    <div class="ui info message">
-      {{ message }}
-    </div>
+        <div class="ui info message">
+          {{ message }}
+        </div>
       {% endfor %}
     {% endif %}
-  {% if rewards %}
-    {% for reward in rewards %}
-    <div class="ui cards">
-      <div class="ui centered card">
-        <div class="image">
-          <img src="{{ reward.image.url }}">
-        </div>
-        <div class="content">
-          <div class="header">
-            {{ reward.name }}
+    {% if rewards %}
+      {% for reward in rewards %}
+        <div class="ui cards">
+          <div class="ui centered card">
+            <div class="image">
+              <img src="{{ reward.image.url }}">
+            </div>
+            <div class="content">
+              <div class="header">
+                {{ reward.name }}
+              </div>
+            </div>
+            <div class="extra content">
+              <div class="ui basic green left floated button">修改</div>
+              <div class="ui basic red right floated button">刪除</div>
+            </div>
           </div>
         </div>
-        <div class="extra content">
-          <div class="ui basic green left floated button">修改</div>
-          <div class="ui basic red right floated button">刪除</div>
-        </div>
-      </div>
-    </div>
-    {% endfor %}
-  {% endif %}
+      {% endfor %}
+    {% endif %}
     <div class="ui horizontal divider">
       OR
     </div>
