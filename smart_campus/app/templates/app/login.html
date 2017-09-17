@@ -1,64 +1,62 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}
-Smart Campus Login
-{% endblock %}
+{% block title %}Smart Campus Login {% endblock %}
+
 
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/login.css" %}" />
 {% endblock %}
+
 {% block nav %}
 {% endblock %}
 
 {% block content %}
-<div class="ui middle aligned center aligned grid">
-  <div class="column">
-    <h2 class="ui teal header">
-      <div class="content">
-        成功大學智慧校園管理系統
-      </div>
-    </h2>
-    <form class="ui large form" method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="ui stacked segment">
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="user icon"></i>
-            <input type="text" name="email" placeholder="E-mail address">
-          </div>
+  <div class="ui middle aligned center aligned grid">
+    <div class="column">
+      <h2 class="ui teal header">
+        <div class="content">
+          成功大學智慧校園管理系統
         </div>
-        <div class="field">
-          <div class="ui left icon input">
-            <i class="lock icon"></i>
-            <input type="password" name="password" placeholder="Password">
+      </h2>
+      <form class="ui large form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="ui stacked segment">
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="user icon"></i>
+              <input type="text" name="email" placeholder="E-mail address">
+            </div>
           </div>
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="lock icon"></i>
+              <input type="password" name="password" placeholder="Password">
+            </div>
+          </div>
+          <button class="ui fluid large teal submit button" type="submit">登入</button>
         </div>
-        <button class="ui fluid large teal submit button" type="submit">登入</button>
-      </div>
-      <div class="ui error message">
-        {% if messages %}
+        <div class="ui error message">
+          {% if messages %}
             {% for message in messages %}
               {{ message }}
             {% endfor %}
-        {% endif %}
-      </div>
-    </form>
-    {% if messages %}
-    <div class="ui negative message">
-        {% for message in messages %}
-          {{ message }}
-        {% endfor %}
+          {% endif %}
+        </div>
+      </form>
+      {% if messages %}
+        <div class="ui negative message">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
+        </div>
+      {% endif %}
     </div>
-    {% endif %}
   </div>
-</div>
-
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-<script src="{% static "app/js/login.js" %}"></script>
-
+  {{ block.super }}
+  <script src="{% static "app/js/login.js" %}"></script>
 {% endblock %}

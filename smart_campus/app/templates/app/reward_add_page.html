@@ -1,36 +1,39 @@
 {% extends 'app/base.html' %}
 {% load static %}
+
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static " app/css/edit.css " %}">
 {% endblock %}
+
 {% block content%}
-<div class="ui text container">
-  <form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="reward_form">
-    {% csrf_token %}
-    <div class="required five wide field">
-      <label>獎勵名稱</label>
-      <input type="text" name="name" placeholder="類別名稱">
-    </div>
-    <div class="required field">
-      <label>獎勵描述</label>
-      <textarea rows="2" form="reward_form" name="description" placeholder="類別描述"></textarea>
-    </div>
-    <div class="required five wide field">
-      <label>圖片上傳</label>
-      <div class="ui action input">
-        <input type="text" placeholder="img 1" readonly="">
-        <input id="image" name="image" type="file" accept="image/*" style="display: none;">
-        <div class="ui icon button">
-          <i class="attach icon"></i>
+  <div class="ui text container">
+    <form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="reward_form">
+      {% csrf_token %}
+      <div class="required five wide field">
+        <label>獎勵名稱</label>
+        <input type="text" name="name" placeholder="類別名稱">
+      </div>
+      <div class="required field">
+        <label>獎勵描述</label>
+        <textarea rows="2" form="reward_form" name="description" placeholder="類別描述"></textarea>
+      </div>
+      <div class="required five wide field">
+        <label>圖片上傳</label>
+        <div class="ui action input">
+          <input type="text" placeholder="img 1" readonly="">
+          <input id="image" name="image" type="file" accept="image/*" style="display: none;">
+          <div class="ui icon button">
+            <i class="attach icon"></i>
+          </div>
         </div>
       </div>
-    </div>
-    <button class="ui submit teal button" type="submit">新增</button>
-    <div class="ui error message"></div>
-  </form>
-</div>
+      <button class="ui submit teal button" type="submit">新增</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
 {% endblock %}
+
 {% block script %}
   {{ block.super }}
   <script src="{% static "app/js/reward_add_page.js" %}"></script>

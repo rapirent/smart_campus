@@ -25,11 +25,11 @@ function addMarker(title, lat, lng) {
 
   marker.addListener('click', function() {
     map.setZoom(16);
-    map.setCenter(marker.getPosition());
-    $("#selectbasic").val(marker.getTitle());
-    $("#lat_input").val(marker.getPosition().lat());
+    map.setCenter(marker.getPosition())
+    $("#selectbasic").val(marker.getTitle())
+    $("#lat_input").val(marker.getPosition().lat())
     $("#lng_input").val(marker.getPosition().lng())
-  });
+  })
 }
 
 let imgCount=1;
@@ -66,4 +66,4 @@ $("#addimage").click( function(){
     $('.ui.radio.checkbox').checkbox()
 
   }
-});
+})
