@@ -258,10 +258,10 @@ class TravelPlan(models.Model):
         through='TravelPlanStations'
     )
     image = models.ImageField(
-                        null=True,
-                        blank=True,
-                        upload_to="images/travel_plan/"
-                    )
+        null=True,
+        blank=True,
+        upload_to="images/travel_plan/"
+    )
 
     def __str__(self):
         return self.name

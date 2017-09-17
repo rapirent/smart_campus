@@ -269,9 +269,9 @@ def set_primary_station_image(request, pk):
         return HttpResponseForbidden()
 
     station_images = StationImage.objects.filter(station=image.station)
-    for each_img in station_images:
-        each_img.is_primary = False
-        each_img.save()
+    for img in station_images:
+        img.is_primary = False
+        img.save()
 
     image.is_primary = True
     image.save()
@@ -365,7 +365,6 @@ def get_all_rewards(request):
 @csrf_exempt
 def get_all_stations(request):
     """API for retrieving contents of all Stations"""
-    print(request.get_host())
     data = [
         {
             'id': station.id,
@@ -493,7 +492,7 @@ def update_user_experience_point(request):
 @csrf_exempt
 @require_POST
 def add_user_reward(request):
-    # POST a reward id and update the user data
+    """ POST a reward id and update the user data """
     email = request.POST.get('email')
     reward_id = request.POST.get('reward_id')
 
@@ -605,7 +604,7 @@ def get_all_travel_plans(request):
 
 @login_required
 def reward_list_page(request):
-    # List all rewards.
+    """ List all rewards. """
 
     context = {
         'email': request.user.email,
@@ -618,7 +617,7 @@ def reward_list_page(request):
 
 @login_required
 def reward_add_page(request):
-    # Add a reward
+    """ Add a reward """
     if request.method == 'POST':
         reward_form = PartialRewardForm(request.POST, request.FILES)
 
@@ -683,7 +682,6 @@ def manager_add_page(request):
             manager = form.save(commit=False)
             manager.set_password(password)
             manager.save()
-
             return HttpResponseRedirect('/managers/')
 
     else:
@@ -714,7 +712,6 @@ def manager_edit_page(request, pk):
         if form.is_valid():
             data = form.cleaned_data
             form.save()
-
             return HttpResponseRedirect('/managers/')
 
     else:
@@ -891,7 +888,7 @@ def station_delete_page(request, pk):
 
 @login_required
 def travelplan_list_page(request):
-    # list the travelplan on teh page
+    """ List the travel plans on page """
     context = {
         'categories': StationCategory.objects.all(),
         'email': request.user.email,
@@ -903,7 +900,7 @@ def travelplan_list_page(request):
 
 @login_required
 def travelplan_add_page(request):
-    # add the travelplan using partialtravelplanform
+    """ add the travelplan using partialtravelplanform """
     if request.method == 'POST':
         travelplan_form = PartialTravelPlanForm(request.POST, request.FILES)
 
@@ -931,36 +928,32 @@ def travelplan_add_page(request):
 
 @login_required
 def travelplan_edit_page(request, pk):
-    # edit the travelplan content using travelplanform
+    """ Edit the travel plan """
 
-    # use pk to get the travelplan
     travelplan = get_object_or_404(TravelPlan, pk=pk)
 
     if request.method == 'POST':
-        # instance varible to specify the travelplan being edited
         travelplan_form = PartialTravelPlanForm(
-                                request.POST,
-                                request.FILES,
-                                instance=travelplan
-                            )
-        print(request.POST)
+            request.POST,
+            request.FILES,
+            instance=travelplan
+        )
+
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
 
             json_order = json.loads(request.POST['order'])
 
             if not json_order:
-                for travelplan_station in TravelPlanStations.objects.filter(
-                                                travelplan_id=pk
-                                            ):
+                for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk):
                     travelplan_station.delete()
 
             else:
                 for order, station_id in enumerate(json_order):
                     changed_travelplan = TravelPlanStations.objects.filter(
-                                                travelplan_id=pk,
-                                                station_id=station_id
-                                            )
+                        travelplan_id=pk,
+                        station_id=station_id
+                    )
 
                     if not changed_travelplan:
                         TravelPlanStations.objects.create(
@@ -979,7 +972,6 @@ def travelplan_edit_page(request, pk):
             }
 
             return HttpResponseRedirect('/travelplans/')
-
         form_data = travelplan_form.cleaned_data
 
     else:
@@ -989,17 +981,17 @@ def travelplan_edit_page(request, pk):
         }
 
     travelplanstations = TravelPlanStations.objects.filter(
-                                travelplan_id=pk
-                            ).order_by('order')
+        travelplan_id=pk
+    ).order_by('order')
 
     selected_stations_id = [
-        travelplanstation.station_id for travelplanstation
-        in travelplanstations
+        travelplanstation.station_id
+        for travelplanstation in travelplanstations
     ]
 
     selected_stations = [
-        Station.objects.get(id=station_id) for station_id
-        in selected_stations_id
+        Station.objects.get(id=station_id)
+        for station_id in selected_stations_id
     ]
 
     context = {
@@ -1017,7 +1009,7 @@ def travelplan_edit_page(request, pk):
 
 @login_required
 def travelplan_delete_page(request, pk):
-    # Delete the travelplan and its travelplan_stations
+    """ Delete the travelplan and its travelplan_stations """
 
     travelplan = get_object_or_404(TravelPlan, pk=pk)
     travelplan_stations = TravelPlanStations.objects.filter(travelplan_id=pk)

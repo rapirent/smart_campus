@@ -26,15 +26,15 @@
           <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
         </div>
         <div class="field">
-            <label>類別</label>
-            <select class="ui selection dropdown" name="category">
-              {% if categories %}
-                {% for category in categories %}
-                  <option value="{{ category.id }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
-                {% endfor %}
-              {% endif %}
-            </select>
-          </div>
+          <label>類別</label>
+          <select class="ui selection dropdown" name="category">
+            {% if categories %}
+              {% for category in categories %}
+                <option value="{{ category.id }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
         <div class="left floated field">
           <label>綁定收藏品</label>
           <select class="ui selection dropdown" placeholder=""></select>

@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block stylesheet %}
-	{{ block.super }}
-	<link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
 
 {% block content%}
@@ -35,6 +35,6 @@
 {% endblock %}
 
 {% block script %}
-	{{ block.super }}
-	<script src="{% static 'app/js/travelplan_add_page.js' %}"></script>
+  {{ block.super }}
+  <script src="{% static 'app/js/travelplan_add_page.js' %}"></script>
 {% endblock %}
