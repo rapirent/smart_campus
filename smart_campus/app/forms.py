@@ -1,4 +1,11 @@
-from django import forms
+from django.forms import (
+    ModelForm,
+    CharField,
+    FloatField,
+    ImageField,
+    IntegerField
+)
+
 from django.conf import settings
 
 from .models import(
@@ -11,45 +18,44 @@ from .models import(
 )
 
 
-class StationForm(forms.ModelForm):
-    beacon = forms.CharField()
-    lat = forms.FloatField()
-    lng = forms.FloatField()
-    main_img_num = forms.IntegerField(required=False)
+class StationForm(ModelForm):
+    beacon = CharField()
+    lat = FloatField()
+    lng = FloatField()
+    main_img_num = IntegerField()
 
     def __init__(self, *args, **kwargs):
         super(StationForm, self).__init__(*args, **kwargs)
         for i in range(1, settings.MAX_IMGS_UPLOAD + 1):
             field_name = 'img{0}'.format(i)
-            self.fields[field_name] = forms.ImageField(required=False)
+            self.fields[field_name] = ImageField(required=False)
 
     class Meta:
         model = Station
         fields = ('name', 'content', 'category')
 
 
-class StationCategoryForm(forms.ModelForm):
+class StationCategoryForm(ModelForm):
     class Meta:
         model = StationCategory
         fields = '__all__'
 
 
-class PartialRewardForm(forms.ModelForm):
+class PartialRewardForm(ModelForm):
     class Meta:
         model = Reward
         exclude = ['related_station']
 
 
-class ManagerForm(forms.ModelForm):
-
+class ManagerForm(ModelForm):
     class Meta:
         model = User
         fields = ('email', 'group', 'role')
 
 
-class BeaconForm(forms.ModelForm):
-    lat = forms.FloatField()
-    lng = forms.FloatField()
+class BeaconForm(ModelForm):
+    lat = FloatField()
+    lng = FloatField()
 
     class Meta:
         model = Beacon
@@ -60,8 +66,8 @@ class BeaconForm(forms.ModelForm):
         self.fields['owner_group'].required = False
 
 
-class PartialTravelPlanForm(forms.ModelForm):
-    image = forms.ImageField(required=False)
+class PartialTravelPlanForm(ModelForm):
+    image = ImageField(required=False)
 
     class Meta:
         model = TravelPlan
