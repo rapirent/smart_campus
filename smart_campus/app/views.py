@@ -15,7 +15,6 @@ from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
-
 import os
 import random
 
@@ -150,18 +149,11 @@ def index(request):
 def station_list_page(request):
     """Show all stations managed by the user's group"""
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
+        stations = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group)
-
-    categories = StationCategory.objects.all()
-
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
+        stations = Station.objects.filter(
+                        owner_group=request.user.group
+                    ).order_by('id')
 
     station_data = [
         {
@@ -182,7 +174,7 @@ def station_list_page(request):
     context = {
         'email': request.user.email,
         'stations': station_data,
-        'categories': categories_data
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/station_list.html', context)
