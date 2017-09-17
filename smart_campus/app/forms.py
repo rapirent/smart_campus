@@ -22,7 +22,7 @@ class StationForm(ModelForm):
     beacon = CharField()
     lat = FloatField()
     lng = FloatField()
-    main_img_num = IntegerField()
+    main_img_num = IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(StationForm, self).__init__(*args, **kwargs)

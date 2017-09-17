@@ -289,7 +289,7 @@ def delete_station_image(request, pk):
 
     if not image.is_primary:
         if os.path.isfile(image.image.path):
-            os.remove(img.image.path)
+            os.remove(image.image.path)
         image.delete()
 
         return HttpResponseRedirect('/stations/{0}/edit/'.format(image.station.id))

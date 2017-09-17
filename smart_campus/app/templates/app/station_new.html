@@ -35,7 +35,7 @@
             <div class="menu">
               {% if categories %}
                 {% for category in categories %}
-                  <div class="item" value="{{ category.name }}" data-value="{{ category.name }}">
+                  <div class="item" value="{{ category.name }}" data-value="{{ category.id }}">
                     {{ category.name }}
                   </div>
                 {% endfor %}

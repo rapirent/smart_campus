@@ -26,17 +26,15 @@
           <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
         </div>
         <div class="field">
-          <label>類別</label>
-          <select class="ui selection dropdown" placeholder="{{form_data.category}}">
-            {% if categories %}
-              {% for category in categories %}
-              <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
-                {{ category.name }}
-              </option>
-              {% endfor %}
-            {% endif %}
-          </select>
-        </div>
+            <label>類別</label>
+            <select class="ui selection dropdown" name="category">
+              {% if categories %}
+                {% for category in categories %}
+                  <option value="{{ category.id }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
+                {% endfor %}
+              {% endif %}
+            </select>
+          </div>
         <div class="left floated field">
           <label>綁定收藏品</label>
           <select class="ui selection dropdown" placeholder=""></select>
@@ -53,25 +51,25 @@
       <!-- Button : Change Image -->
       <div class="field">
         <label>更新圖片</label>
-        {% if form_data.images %}
-          {% for image in  form_data.images %}
-          <div class="ui centered card">
-            <div class="ui medium image">
-              <div class="ui dimmer">
-                <div class="content">
-                  <div class="center">
-                    {% if image.is_primary %}
-                      <h2>刪除前請先將其他圖片設為主要圖片</h2>
-                    {% else %}
-                      <a class="ui small teal button" href="">選為主要圖片</a>
-                      <a class="ui small red button" href="">刪除</a>
-                    {% endif %}
+        {% if images %}
+          {% for image in images %}
+            <div class="ui centered card">
+              <div class="ui medium image">
+                <div class="ui dimmer">
+                  <div class="content">
+                    <div class="center">
+                      {% if image.is_primary %}
+                        <h2>刪除前請先將其他圖片設為主要圖片</h2>
+                      {% else %}
+                        <a class="ui small teal button" href="{% url 'Set Primary Station Image' image.id %}">選為主要圖片</a>
+                        <a class="ui small red button" href="{% url 'Delete Station Image' image.id %}">刪除</a>
+                      {% endif %}
+                    </div>
                   </div>
                 </div>
+                <img src="{{ image.image.url }}">
               </div>
-              <img src="{{ image.image.url }}">
             </div>
-          </div>
           {% endfor %}
         {% endif %}
         <div class="ui center aligned grid">
