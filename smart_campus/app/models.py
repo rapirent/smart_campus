@@ -10,7 +10,7 @@ class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
     name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=200, blank=True)
-    location = models.GeometryField(srid=4326, null=True)
+    location = models.PointField(srid=4326)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
     station = models.ManyToManyField('Station')
 
@@ -223,7 +223,7 @@ class Station(models.Model):
     name = models.CharField(max_length=254, unique=True)
     content = models.TextField(blank=True)
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
-    location = models.GeometryField(srid=4326, null=True)
+    location = models.PointField(srid=4326, null=True, blank=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -234,7 +234,7 @@ class Station(models.Model):
 
 
 class StationCategory(models.Model):
-    name = models.CharField(max_length=254, primary_key=True)
+    name = models.CharField(max_length=254)
     description = models.TextField(blank=True)
 
     def __str__(self):

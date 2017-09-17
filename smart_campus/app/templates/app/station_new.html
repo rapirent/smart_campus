@@ -36,9 +36,9 @@
             <div class="menu">
               {% if categories %}
                 {% for category in categories %}
-                <div class="item" value="{{ category.name }}" data-value="{{ category.name }}">
-                  {{ category.name }}
-                </div>
+                  <div class="item" value="{{ category.name }}" data-value="{{ category.id }}">
+                    {{ category.name }}
+                  </div>
                 {% endfor %}
               {% endif %}
             </div>
@@ -54,7 +54,7 @@
       </div>
       <hr>
 
-      <div class="required five wide field">
+      <div class="five wide field">
         <label>圖片上傳</label>
         <div id="uiAddImage">
           <div class="ui action input">
