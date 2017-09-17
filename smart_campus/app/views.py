@@ -2,7 +2,12 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.contrib import auth
-from django.http import HttpResponseRedirect, JsonResponse, HttpResponse, HttpResponseForbidden
+from django.http import (
+    HttpResponseRedirect,
+    JsonResponse,
+    HttpResponseForbidden,
+    HttpResponse
+)
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -17,9 +22,10 @@ from .models import (
     User, Reward, Permission,
     Station, StationCategory,
     Beacon, StationImage, Question,
-    UserReward, TravelPlan
+    UserReward, UserGroup,
+    TravelPlan
 )
-from .forms import StationForm
+from .forms import StationForm, StationCategoryForm, PartialRewardForm
 
 
 @csrf_exempt
@@ -105,16 +111,16 @@ def login_page(request):
 
         if not user:
             messages.warning(request, 'Login failed!')
-            return HttpResponseRedirect('/login/')
+            return render(request, 'app/login.html')
 
         if user.can(Permission.EDIT) or user.can(Permission.ADMIN):
             auth.login(request, user)
             return HttpResponseRedirect('/')
-
+        else:
+            messages.warning(request, 'Login failed!')
     else:
         if request.user.is_authenticated():
             return HttpResponseRedirect('/')
-
     return render(request, 'app/login.html')
 
 
@@ -126,7 +132,16 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    context = {'email': request.user.email}
+    categories = StationCategory.objects.all()
+
+    categories_data = [
+        {
+            'name': category.name,
+        }
+        for category in categories
+    ]
+
+    context = {'email': request.user.email, 'categories': categories_data}
     return render(request, 'app/index.html', context)
 
 
@@ -134,20 +149,33 @@ def index(request):
 def station_list_page(request):
     """Show all stations managed by the user's group"""
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
+        stations = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(
+                        owner_group=request.user.group
+                    ).order_by('id')
 
     station_data = [
         {
             'id': station.id,
             'name': station.name,
-            'image_url': station.primary_image_url,
+            'primary_image': StationImage.objects.filter(
+                station=station,
+                is_primary=True
+            ).first(),
+            'category': station.category,
+            'beacon': Beacon.objects.filter(
+                station=station
+            ).first()
         }
         for station in stations
     ]
 
-    context = {'email': request.user.email, 'stations': station_data}
+    context = {
+        'email': request.user.email,
+        'stations': station_data,
+        'categories': StationCategory.objects.all()
+    }
 
     return render(request, 'app/station_list.html', context)
 
@@ -216,7 +244,8 @@ def station_edit_page(request, pk):
             'content': station.content,
             'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
-            'lat': station.location.y
+            'lat': station.location.y,
+            'images': StationImage.objects.filter(station_id=station.id)
         }
 
     if request.user.can(Permission.ADMIN):
@@ -428,6 +457,27 @@ def update_user_experience_point(request):
 
 @csrf_exempt
 @require_POST
+def add_user_reward(request):
+    # POST a reward id and update the user data
+    email = request.POST.get('email')
+    reward_id = request.POST.get('reward_id')
+
+    user = User.objects.filter(email=email).first()
+    reward = Reward.objects.filter(id=reward_id).first()
+
+    if not user or not reward:
+        return HttpResponse('Either user or reward does not exist.', status=404)
+
+    try:
+        UserReward.objects.create(user=user, reward=reward)
+    except ValueError:
+        return HttpResponse('Add user reward failed.', status=400)
+
+    return HttpResponse('Create Succeeded', status=200)
+
+
+@csrf_exempt
+@require_POST
 def add_user_favorite_stations(request):
     station_id = request.POST.get('station_id')
     email = request.POST.get('email')
@@ -448,6 +498,48 @@ def add_user_favorite_stations(request):
         },
         status=200
     )
+
+
+@login_required
+def category_add_page(request):
+    # Add a new category.
+    if request.method == 'POST':
+        category_form = StationCategoryForm(request.POST)
+
+        if category_form.is_valid():
+            if request.user.can(Permission.ADMIN):
+                stations = Station.objects.all()
+            elif request.user.can(Permission.EDIT):
+                stations = Station.objects.filter(
+                    owner_group=request.user.group
+                )
+            else:
+                return HttpResponseForbidden()
+
+            category_form.save()
+            context = {
+                'name': category_form.cleaned_data['name'],
+                'station_list': [
+                    {
+                        'id': station.id,
+                        'name': station.name,
+                        'image_url': station.primary_image_url
+                    }
+                    for station in stations
+                ],
+                'categories': StationCategory.objects.all()
+            }
+
+            # TODO
+            # add the specified category station list
+            return HttpResponse('Success', status=200)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/category_add_page.html', context)
 
 
 @csrf_exempt
@@ -488,3 +580,41 @@ def get_all_travel_plans(request):
     ]
 
     return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+
+
+@login_required
+def reward_list_page(request):
+    # List all rewards.
+
+    context = {
+        'email': request.user.email,
+        'rewards': Reward.objects.all(),
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/reward_list_page.html', context)
+
+
+@login_required
+def reward_add_page(request):
+    # Add a reward
+    if request.method == 'POST':
+        reward_form = PartialRewardForm(request.POST, request.FILES)
+
+        if reward_form.is_valid():
+            reward_form.save()
+
+            context = {
+                'rewards': Reward.objects.all(),
+                'email': request.user.email,
+                'categories': StationCategory.objects.all()
+            }
+
+            return render(request, 'app/reward_list_page.html', context)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/reward_add_page.html', context)

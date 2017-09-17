@@ -1,39 +1,50 @@
 {% extends "app/base.html" %}
 {% load static %}
 
-{% block title %}Smart Campus{% endblock %}
-
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_list.css" %}" />
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="row">
-    <!-- BUTTON : Create new station -->
-    <div class="col-lg-3">
-      <p>
-        <a href="{% url 'Add Station Page' %}" class="btn btn-sq-lg btn-outline-primary">
-          <br>
-          <i class="fa fa-plus-square-o fa-5x" aria-hidden="true" ></i>
-        </a>        
-      </p>
+  <div class="ui borderless center aligned text container">
+    <div class="ui divided items">
+      {% if stations %}
+        {% for station in stations %}
+          <div class="item">
+            {% if station.primary_image %}
+              <div class="image">
+                <img src="{{ station.primary_image.image.url }}">
+              </div>
+            {% endif %}
+            <div class="ui left aligned segment content">
+              <div class="ui header">
+                {{ station.name }}
+              </div>
+              <div class="meta">
+                {{ station.beacon.name}}
+              </div>
+              <div class="extra">
+                <div class="ui label">
+                  <i class="globe icon"></i>
+                  {{ station.category}}
+                </div>
+                <div class="ui right floated buttons">
+                  <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
+                  <a class="ui basic red button" href="">刪除</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
     </div>
-
-    <!-- List all stations created by the User's Group -->
-    {% if stations %}
-      {% for station in stations %}
-        <div class="col-lg-3">
-          <p>
-            <a href="{% url 'Edit Station Page' station.id %}" class="btn btn-sq-lg btn-primary" style="background: url('{{ station.image_url }}'); background-size: auto 125px; background-position: 50% 66%;background-repeat: no-repeat;">
-              <label class="text-dark station-block">{{ station.name }}</label>
-            </a>        
-          </p>
-        </div>
-      {% endfor %}
-    {% endif %}
+    <div class="ui horizontal divider">
+        OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Add Station Page' %}">
+        新增站點
+      <i class="add icon"></i>
+    </a>
   </div>
-</div>
-
 {% endblock %}

@@ -1,4 +1,7 @@
-{% extends "app/base.html" %}
+{% extends 'app/base.html' %}
 {% load static %}
 
-{% block title %}Smart Campus{% endblock %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
+{% endblock %}

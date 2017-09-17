@@ -3,166 +3,163 @@
 
 {% block stylesheet %}
   {{ block.super }}
-  <link rel="stylesheet" type="text/css" href="{% static "app/css/station_edit.css" %}" />
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
+
 {% block content %}
-<div class="container content">
-  <!-- Display Error -->
-  {% for field in form %} 
-    {% for error in field.errors %}
-        <li class='text-danger'><strong>{{ field.label }}: {{ error|escape }}</strong></li>
-    {% endfor %}    
-  {% endfor %}
-  <!-- Form -->
-  <form action="" method="POST" enctype="multipart/form-data">            
-    {% csrf_token %}
-    <div class="row">
-
-      <!-- Station Name -->
-      <div class="col-md-4">
-        <label class="control-label col" for="name">名稱</label>  
-        <div class="col">
-          <input id="name" name="name" type="text" placeholder="站點名稱" class="form-control input-md" value="{{ form_data.name }}" required="">
+  <div class="ui container">
+    <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
+      {% for field in form %}
+        {% if field.errors %}
+          <div class="ui negative message">
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error|escape }}</li>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endfor %}
+      {% csrf_token %}
+      <div class="fields">
+        <div class="field">
+          <label>名稱</label>
+          <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}" required="">
         </div>
-      </div>
-
-      <!-- Category Select -->
-      <div class="col-md-4">
-        <label class="control-label col-md-12" for="select_category">類別</label> 
-        <select id="select_category" name="category" class="custom-select" required="">
-          <option value>請選擇類別...</option>
-          <!-- Template Snippet loading options -->
-          {% include "app/_option_snippet.html" with datas=categories form_data=form_data.category %}
-        </select>
-      </div>
-
-      <!-- Delete Station -->
-      <div class="col-md-4">
-        <button type="submit" class="btn btn-danger col-md-4" id="btn_delete" formnovalidate>刪除站點</button>
-        <input type="text" name="delete_confirmed" id="delete_confirmed" value='false' hidden>
-      </div>
-
-    </div>
-    <br>
-
-    <!-- Content Textarea -->
-    <div class="row">
-      <div class="col-md-6">
-        <label class="col control-label" for="content">推播內容</label>
-        <div class="col">                     
-          <textarea class="form-control" id="content" name="content">{{ form_data.content }}</textarea>
-        </div>
-      </div>
-    </div>
-    <br>
-
-    <!-- Button : Change Image -->
-    <div class="row">     
-      <div class="col-md-6">
-        <label class="col control-label">更改圖片</label>
-        <button type="button" class="btn btn-danger col-md-6" id="img_change">更改上傳圖片</button>
-        <input type="text" name="img_changed" id="img_changed" value='false' hidden>
-      </div>
-    </div>
-    <br>
-    <!-- Image Upload Section : HIDDEN-->
-    <div class="row" id="img_upload_sec" style="display: none;">
-      <div class="col-md-4" id="img_upload">
-        <label class="col-md-4 control-label">圖片上傳</label>
-        <div class="col-md-4">
-          Img 1:
-          <input id="img1" name="img1" class="form-control-file" type="file" accept="image/*">
-        </div>
-      </div>
-      <div class="col">
-        <br>
-        <button type="button" id="btn_addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
-      </div>
-    </div>
-    <br>
-
-    <!-- Choose Primary photo : HIDDEN-->
-    <div class="row" id="img_choose_sec" style="display: none;">
-      <div class="col-md-8" id='radios-img-select'> 
-        <label class="col-md-3 control-label" >選擇主要照片</label>
-        <label class="radio-inline" for="radios-1">
-          <input type="radio" name="main_img_num" id="radios-1" value="1" checked="checked">
-          1
-        </label>  
-      </div>
-    </div>
-    <br>
-
-    <!-- Beacon Information -->
-    <div class="row">
-      <div class="col-md-5">
-        <div class="col-md-12">
-
-          <!-- Select linking Beacon from Map -->
-          <label class="control-label col" for="selectbasic">Beacon選擇(請在地圖點選)</label> 
-          <select id="selectbasic" name="beacon" class="custom-select" required="">
-            <option value>請在地圖點選...</option>
-            <!-- Template Snippet loading options -->
-            {% include "app/_option_snippet.html" with datas=beacons form_data=form_data.beacon %}
+        <div class="field">
+          <label>類別</label>
+          <select class="ui selection dropdown" placeholder="{{form_data.category}}">
+            {% if categories %}
+              {% for category in categories %}
+              <option class="item active selected" value="{{ category.name }}" data-value="{{ category.name }}">
+                {{ category.name }}
+              </option>
+              {% endfor %}
+            {% endif %}
           </select>
-          <br><br><br><br><br><br><br>
-
-          <!-- Station Location -->
-          <label class="control-label col" for="">站點位置(預設為Beacon位置)</label> 
-          緯度:
-          <input id="lat_input" name="lat" type="text" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat }}">
-          經度:
-          <input id="lng_input" name="lng" type="text" placeholder="經度" class="form-control input-md" required="" value="{{ form_data.lng|stringformat:'f' }}">
+        </div>
+        <div class="left floated field">
+          <label>綁定收藏品</label>
+          <select class="ui selection dropdown" placeholder=""></select>
         </div>
       </div>
+      <hr>
+      <div class="field">
+        <label>推播內容</label>
+        <input id="x" type="hidden" name="content">
+        <trix-editor form="station_form" input="x"></trix-editor>
+      </div>
+      <hr>
 
-      <!-- MAP -->
-      <div class="col-md-4">
-        <label class="control-label col-md-12" for="map">Beacon位置一覽</label>
+      <!-- Button : Change Image -->
+      <div class="field">
+        <label>更新圖片</label>
+        {% if form_data.images %}
+          {% for image in  form_data.images %}
+          <div class="ui centered card">
+            <div class="ui medium image">
+              <div class="ui dimmer">
+                <div class="content">
+                  <div class="center">
+                    {% if image.is_primary %}
+                      <h2>刪除前請先將其他圖片設為主要圖片</h2>
+                    {% else %}
+                      <a class="ui small teal button" href="">選為主要圖片</a>
+                      <a class="ui small red button" href="">刪除</a>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              <img src="{{ image.image.url }}">
+            </div>
+          </div>
+          {% endfor %}
+        {% endif %}
+        <div class="ui center aligned grid">
+          <div class="five wide field">
+            <div id="uiAddImage">
+              <div class="ui action input">
+                <input type="text" placeholder="img 1" readonly="">
+                <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
+                <div class="ui icon button">
+                  <i class="attach icon"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ui center aligned grid">
+          <div class="column">
+            <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+          </div>
+        </div>
+      </div>
+      <hr>
+      <div class="four wide column centered field">
+        <label>Beacon位置一覽(請點選beacon)</label>
         <div id="map" style="height:400px;width:600px"></div>
       </div>
-    </div>
-    <br>
-    <div class='row'>
-      <button type="submit" class="btn btn-primary btn-success btn-block">儲存</button>
-    </div>
-  </form>
-</div>
-
+      <div class="field">
+        <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
+      </div>
+      <hr>
+      <div class="field">
+        <label>站點位置(預設為Beacon位置)</label>
+        <br>
+        <div class="three wide field">
+          <label>緯度</label>
+          <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" required="" value="{{ form_data.lat|stringformat:'f' }}">
+        </div>
+        <div class="three wide field">
+          <label>經度</label>
+          <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" required="" value="{{ form_data.lng|stringformat:'f' }}">
+        </div>
+      </div>
+      <button class="ui fluid teal submit button" type="submit">儲存站點資訊</button>
+    </form>
+  </div>
 {% endblock %}
 
 {% block script %}
   {{ block.super }}
   <script>
-  $("#img_change").click(function(){
-    if( $("#img_changed").val() == 'false'){
-      var check = confirm("需重新上傳所有圖片！是否繼續？");
-      if(check == true){
-        $("#img_upload_sec").show();
-        $("#img_choose_sec").show();
-        $("#img_changed").val('true');
-      }    
-    }
-  });
+    var location_arr = [];
 
-  $("#btn_delete").click(function(){
-    var check = confirm("確認要刪除站點？");
-    if(check == true){
-      $("#delete_confirmed").val("true");
-    }
-  })
-  
-  /*Get location(lat, lng) of beacons, 
-    In order to show them on the Map*/
-  var location_arr = [];
-  
-  {% if beacons %}
-    {% for beacon in beacons %}
-      location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
-    {% endfor %}
-  {% endif %}
-  var MAX_IMGS = {{ max_imgs }};
+    {% if beacons %}
+      {% for beacon in beacons %}
+        location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
+      {% endfor %}
+    {% endif %}
+    var MAX_IMGS = {{ max_imgs }};
   </script>
-  <script type="text/javascript" src="{% static 'app/js/station_new.js' %}"></script>
+  <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function () {
+      const element = document.querySelector("trix-editor")
+      element.editor.setSelectedRange([0, 0])
+      element.editor.insertHTML( "{{ form_data.content|safe|escape }}")
+      const beacon_name = '{{form_data.beacon|stringformat:"s"}}'
+      $("#selectbasic").val( beacon_name )
+      $("#lat_input").val( {{ form_data.lat|stringformat:'f'}} )
+      $("#lng_input").val( {{ form_data.lng|stringformat:'f' }} )
+
+
+      $('.ui.selection').dropdown();
+      $(".ui.icon.button").click(function () {
+        $(this).parent().find("input:file").click();
+      });
+
+      $('input:file', '.ui.action.input')
+        .on('change', function (e) {
+          var name = e.target.files[0].name;
+          $('input:text', $(e.target).parent()).val(name);
+        });
+      $('.ui.radio.checkbox')
+        .checkbox();
+      $('.field .image').dimmer({
+        on: 'hover'
+      });
+    })
+  </script>
 {% endblock %}

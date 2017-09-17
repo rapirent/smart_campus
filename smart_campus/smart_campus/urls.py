@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
 
 import app
 
@@ -28,4 +30,16 @@ urlpatterns = [
     url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
     url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
     url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
+    url(r'^add_category/$', app.views.category_add_page,
+        name='Category Add Page'),
+    url(r'rewards/$', app.views.reward_list_page,
+        name='Reward List Page'),
+    url(r'rewards/new/$', app.views.reward_add_page,
+        name='Reward Add Page')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT
+    )

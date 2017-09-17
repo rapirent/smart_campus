@@ -3,52 +3,60 @@
 
 {% block title %}Smart Campus Login {% endblock %}
 
+
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/login.css" %}" />
 {% endblock %}
 
-{% block nav %}{% endblock %}
+{% block nav %}
+{% endblock %}
 
 {% block content %}
-<div class="container">  
-  <div class="col-lg-6 col-md-6 col-sm-8 loginbox">
-    <div class="row">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-        <img src="{% static 'app/icon/ncku.png' %}" alt="Logo" class="logo"> 
-      </div>
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6">
-        <span class="singtext">管理後台登入 </span>   
-      </div>                
-    </div>
-    <form class="form-signin" action="" method="POST">  
-      {% csrf_token %}
-      <div class="row loginbox_content ">                         
-        <div class="input-group margin-bottom-sm">
-          <span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>
-          <input class="form-control" name="email" type="text" placeholder="Email address" required="" autofocus="">
+  <div class="ui middle aligned center aligned grid">
+    <div class="column">
+      <h2 class="ui teal header">
+        <div class="content">
+          成功大學智慧校園管理系統
         </div>
-        <div class="input-group">
-          <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-          <input class="form-control" name="password" type="password" placeholder="Password" required="">
-        </div>              
-      </div>
-      <div class="row">                   
-        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-7"> 
+      </h2>
+      <form class="ui large form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="ui stacked segment">
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="user icon"></i>
+              <input type="text" name="email" placeholder="E-mail address">
+            </div>
+          </div>
+          <div class="field">
+            <div class="ui left icon input">
+              <i class="lock icon"></i>
+              <input type="password" name="password" placeholder="Password">
+            </div>
+          </div>
+          <button class="ui fluid large teal submit button" type="submit">登入</button>
+        </div>
+        <div class="ui error message">
           {% if messages %}
-            <ul class="messages">
-              {% for message in messages %}
-                <p{% if message.tags %} class="{{ message.tags }} text-danger"{% endif %}>{{ message }}</p>
-              {% endfor %}
-            </ul>
-          {% endif %}                   
+            {% for message in messages %}
+              {{ message }}
+            {% endfor %}
+          {% endif %}
         </div>
-        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-5 ">                        
-          <button type="submit" class="btn btn-primary btn-success btn-block">Log in</button>
+      </form>
+      {% if messages %}
+        <div class="ui negative message">
+          {% for message in messages %}
+            {{ message }}
+          {% endfor %}
         </div>
-      </div>
-    </form>
+      {% endif %}
+    </div>
   </div>
-  <div class="col-lg-6 col-md-6 col-sm-4"></div>
-</div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{% static "app/js/login.js" %}"></script>
 {% endblock %}
