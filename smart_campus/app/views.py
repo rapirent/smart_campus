@@ -418,11 +418,11 @@ def get_unanswered_question(request):
     questions = Question.objects.filter(linked_station=station)
     user_answered_questions = Question.objects.filter(user=user)
 
-    # Get questions that the user hasn't answered yet
+    """Get questions that the user hasn't answered yet"""
     not_answered_questions = questions.difference(user_answered_questions)
 
     if not_answered_questions.exists():
-        # pick 1 question randomly
+        """pick 1 question randomly"""
         question = random.sample(list(not_answered_questions), 1)[0]
         ans = question.choices.filter(questionchoice__is_answer=True).first()
         data = {
@@ -431,7 +431,7 @@ def get_unanswered_question(request):
             'choices': [choice.content for choice in question.choices.all()],
             'answer': ans.content
         }
-        # Add to answered questions
+        """Add to answered questions"""
         user.answered_questions.add(question)
 
         return JsonResponse(data=data, status=200)
@@ -492,7 +492,7 @@ def update_user_experience_point(request):
 @csrf_exempt
 @require_POST
 def add_user_reward(request):
-    """ POST a reward id and update the user data """
+    """POST a reward id and update the user data"""
     email = request.POST.get('email')
     reward_id = request.POST.get('reward_id')
 
@@ -536,7 +536,6 @@ def add_user_favorite_stations(request):
 
 @login_required
 def category_add_page(request):
-    # Add a new category.
     if request.method == 'POST':
         category_form = StationCategoryForm(request.POST)
 
@@ -604,7 +603,6 @@ def get_all_travel_plans(request):
 
 @login_required
 def reward_list_page(request):
-    """ List all rewards. """
 
     context = {
         'email': request.user.email,
@@ -617,7 +615,6 @@ def reward_list_page(request):
 
 @login_required
 def reward_add_page(request):
-    """ Add a reward """
     if request.method == 'POST':
         reward_form = PartialRewardForm(request.POST, request.FILES)
 
@@ -642,21 +639,20 @@ def reward_add_page(request):
 
 @login_required
 def manager_list_page(request):
-    # List the manager on the page
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
     manager_list = User.objects.exclude(role__name='User').order_by('email')
     paginator = Paginator(manager_list, 10)
 
-    # Try to get the page number
+    """Try to get the page number"""
     page = request.GET.get('page', 1)
     try:
         managers = paginator.page(page)
     except PageNotAnInteger:
         managers = paginator.page(1)
     except EmptyPage:
-        # Page Number is out of range
+        """Page Number is out of range"""
         managers = paginator.page(paginator.num_pages)
 
     context = {
@@ -683,7 +679,6 @@ def manager_add_page(request):
             manager.set_password(password)
             manager.save()
             return HttpResponseRedirect('/managers/')
-
     else:
         form = ManagerForm()
 
@@ -713,7 +708,6 @@ def manager_edit_page(request, pk):
             data = form.cleaned_data
             form.save()
             return HttpResponseRedirect('/managers/')
-
     else:
         form = ManagerForm()
 
@@ -749,21 +743,20 @@ def manager_delete_page(request, pk):
 
 @login_required
 def beacon_list_page(request):
-    # List the Beacon on the page
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
     beacon_list = Beacon.objects.all().order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
-    # Try to get the page number
+    """Try to get the page number"""
     page = request.GET.get('page', 1)
     try:
         beacons = paginator.page(page)
     except PageNotAnInteger:
         beacons = paginator.page(1)
     except EmptyPage:
-        # Page number is out of range
+        """Page number is out of range"""
         beacons = paginator.page(paginator.num_pages)
 
     context = {
@@ -866,9 +859,9 @@ def station_delete_page(request, pk):
             'id': station.id,
             'name': station.name,
             'primary_image': StationImage.objects.filter(
-                    station=station,
-                    is_primary=True
-                ).first(),
+                station=station,
+                is_primary=True
+            ).first(),
             'category': station.category,
             'beacon': Beacon.objects.filter(
                 station=station
@@ -888,7 +881,6 @@ def station_delete_page(request, pk):
 
 @login_required
 def travelplan_list_page(request):
-    """ List the travel plans on page """
     context = {
         'categories': StationCategory.objects.all(),
         'email': request.user.email,
@@ -928,8 +920,6 @@ def travelplan_add_page(request):
 
 @login_required
 def travelplan_edit_page(request, pk):
-    """ Edit the travel plan """
-
     travelplan = get_object_or_404(TravelPlan, pk=pk)
 
     if request.method == 'POST':
@@ -1009,7 +999,7 @@ def travelplan_edit_page(request, pk):
 
 @login_required
 def travelplan_delete_page(request, pk):
-    """ Delete the travelplan and its travelplan_stations """
+    """Delete the travelplan and its travelplan_stations"""
 
     travelplan = get_object_or_404(TravelPlan, pk=pk)
     travelplan_stations = TravelPlanStations.objects.filter(travelplan_id=pk)

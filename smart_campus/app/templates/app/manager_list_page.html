@@ -26,10 +26,10 @@
                     {% if manager.email != email %}
                       <a class="ui basic green floated button" href="{% url 'Manager Edit Page' manager.email %}">修改</a>
                       <a class="ui basic red floated button" href="{% url 'Manager Delete Page' manager.email %}">刪除</a>
-                {% else %}
-                  <i class="ui basic grey floated button" style="cursor: not-allowed;">修改</i>
-                  <i class="ui basic grey floated button" style="cursor: not-allowed;">刪除</i>
-                {% endif %}
+                    {% else %}
+                      <i class="ui basic grey floated button" style="cursor: not-allowed;">修改</i>
+                      <i class="ui basic grey floated button" style="cursor: not-allowed;">刪除</i>
+                    {% endif %}
                   </div>
                 </td>
               </tr>
@@ -72,5 +72,4 @@
       <i class="add icon"></i>
     </a>
   </div>
-
 {% endblock %}
