@@ -365,6 +365,8 @@ def get_all_rewards(request):
 @csrf_exempt
 def get_all_stations(request):
     """API for retrieving contents of all Stations"""
+    stations = Station.objects.all()
+
     data = [
         {
             'id': station.id,
@@ -373,15 +375,11 @@ def get_all_stations(request):
             'category': str(station.category),
             'location': station.location.get_coords(),
             'image': {
-                'primary':
-                    'http://{0}{1}'.format(request.get_host(), StationImage.objects.filter(station=station, is_primary=True).first().image.url)
-                    if StationImage.objects.filter(station=station, is_primary=True).exists()
-                    else '',
-                'others': ['http://{0}{1}'.format(request.get_host(), img.image.url)
-                           for img in StationImage.objects.filter(station=station, is_primary=False)]
+                'primary': station.get_primary_image(),
+                'others': station.get_other_images()
             }
         }
-        for station in Station.objects.all()
+        for station in stations
     ]
 
     return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
@@ -801,6 +799,7 @@ def beacon_edit_page(request, pk):
 
     if request.method == 'POST':
         form = BeaconForm(request.POST, instance=beacon)
+        print(request.POST)
         if form.is_valid():
             data = form.cleaned_data
             beacon = form.save(commit=False)
@@ -820,7 +819,7 @@ def beacon_edit_page(request, pk):
     }
 
     context = {
-        'groups': UserGroup.objects.all(),
+        'groups': UserGroup.objects.all().order_by('id'),
         'form': form,
         'form_data': form_data
     }

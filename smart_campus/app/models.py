@@ -232,6 +232,37 @@ class Station(models.Model):
             category=str(self.category)
         )
 
+    def get_primary_image(self):
+        """
+        Get the primary image
+        Return  when primary image didn't exist
+        """
+        primary_image = StationImage.objects.filter(
+            station=self,
+            is_primary=True
+        ).first()
+
+        if not primary_image:
+            return ''
+        else:
+            return primary_image.image.url
+
+    def get_other_images(self):
+        """
+        Return a image url list
+        """
+        others_image = StationImage.objects.filter(
+            station=self,
+            is_primary=False
+        ).order_by('id')
+
+        images_url = [
+            image.image.url
+            for image in others_image
+        ]
+
+        return images_url
+
 
 class StationCategory(models.Model):
     name = models.CharField(max_length=254)
