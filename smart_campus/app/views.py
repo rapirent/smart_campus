@@ -366,6 +366,8 @@ def get_all_rewards(request):
 def get_all_stations(request):
     """API for retrieving contents of all Stations"""
     stations = Station.objects.all()
+    prefix = 'https://' if request.is_secure() else 'http://'
+    domain = request.get_host()
 
     data = [
         {
@@ -375,8 +377,17 @@ def get_all_stations(request):
             'category': str(station.category),
             'location': station.location.get_coords(),
             'image': {
-                'primary': station.get_primary_image(),
-                'others': station.get_other_images()
+                'primary':
+                    '{0}{1}{2}'.format(
+                        prefix,
+                        domain,
+                        station.get_primary_image()
+                    )
+                    if station.get_primary_image() else '',
+                'others': [
+                    '{0}{1}{2}'.format(prefix, domain, image_url)
+                    for image_url in station.get_other_images()
+                ]
             }
         }
         for station in stations

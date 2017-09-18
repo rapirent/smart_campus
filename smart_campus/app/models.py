@@ -235,7 +235,7 @@ class Station(models.Model):
     def get_primary_image(self):
         """
         Get the primary image
-        Return  when primary image didn't exist
+        Return None when primary image didn't exist
         """
         primary_image = StationImage.objects.filter(
             station=self,
@@ -243,7 +243,7 @@ class Station(models.Model):
         ).first()
 
         if not primary_image:
-            return ''
+            return None
         else:
             return primary_image.image.url
 
