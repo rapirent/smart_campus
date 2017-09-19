@@ -1036,3 +1036,82 @@ def travelplan_delete_page(request, pk):
     travelplan.delete()
 
     return HttpResponseRedirect('/travelplans/')
+
+
+@login_required
+def group_list_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    context = {
+        'email': request.user.email,
+        'groups': UserGroup.objects.all(),
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/group_list_page.html', context)
+
+
+@login_required
+def group_add_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        group = request.POST.get('group')
+
+        if group:
+            try:
+                UserGroup.objects.create(name=group)
+                return HttpResponseRedirect('/groups/')
+            except:
+                messages.warning(request, 'This group name already exists!')
+        else:
+            messages.warning(request, 'Group name input is not given!')
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/group_add_page.html', context)
+
+
+@login_required
+def group_edit_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    group_instance = get_object_or_404(UserGroup, pk=pk)
+
+    if request.method == 'POST':
+        group = request.POST.get('group')
+
+        if group:
+            try:
+                group_instance.name = group
+                group_instance.save()
+                return HttpResponseRedirect('/groups/')
+            except:
+                messages.warning(request, 'This group name already exists!')
+        else:
+            messages.warning(request, 'Group name input is not given!')
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'group': group_instance.name
+    }
+
+    return render(request, 'app/group_edit_page.html', context)
+
+
+@login_required
+def group_delete_page(request, pk):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    group_instance = get_object_or_404(UserGroup, pk=pk)
+    group_instance.delete()
+
+    return HttpResponseRedirect('/groups/')

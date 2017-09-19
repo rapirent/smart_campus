@@ -73,7 +73,17 @@ urlpatterns = [
         name='TravelPlan Edit Page'),
     url(r'^travelplans/(?P<pk>\d+)/delete/$',
         app.views.travelplan_delete_page,
-        name='TravelPlan Delete Page')
+        name='TravelPlan Delete Page'),
+
+    # UserGroup
+    url(r'^groups/$', app.views.group_list_page,
+        name='Group List Page'),
+    url(r'^groups/new/$', app.views.group_add_page,
+        name='Group Add Page'),
+    url(r'^groups/(?P<pk>\d+)/edit/$', app.views.group_edit_page,
+        name='Group Edit Page'),
+    url(r'^groups/(?P<pk>\d+)/delete/$', app.views.group_delete_page,
+        name='Group Delete Page')
 ]
 
 if settings.DEBUG:
