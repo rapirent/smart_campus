@@ -29,6 +29,7 @@ urlpatterns = [
 
     # Stations
     url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
+    url(r'^stations/category/(?P<pk>\d+)/$', app.views.station_list_by_category_page, name='Station List By Category Page'),
     url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
     url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
     url(r'^station_image/(?P<pk>\d+)/set_primary/$', app.views.set_primary_station_image, name='Set Primary Station Image'),
@@ -45,6 +46,10 @@ urlpatterns = [
         name='Reward List Page'),
     url(r'rewards/new/$', app.views.reward_add_page,
         name='Reward Add Page'),
+    url(r'rewards/(?P<pk>\d+)/edit$', app.views.reward_edit_page,
+        name='Reward Edit Page'),
+    url(r'rewards/(?P<pk>\d+)/delete$', app.views.reward_delete_page,
+        name='Reward Delete Page'),
 
     # Managers
     url(r'^managers/$', app.views.manager_list_page,
@@ -73,7 +78,17 @@ urlpatterns = [
         name='TravelPlan Edit Page'),
     url(r'^travelplans/(?P<pk>\d+)/delete/$',
         app.views.travelplan_delete_page,
-        name='TravelPlan Delete Page')
+        name='TravelPlan Delete Page'),
+
+    # Questions
+    url(r'^questions/$', app.views.question_list_page,
+        name='Question List Page'),
+    url(r'^questions/new/$', app.views.question_add_page,
+        name='Question Add Page'),
+    url(r'^questions/(?P<pk>\d+)/edit/$', app.views.question_edit_page,
+        name='Question Edit Page'),
+    url(r'^questions/(?P<pk>\d+)/delete/$', app.views.question_delete_page,
+        name='Question Delete Page')
 ]
 
 if settings.DEBUG:
