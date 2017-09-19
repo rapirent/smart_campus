@@ -242,10 +242,9 @@ class Station(models.Model):
             is_primary=True
         ).first()
 
-        if not primary_image:
-            return None
-        else:
+        if primary_image:
             return primary_image.image.url
+        return None
 
     def get_other_images(self):
         """Get the image excluding primary one
