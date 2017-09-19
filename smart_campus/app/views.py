@@ -31,15 +31,22 @@ from .models import (
     Station, StationCategory,
     Beacon, StationImage, Question,
     UserReward, UserGroup,
-    TravelPlan, Role
+    TravelPlan, Role,
+    Choice, QuestionChoice
 )
 from .forms import (
     StationForm,
     CategoryForm,
     ManagerForm,
     PartialRewardForm,
+<<<<<<< HEAD
     BeaconForm,
     PartialTravelPlanForm
+=======
+    RewardForm,
+    BeaconForm,
+    QuestionForm
+>>>>>>> 3bcf46ecdab40ff13163d233968c370d77404120
 )
 
 
@@ -148,15 +155,7 @@ def logout_page(request):
 @login_required
 def index(request):
     categories = StationCategory.objects.all()
-
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
-    context = {'email': request.user.email, 'categories': categories_data}
+    context = {'email': request.user.email, 'categories': categories}
     return render(request, 'app/index.html', context)
 
 
@@ -167,6 +166,39 @@ def station_list_page(request):
         stations = Station.objects.all()
     else:
         stations = Station.objects.filter(owner_group=request.user.group)
+
+    station_data = [
+        {
+            'id': station.id,
+            'name': station.name,
+            'primary_image': StationImage.objects.filter(
+                    station=station,
+                    is_primary=True
+                ).first(),
+            'category': station.category,
+            'beacon': Beacon.objects.filter(
+                station=station
+            ).first()
+        }
+        for station in stations
+    ]
+
+    context = {
+        'email': request.user.email,
+        'stations': station_data,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def station_list_by_category_page(request, pk):
+    category = get_object_or_404(StationCategory, pk=pk)
+    if request.user.can(Permission.ADMIN):
+        stations = Station.objects.filter(category=category)
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group, category=category)
 
     station_data = [
         {
@@ -368,7 +400,6 @@ def get_all_rewards(request):
 @csrf_exempt
 def get_all_stations(request):
     """API for retrieving contents of all Stations"""
-    print(request.get_host())
     data = [
         {
             'id': station.id,
@@ -376,6 +407,7 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
+            'rewards': [station.id for station in station.reward_set.all()],
             'image': {
                 'primary':
                     'http://{0}{1}'.format(request.get_host(), StationImage.objects.filter(station=station, is_primary=True).first().image.url)
@@ -544,31 +576,9 @@ def category_add_page(request):
         category_form = CategoryForm(request.POST)
 
         if category_form.is_valid():
-            if request.user.can(Permission.ADMIN):
-                stations = Station.objects.all()
-            elif request.user.can(Permission.EDIT):
-                stations = Station.objects.filter(
-                    owner_group=request.user.group)
-            else:
-                return HttpResponseForbidden()
-
             category_form.save()
-            context = {
-                'name': category_form.cleaned_data['name'],
-                'station_list': [{
-                        'id': station.id,
-                        'name': station.name,
-                        'image_url': station.primary_image_url
-                    }
-                    for station in stations
-                ],
-                'categories': StationCategory.objects.all()
-            }
+            return HttpResponseRedirect('/stations/')
 
-            # TODO
-            # add the specified category station list
-            return HttpResponse('Success', status=200)
-            # return render(request, 'station_list.html', context)
     context = {
         'email': request.user.email,
         'categories': StationCategory.objects.all()
@@ -656,13 +666,52 @@ def reward_add_page(request):
 
 
 @login_required
+def reward_edit_page(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    if request.method == 'POST':
+        reward_form = RewardForm(request.POST, request.FILES, instance=reward)
+
+        if reward_form.is_valid():
+            reward_form.save()
+
+            return HttpResponseRedirect('/rewards/')
+
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    form_data = {
+        'name': reward.name,
+        'description': reward.description,
+        'related_station': reward.related_station
+    }
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'stations': stations,
+        'form_data': form_data
+    }
+    return render(request, 'app/reward_edit_page.html', context)
+
+
+@login_required
+def reward_delete_page(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    reward.delete()
+
+    return HttpResponseRedirect('/rewards/')
+
+
+@login_required
 def manager_list_page(request):
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
     context = {
         'email': request.user.email,
-        'managers': User.objects.exclude(role__name='User')
+        'managers': User.objects.exclude(role__name='User'),
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -690,7 +739,8 @@ def manager_add_page(request):
     context = {
         'roles': roles,
         'groups': groups,
-        'form': form
+        'form': form,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_add_page.html', context)
@@ -726,7 +776,8 @@ def manager_edit_page(request, pk):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'form_data': form_data
+        'form_data': form_data,
+        'categories': StationCategory.objects.all()
     }
 
     return render(request, 'app/manager_edit_page.html', context)
@@ -907,3 +958,121 @@ def travelplan_add_page(request):
         'form': travelplan_form
     }
     return render(request, 'app/travelplan_add_page.html', context)
+
+
+def question_list_page(request):
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    station_questions = [
+        {
+            'station': station.name,
+            'questions': station.question_set.all()
+        }
+        for station in stations
+    ]
+    station_questions.append(
+        {
+            'station': '(Not Linked)',
+            'questions': Question.objects.filter(linked_station=None)
+        }
+    )
+    context = {
+        'station_questions': station_questions,
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/question_list_page.html', context)
+
+
+@login_required
+def question_add_page(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            question = form.save()
+
+            for i in range(1, 5):
+                choice_name = 'choice{0}'.format(i)
+                if data[choice_name]:
+                    choice = Choice.objects.get_or_create(content=data[choice_name])[0]
+                    is_answer = (choice_name == data['answer'])
+                    QuestionChoice.objects.create(question=question, choice=choice, is_answer=is_answer)
+            return HttpResponseRedirect('/questions/')
+    else:
+        form = QuestionForm()
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'form': form
+    }
+    return render(request, 'app/question_add_page.html', context)
+
+
+@login_required
+def question_edit_page(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+        if form.is_valid():
+            data = form.cleaned_data
+            question = form.save()
+            question.choices.clear()
+            question.save()
+
+            for i in range(1, 5):
+                choice_name = 'choice{0}'.format(i)
+                if data[choice_name]:
+                    choice = Choice.objects.get_or_create(content=data[choice_name])[0]
+                    is_answer = (choice_name == data['answer'])
+                    QuestionChoice.objects.create(question=question, choice=choice, is_answer=is_answer)
+
+            # Clear unused choices
+            Choice.objects.filter(questionchoice__question=None).delete()
+
+            return HttpResponseRedirect('/questions/')
+    else:
+        form = QuestionForm()
+
+    choices = list(QuestionChoice.objects.filter(question=question))
+    answer = ''
+    for index, choice in enumerate(choices, 1):
+        if choice.is_answer is True:
+            answer = 'choice{0}'.format(index)
+
+    form_data = {
+        'content': question.content,
+        'linked_station': question.linked_station,
+        'choice1': choices[0].choice.content,
+        'choice2': choices[1].choice.content,
+        'choice3': choices[2].choice.content,
+        'choice4': choices[3].choice.content,
+        'answer': answer
+    }
+
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'form': form,
+        'form_data': form_data,
+        'stations': stations
+    }
+    return render(request, 'app/question_edit_page.html', context)
+
+
+@login_required
+def question_delete_page(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    question.delete()
+
+    return HttpResponseRedirect('/questions/')

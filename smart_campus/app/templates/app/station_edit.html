@@ -34,11 +34,20 @@
       </div>
       <div class="field">
         <label>類別</label>
-        <select class="ui selection dropdown" name="category">
-          {% if categories %} {% for category in categories %}
-          <option value="{{ category.name }}" {% if form_data.category|stringformat:"s" == category.name|stringformat:"s" %}selected{% endif %} >{{ category.name }}</option>
-          {% endfor %} {% endif %}
-        </select>
+        <div class="ui selection dropdown">
+          <input type="hidden" name="category" value="{{ form_data.category }}">
+          <i class="dropdown icon"></i>
+          <div class="default text">請選擇類別...</div>
+          <div class="menu">
+            {% if categories %}
+              {% for category in categories %}
+                <div class="item" value="{{ category.id }}" data-value="{{ category.id }}">
+                  {{ category.name }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
       </div>
       <div class="left floated field">
           <label>綁定收藏品</label>
