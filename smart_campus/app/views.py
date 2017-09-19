@@ -898,7 +898,7 @@ def beacon_edit_page(request, pk):
 
     if request.method == 'POST':
         form = BeaconForm(request.POST, instance=beacon)
-        print(request.POST)
+
         if form.is_valid():
             data = form.cleaned_data
             beacon = form.save(commit=False)
@@ -1109,26 +1109,26 @@ def travelplan_delete_page(request, pk):
 def question_list_page(request):
     if request.user.is_administrator():
         stations = Station.objects.all()
+        question_list = Question.objects.all()
     else:
-        stations = Station.objects.filter(owner_group=request.user.group)
+        stations = Satation.objects.filter(owner_group=request.user.group)
+        question_list = Question.objects.filter(linked_station__in=stations)
 
-    station_questions = [
-        {
-            'station': station.name,
-            'questions': station.question_set.all()
-        }
-        for station in stations
-    ]
-    station_questions.append(
-        {
-            'station': '(Not Linked)',
-            'questions': Question.objects.filter(linked_station=None)
-        }
-    )
+    paginator = Paginator(question_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        questions = paginator.page(page)
+    except PageNotAnInteger:
+        questions = paginator.page(1)
+    except EmptyPage:
+        """Page number is out of range"""
+        questions = paginator.page(paginator.num_pages)
+
     context = {
-        'station_questions': station_questions,
+        'questions': questions,
         'email': request.user.email,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/question_list_page.html', context)
@@ -1136,6 +1136,11 @@ def question_list_page(request):
 
 @login_required
 def question_add_page(request):
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Satation.objects.filter(owner_group=request.user.group)
+
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
@@ -1154,7 +1159,8 @@ def question_add_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
+        'stations': stations.order_by('id'),
         'form': form
     }
     return render(request, 'app/question_add_page.html', context)

@@ -1,1 +1,79 @@
+{% extends "app/base.html" %}
+{% load static %}
 
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+    <table class="ui selectable celled striped table">
+      <thead>
+        <tr class="center aligned">
+          <th>綁定站點</th>
+          <th>問題類型</th>
+          <th>選項</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if questions %}
+          {% for question in questions %}
+            <tr class="center aligned">
+              <td class="collapsing">{{ question.linked_station }}</td>
+              {% if question.question_type == 1 %}
+                <td class="collapsing">是非</td>
+              {% else %}
+                <td class="collapsing">選擇</td>
+              {% endif %}
+              <td class="collapsing">
+                <div class="ui mini buttons">
+                  <a class="ui basic green floated button" href="{% url 'Question Edit Page' question.id %}">修改</a>
+                  <a class="ui basic red floated button" href="{% url 'Question Delete Page' question.id %}">刪除</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      </tbody>
+      <tfoot>
+        {% if questions.has_other_pages %}
+          <tr class="center aligned collapsing">
+            <th colspan="3">
+              <div class="ui pagination menu">
+                {% if questions.has_previous %}
+                  <a class="icon item" href="?page={{ questions.previous_page_number }}">
+                    <i class="left chevron icon"></i>
+                  </a>
+                {% endif %}
+                {% for page in questions.paginator.page_range %}
+                  {% if questions.number == page %}
+                    <div class="active item">{{ page }}</div>
+                  {% else %}
+                    <a class="item" href="?page={{ page }}">{{ page }}</a>
+                  {% endif %}
+                {% endfor %}
+                {% if questions.has_next %}
+                  <a class="icon item" href="?page={{ questions.next_page_number }}">
+                    <i class="right chevron icon"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </th>
+          </tr>
+        {% endif %}
+      </tfoot>
+    </table>
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Question Add Page' %}">
+        新增問題
+        <i class="add icon"></i>
+      </a>
+  </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+{% endblock %}

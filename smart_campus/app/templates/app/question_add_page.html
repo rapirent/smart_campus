@@ -1,0 +1,90 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+{% endblock %}
+
+{% block content %}
+<div class="ui text container">
+  <form class="ui big borderless form" action="" method="POST" id="question_form">
+    {% csrf_token %}
+    <div class="required five wide field">
+      <label>題目內容</label>
+      <input type="text" name="content">
+    </div>
+    <div class="grouped fields">
+        <label>選項及答案勾選</label>
+      <div class="inline required fields">
+        <div class="field">
+          <div class="ui toggle checkbox">
+            <input type="radio" name="answer" value="choice1" checked="cheked">
+            <label>選項一</label>
+          </div>
+        </div>
+        <div class="required five wide field">
+          <input type="text" name="choice1">
+        </div>
+      </div>
+      <div class="inline required fields">
+          <div class="field">
+            <div class="ui toggle checkbox">
+              <input type="radio" name="answer" value="choice2">
+              <label>選項二</label>
+            </div>
+          </div>
+          <div class="required five wide field">
+            <input type="text" name="choice2">
+          </div>
+        </div>
+      <div class="inline required fields">
+        <div class="field">
+          <div class="ui toggle checkbox">
+            <input type="radio" name="answer" value="choice3">
+            <label>選項三</label>
+          </div>
+        </div>
+        <div class="required five wide field">
+          <input type="text" name="choice3">
+        </div>
+      </div>
+      <div class="inline required fields">
+        <div class="field">
+          <div class="ui toggle checkbox">
+            <input type="radio" name="answer" value="choice4">
+            <label>選項四</label>
+          </div>
+        </div>
+        <div class="required five wide field">
+          <input type="text" name="choice4">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <div class="ui inline floating dropdown labeled search icon button">
+        <input type="hidden" name="linked_station">
+        <i class="search icon"></i>
+        <span class="text" id="selectedStationId">選擇站點</span>
+        <div class="menu" id="selectionMenu">
+          {% if stations %}
+            {% for station in stations %}
+              <div class="item" data-value="{{ station.id }}" category="{{ station.category }}">
+                {{ station.name }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <button class="ui submit teal button" type="submit">新增</button>
+    <div class="ui error message"></div>
+  </form>
+
+</div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{% static 'app/js/question.js' %}"></script>
+{% endblock %}
