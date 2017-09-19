@@ -364,7 +364,23 @@ def get_all_rewards(request):
 
 @csrf_exempt
 def get_all_stations(request):
-    """API for retrieving contents of all Stations"""
+    """API for retrieving contents of all Stations
+
+    Returns:
+        data (:obj: `list` of :obj: `dict`): a json-liked dict formating with::
+            {
+                'id': station's id,
+                'name': statione's name,
+                'content': station's infomation content,
+                'category' (data: what category station belongs to,
+                'location': station's location,
+                'image': {
+                    'primary': primary image url,
+                    'others': list of the other image url
+                }
+            }
+
+    """
     stations = Station.objects.all()
     prefix = 'https://' if request.is_secure() else 'http://'
     domain = request.get_host()
@@ -393,7 +409,12 @@ def get_all_stations(request):
         for station in stations
     ]
 
-    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(
+        data={'data': data},
+        status=200,
+        json_dumps_params={'ensure_ascii': False},
+        content_type='application/json; charset=utf-8'
+    )
 
 
 @csrf_exempt
@@ -427,11 +448,11 @@ def get_unanswered_question(request):
     questions = Question.objects.filter(linked_station=station)
     user_answered_questions = Question.objects.filter(user=user)
 
-    """Get questions that the user hasn't answered yet"""
+    # Get questions that the user hasn't answered yet
     not_answered_questions = questions.difference(user_answered_questions)
 
     if not_answered_questions.exists():
-        """pick 1 question randomly"""
+        # pick 1 question randomly
         question = random.sample(list(not_answered_questions), 1)[0]
         ans = question.choices.filter(questionchoice__is_answer=True).first()
         data = {
@@ -440,7 +461,7 @@ def get_unanswered_question(request):
             'choices': [choice.content for choice in question.choices.all()],
             'answer': ans.content
         }
-        """Add to answered questions"""
+        # Add to answered questions
         user.answered_questions.add(question)
 
         return JsonResponse(data=data, status=200)
@@ -654,14 +675,14 @@ def manager_list_page(request):
     manager_list = User.objects.exclude(role__name='User').order_by('email')
     paginator = Paginator(manager_list, 10)
 
-    """Try to get the page number"""
+    # Try to get the page number
     page = request.GET.get('page', 1)
     try:
         managers = paginator.page(page)
     except PageNotAnInteger:
         managers = paginator.page(1)
     except EmptyPage:
-        """Page Number is out of range"""
+        # Page Number is out of range
         managers = paginator.page(paginator.num_pages)
 
     context = {
@@ -758,7 +779,7 @@ def beacon_list_page(request):
     beacon_list = Beacon.objects.all().order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
-    """Try to get the page number"""
+    # Try to get the page number
     page = request.GET.get('page', 1)
     try:
         beacons = paginator.page(page)
@@ -902,7 +923,6 @@ def travelplan_list_page(request):
 
 @login_required
 def travelplan_add_page(request):
-    """ add the travelplan using partialtravelplanform """
     if request.method == 'POST':
         travelplan_form = PartialTravelPlanForm(request.POST, request.FILES)
 
@@ -1009,8 +1029,6 @@ def travelplan_edit_page(request, pk):
 
 @login_required
 def travelplan_delete_page(request, pk):
-    """Delete the travelplan and its travelplan_stations"""
-
     travelplan = get_object_or_404(TravelPlan, pk=pk)
     travelplan_stations = TravelPlanStations.objects.filter(travelplan_id=pk)
 

@@ -234,8 +234,10 @@ class Station(models.Model):
 
     def get_primary_image(self):
         """Get the primary image
+
         Returns:
-            image_url string if the station primary image exist, None otherwise.
+            image_url (str) if the station primary image exist, None otherwise.
+
         """
         primary_image = StationImage.objects.filter(
             station=self,
@@ -248,8 +250,10 @@ class Station(models.Model):
 
     def get_other_images(self):
         """Get the image excluding primary one
+
         Returns:
-            string list
+            image_url(:obj: `list` of :obj: `str`)
+
         """
         others_image = StationImage.objects.filter(
             station=self,
