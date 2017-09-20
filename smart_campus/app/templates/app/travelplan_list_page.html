@@ -1,0 +1,51 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+{% endblock %}
+
+{% block content %}
+<div class="ui borderless center aligned text container">
+  <div class="ui divided items">
+    {% if travelplans %}
+      {% for travelplan in travelplans %}
+        <div class="item">
+          {% if travelplan.image %}
+            <div class="image">
+              <img src="{{ travelplan.image.url }}">
+            </div>
+          {% endif %}
+          <div class="ui left aligned segment content">
+            <div class="ui header">
+              {{ travelplan.name }}
+            </div>
+            <div class="description">
+              {{ travelplan.description }}
+            </div>
+            <div class="extra">
+              <div class="ui right floated buttons">
+                <a class="ui basic green button" href="{% url 'TravelPlan Edit Page' travelplan.id %}">修改</a>
+                <a class="ui basic red button" href="{% url 'TravelPlan Delete Page' travelplan.id %}">刪除</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+  <div class="ui horizontal divider">
+      OR
+  </div>
+  <a class="ui teal labeled icon button" href="{% url 'TravelPlan Add Page' %}">
+    新增行程
+    <i class="add icon"></i>
+  </a>
+</div>
+{% endblock %}
+{% block script %}
+  {{ block.super }}
+{% endblock %}

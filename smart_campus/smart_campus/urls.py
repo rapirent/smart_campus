@@ -22,20 +22,58 @@ import app
 
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
     url(r'^smart_campus/', include('app.urls')),
     url(r'^login/$', app.views.login_page, name='Login Page'),
     url(r'^logout/$', app.views.logout_page, name='Logout Page'),
     url(r'^$', app.views.index, name='index'),
+
+    # Stations
     url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
     url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
     url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
+    url(r'^station_image/(?P<pk>\d+)/set_primary/$', app.views.set_primary_station_image, name='Set Primary Station Image'),
+    url(r'^station_image/(?P<pk>\d+)/delete/$', app.views.delete_station_image, name='Delete Station Image'),
+    url(r'^stations/(?P<pk>\d+)/delete/$', app.views.station_delete_page,
+        name='Delete Station Page'),
+
+    # Categories
     url(r'^add_category/$', app.views.category_add_page,
         name='Category Add Page'),
+
+    # Rewards
     url(r'rewards/$', app.views.reward_list_page,
         name='Reward List Page'),
     url(r'rewards/new/$', app.views.reward_add_page,
-        name='Reward Add Page')
+        name='Reward Add Page'),
+
+    # Managers
+    url(r'^managers/$', app.views.manager_list_page,
+        name='Manager List Page'),
+    url(r'^managers/new/$', app.views.manager_add_page,
+        name='Manager Add Page'),
+    url(r'^managers/(?P<pk>[^/]+)/edit/$', app.views.manager_edit_page,
+        name='Manager Edit Page'),
+    url(r'^managers/(?P<pk>[^/]+)/delete/$', app.views.manager_delete_page,
+        name='Manager Delete Page'),
+
+    # Beacons
+    url(r'^beacons/$', app.views.beacon_list_page,
+        name='Beacon List Page'),
+    url(r'^beacons/new/$', app.views.beacon_add_page,
+        name='Beacon Add Page'),
+    url(r'^beacons/(?P<pk>[^/]+)/edit/$', app.views.beacon_edit_page,
+        name='Beacon Edit Page'),
+    url(r'^beacons/(?P<pk>[^/]+)/delete/$', app.views.beacon_delete_page,
+        name='Beacon Delete Page'),
+    url(r'^travelplans/$', app.views.travelplan_list_page,
+        name='TravelPlan List Page'),
+    url(r'^travelplans/new$', app.views.travelplan_add_page,
+        name='TravelPlan Add Page'),
+    url(r'^travelplans/(?P<pk>\d+)/edit/$', app.views.travelplan_edit_page,
+        name='TravelPlan Edit Page'),
+    url(r'^travelplans/(?P<pk>\d+)/delete/$',
+        app.views.travelplan_delete_page,
+        name='TravelPlan Delete Page')
 ]
 
 if settings.DEBUG:

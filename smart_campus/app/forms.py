@@ -8,14 +8,21 @@ from django.forms import (
 
 from django.conf import settings
 
-from .models import Station, StationCategory, Reward
+from .models import(
+    Station,
+    StationCategory,
+    Reward,
+    User,
+    Beacon,
+    TravelPlan,
+)
 
 
 class StationForm(ModelForm):
     beacon = CharField()
     lat = FloatField()
     lng = FloatField()
-    main_img_num = IntegerField()
+    main_img_num = IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
         super(StationForm, self).__init__(*args, **kwargs)
@@ -38,3 +45,30 @@ class PartialRewardForm(ModelForm):
     class Meta:
         model = Reward
         exclude = ['related_station']
+
+
+class ManagerForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ('email', 'group', 'role')
+
+
+class BeaconForm(ModelForm):
+    lat = FloatField()
+    lng = FloatField()
+
+    class Meta:
+        model = Beacon
+        fields = ('beacon_id', 'name', 'description', 'owner_group')
+
+    def __init__(self, *args, **kwargs):
+        super(BeaconForm, self).__init__(*args, **kwargs)
+        self.fields['owner_group'].required = False
+
+
+class PartialTravelPlanForm(ModelForm):
+    image = ImageField(required=False)
+
+    class Meta:
+        model = TravelPlan
+        exclude = ['stations']

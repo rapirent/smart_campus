@@ -10,7 +10,7 @@ class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
     name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=200, blank=True)
-    location = models.GeometryField(srid=4326, null=True)
+    location = models.PointField(srid=4326)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
     station = models.ManyToManyField('Station')
 
@@ -42,7 +42,12 @@ class User(AbstractBaseUser):
     password = models.CharField(max_length=128)
     nickname = models.CharField(max_length=254, blank=True)
     role = models.ForeignKey('Role', null=True, on_delete=models.SET_NULL)
-    group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
+    group = models.ForeignKey(
+        'UserGroup',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
 
     experience_point = models.IntegerField(default=0)
     earned_coins = models.IntegerField(default=0)
@@ -218,7 +223,7 @@ class Station(models.Model):
     name = models.CharField(max_length=254, unique=True)
     content = models.TextField(blank=True)
     category = models.ForeignKey('StationCategory', null=True, on_delete=models.SET_NULL)
-    location = models.GeometryField(srid=4326, null=True)
+    location = models.PointField(srid=4326, null=True, blank=True)
     owner_group = models.ForeignKey('UserGroup', null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
@@ -227,9 +232,44 @@ class Station(models.Model):
             category=str(self.category)
         )
 
+    def get_primary_image(self):
+        """Get the primary image
+
+        Returns:
+            str: Image URL if the primary station image exists, None otherwise.
+
+        """
+        primary_image = StationImage.objects.filter(
+            station=self,
+            is_primary=True
+        ).first()
+
+        if primary_image:
+            return primary_image.image.url
+        return None
+
+    def get_other_images(self):
+        """Get the image excluding primary one
+
+        Returns:
+            dict: Other Images URLs
+
+        """
+        others_image = StationImage.objects.filter(
+            station=self,
+            is_primary=False
+        ).order_by('id')
+
+        images_url = [
+            image.image.url
+            for image in others_image
+        ]
+
+        return images_url
+
 
 class StationCategory(models.Model):
-    name = models.CharField(max_length=254, primary_key=True)
+    name = models.CharField(max_length=254)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -251,6 +291,11 @@ class TravelPlan(models.Model):
     stations = models.ManyToManyField(
         'Station',
         through='TravelPlanStations'
+    )
+    image = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to="images/travel_plan/"
     )
 
     def __str__(self):

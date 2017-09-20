@@ -10,7 +10,7 @@ $(document).ready(function() {
           },
           {
             type: "email",
-            prompt: "錯誤的email格式"
+            prompt: "請輸入正確的email格式"
           }
         ]
       },
