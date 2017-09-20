@@ -34,8 +34,9 @@ from .forms import (
     StationCategoryForm,
     ManagerForm,
     PartialRewardForm,
-    BeaconForm,
     PartialTravelPlanForm,
+    RewardForm,
+    BeaconForm,
     QuestionForm
 )
 
@@ -753,7 +754,7 @@ def manager_list_page(request):
 
     context = {
         'email': request.user.email,
-        'managers': managers,
+        'managers': User.objects.exclude(role__name='User'),
         'categories': StationCategory.objects.all()
     }
 
@@ -1102,6 +1103,9 @@ def travelplan_delete_page(request, pk):
     travelplan.delete()
 
     return HttpResponseRedirect('/travelplans/')
+
+
+@login_required
 def question_list_page(request):
     if request.user.is_administrator():
         stations = Station.objects.all()
