@@ -236,7 +236,7 @@ class Station(models.Model):
         """Get the primary image
 
         Returns:
-            image_url (str) if the station primary image exist, None otherwise.
+            str: Image URL if the primary station image exists, None otherwise.
 
         """
         primary_image = StationImage.objects.filter(
@@ -252,7 +252,7 @@ class Station(models.Model):
         """Get the image excluding primary one
 
         Returns:
-            image_url(:obj: `list` of :obj: `str`)
+            dict: Other Images URLs
 
         """
         others_image = StationImage.objects.filter(
