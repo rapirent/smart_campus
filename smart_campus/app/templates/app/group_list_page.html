@@ -1,0 +1,49 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <style rel="stylesheet" type="text/css">
+    .ui.borderless.center.aligned.text.container {
+      margin-bottom: 1em;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+    {% if messages %}
+      {% for message in messages %}
+      <div class="ui info message">
+            {{ message }}
+      </div>
+      {% endfor %}
+    {% endif %}
+    {% if groups %}
+      {% for group in groups %}
+      <div class="ui cards">
+        <div class="ui centered card">
+          <div class="content">
+            <div class="header">
+              {{ group.name }}
+            </div>
+          </div>
+          <div class="extra content">
+            <a class="ui basic green left floated button" href="{% url 'Group Edit Page' group.id %}">修改</a>
+            <a class="ui basic red right floated button" href="{% url 'Group Delete Page' group.id %}">刪除</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Group Add Page' %}">
+      新增群組
+      <i class="add icon"></i>
+    </a>
+  </div>
+{% endblock %}

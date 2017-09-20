@@ -1058,11 +1058,11 @@ def group_add_page(request):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        group = request.POST.get('group')
+        group_name = request.POST.get('name')
 
-        if group:
+        if group_name:
             try:
-                UserGroup.objects.create(name=group)
+                UserGroup.objects.create(name=group_name)
                 return HttpResponseRedirect('/groups/')
             except:
                 messages.warning(request, 'This group name already exists!')
@@ -1085,11 +1085,11 @@ def group_edit_page(request, pk):
     group_instance = get_object_or_404(UserGroup, pk=pk)
 
     if request.method == 'POST':
-        group = request.POST.get('group')
+        group_name = request.POST.get('name')
 
-        if group:
+        if group_name:
             try:
-                group_instance.name = group
+                group_instance.name = group_name
                 group_instance.save()
                 return HttpResponseRedirect('/groups/')
             except:
