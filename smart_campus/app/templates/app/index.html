@@ -5,3 +5,74 @@
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
 {% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned container">
+    <div class="ui grid">
+      <div class="three column row">
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Station List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/station.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理站點及通知
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Reward List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/reward.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理收藏品
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/question.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理挑戰
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="three column row">
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Beacon List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/beacon.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理beacon
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'TravelPlan List Page'}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/travelplan.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理行程
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/question.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              管理挑戰
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
