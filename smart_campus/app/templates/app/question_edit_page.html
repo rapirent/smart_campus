@@ -15,67 +15,24 @@
       <input type="text" name="content" value="{{ form_data.content }}">
     </div>
     <div class="grouped fields">
-        <label>選項及答案勾選</label>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            {% if form_data.answer == 'choice1' %}
-              <input type="radio" name="answer" value="choice1" checked="cheked">
-            {% else %}
-              <input type="radio" name="answer" value="choice1">
-            {% endif %}
-            <label>選項一</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice1" value="{{ form_data.choice1 }}">
-        </div>
-      </div>
-      <div class="inline required fields">
+      <label>選項及答案勾選</label>
+      {% for counter in "一二三四" %}
+        <div class="inline required fields">
           <div class="field">
             <div class="ui toggle checkbox">
-              {% if form_data.answer == 'choice2' %}
-                <input type="radio" name="answer" value="choice2" checked="checked">
+              {% if form_data.answer == 'choice'|add:{{ forloop.counter }} %}
+                <input type="radio" name="answer" value='choice'|add:{{ forloop.counter }} checked="cheked">
               {% else %}
-                <input type="radio" name="answer" value="choice1">
+                <input type="radio" name="answer" value='choice'|add:{{ forloop.counter }} >
               {% endif %}
-              <label>選項二</label>
+              <label>選項|add:counter</label>
             </div>
           </div>
           <div class="required five wide field">
-            <input type="text" name="choice2" value="{{ form_data.choice2 }}">
+            <input type="text" name='choice'|add:{{ forloop.counter }} value="{{ form_data.'choice'|add:{{ forloop.counter }} }}">
           </div>
         </div>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            {% if form_data.answer == 'choice3' %}
-              <input type="radio" name="answer" value="choice3" checked="checked">
-            {% else %}
-              <input type="radio" name="answer" value="choice3">
-            {% endif %}
-            <label>選項三</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice3" value="{{ form_data.choice3 }}">
-        </div>
-      </div>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            {% if form_data.answer == 'choice4' %}
-              <input type="radio" name="answer" value="choice4" checked="checked">
-            {% else %}
-              <input type="radio" name="answer" value="choice4">
-            {% endif %}
-            <label>選項四</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice4" value="{{ form_data.choice4 }}">
-        </div>
-      </div>
+      {% endfor %}
     </div>
     <div class="field">
       <div class="ui inline floating dropdown labeled search icon button">

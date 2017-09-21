@@ -206,16 +206,9 @@ class Question(models.Model):
         return str(self.id)
 
 
-class Choice(models.Model):
-    content = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.content
-
-
 class QuestionChoice(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    choice = models.ForeignKey('Choice', on_delete=models.CASCADE)
+    choice = models.CharField(max_length=50)
     is_answer = models.BooleanField(default=False)
 
 

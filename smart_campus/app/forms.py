@@ -86,17 +86,9 @@ class PartialTravelPlanForm(ModelForm):
         exclude = ['stations']
 
 
-class QuestionForm(ModelForm):
-    choice1 = CharField()
-    choice2 = CharField()
-    choice3 = CharField()
-    choice4 = CharField()
-    answer = CharField()
+class PartialQuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        fields = ('content', 'linked_station')
-
-    def __init__(self, *args, **kwargs):
-        super(QuestionForm, self).__init__(*args, **kwargs)
-        self.fields['linked_station'].required = False
+        # Becaouse the now the system just need the multiple choice type
+        exclude = ['question_type']
