@@ -1107,20 +1107,20 @@ def question_add_page(request):
         if form.is_valid():
             question = form.save()
 
-            choices = request.POST.getlist('choices')
+            choice_contents = request.POST.getlist('choice_contents')
             answer_order = int(request.POST.get('answer', 1))
 
-            for order, choice in enumerate(choices, start=1):
+            for order, choice_contnet in enumerate(choice_contents, start=1):
                 if answer_order == order:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice_content=choice,
+                        choice_content=choice_contnet,
                         is_answer=True
                     )
                 else:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice_content=choice,
+                        choice_content=choice_contnet,
                         is_answer=False
                     )
             return HttpResponseRedirect('/questions/')
@@ -1147,14 +1147,33 @@ def question_edit_page(request, pk):
     # the post will send the choice model id to indicate which one to edit
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
-        print(form)
-        print(request.POST)
 
         if form.is_valid():
-            pass
+            form.save()
+
+            edited_contents = request.POST.getlist('choice_contents')
+            choice_ids = request.POST.getlist('choice_ids')
+            answer_id = int(request.POST.get('answer', 1))
+            question_choices = QuestionChoice.objects.filter(question=question)
+
+            for question_choice in question_choices:
+                question_choice.is_answer = False
+                question_choice.save()
+
+            for edited_content, choice_id in zip(edited_contents, choice_ids):
+                edited_choice = QuestionChoice.objects.get(
+                    id=choice_id
+                )
+                edited_choice.choice_content = edited_content
+                edited_choice.save()
+
+            answer_choice = QuestionChoice.objects.get(id=answer_id)
+            answer_choice.is_answer = True
+            answer_choice.save()
+            return HttpResponseRedirect('/questions/')
 
         form_data = form.cleaned_data
-        form_data['choices'] = request.POST.getList('choices')
+        form_data['choices'] = request.POST.getlist('choices')
         form_data['answer_id'] = request.POST.get('answer', 1)
     else:
         form = QuestionForm()
@@ -1175,12 +1194,10 @@ def question_edit_page(request, pk):
             choice
             for choice in question_choices
         ],
-        'answer_id': [
-            QuestionChoice.objects.filter(
-                question=question,
-                is_answer=True
-            ).first().id
-        ]
+        'answer_id': QuestionChoice.objects.filter(
+            question=question,
+            is_answer=True
+        ).first().id
     }
 
     context = {

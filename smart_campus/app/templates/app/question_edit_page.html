@@ -21,16 +21,16 @@
           <div class="field">
             <div class="ui toggle checkbox">
               {% if form_data.answer_id == choice.id  %}
-                <input type="radio" name="answer" value={{ choice.id }} checked="cheked">
+                <input type="radio" name="answer" value="{{ choice.id }}" checked="cheked">
               {% else %}
-                <input type="radio" name="answer" value={{ choice.id }}>
+                <input type="radio" name="answer" value="{{ choice.id }}">
               {% endif %}
               <label>選項{{ forloop.counter }}</label>
             </div>
           </div>
           <div class="required five wide field">
-            <input type="hidden" name="choice_id" value={{ choice.id }}>
-            <input type="text" name="choice" value="{{ choice.choice_content }}">
+            <input type="hidden" name="choice_ids" value="{{ choice.id }}">
+            <input type="text" name="choice_contents" value="{{ choice.choice_content }}">
           </div>
         </div>
       {% endfor %}
