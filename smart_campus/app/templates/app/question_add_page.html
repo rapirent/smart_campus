@@ -16,50 +16,23 @@
       </div>
       <div class="grouped fields">
         <label>選項及答案勾選</label>
+        {% for counter in "1234" %}
         <div class="inline required fields">
           <div class="field">
             <div class="ui toggle checkbox">
-              <input type="radio" name="answer" value="1" checked="cheked">
-              <label>選項一</label>
+              {% if counter == '1' %}
+                <input type="radio" name="answer" value="{{ counter }}" checked="cheked">
+              {% else %}
+                <input type="radio" name="answer" value="{{ counter }}">
+              {% endif %}
+              <label>選項{{ counter }}</label>
             </div>
           </div>
           <div class="required five wide field">
             <input type="text" name="choice_contents">
           </div>
         </div>
-        <div class="inline required fields">
-            <div class="field">
-              <div class="ui toggle checkbox">
-                <input type="radio" name="answer" value="2">
-                <label>選項二</label>
-              </div>
-            </div>
-            <div class="required five wide field">
-              <input type="text" name="choice_contents">
-            </div>
-          </div>
-        <div class="inline required fields">
-          <div class="field">
-            <div class="ui toggle checkbox">
-              <input type="radio" name="answer" value="3">
-              <label>選項三</label>
-            </div>
-          </div>
-          <div class="required five wide field">
-            <input type="text" name="choice_contents" >
-          </div>
-        </div>
-        <div class="inline required fields">
-          <div class="field">
-            <div class="ui toggle checkbox">
-              <input type="radio" name="answer" value="4">
-              <label>選項四</label>
-            </div>
-          </div>
-          <div class="required five wide field">
-            <input type="text" name="choice_contents">
-          </div>
-        </div>
+        {% endfor %}
       </div>
       <div class="field">
         <div class="ui inline floating dropdown labeled search icon button">

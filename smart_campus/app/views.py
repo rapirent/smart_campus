@@ -664,7 +664,7 @@ def reward_edit_page(request, pk):
     reward = get_object_or_404(Reward, pk=pk)
     if request.method == 'POST':
         reward_form = RewardForm(request.POST, request.FILES, instance=reward)
-        print(request.POST)
+
         if reward_form.is_valid():
             reward_form.save()
 
@@ -817,7 +817,6 @@ def beacon_list_page(request):
     except PageNotAnInteger:
         beacons = paginator.page(1)
     except EmptyPage:
-        """Page number is out of range"""
         beacons = paginator.page(paginator.num_pages)
 
     context = {
@@ -1101,7 +1100,6 @@ def question_list_page(request):
 
 @login_required
 def question_add_page(request):
-
     if request.method == 'POST':
         form = QuestionForm(request.POST)
 
@@ -1109,6 +1107,8 @@ def question_add_page(request):
             question = form.save()
 
             choice_contents = request.POST.getlist('choice_contents')
+            # The post will send a choice content list,
+            # and a answer_order to indicate which one in te list is the answer
             answer_order = int(request.POST.get('answer', 1))
 
             for order, choice_contnet in enumerate(choice_contents, start=1):
@@ -1145,7 +1145,7 @@ def question_add_page(request):
 def question_edit_page(request, pk):
     question = get_object_or_404(Question, pk=pk)
 
-    # the post will send the choice model id to indicate which one to edit
+    # The post will send the choice model id to indicate which one to edit
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
 

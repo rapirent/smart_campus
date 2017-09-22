@@ -11,6 +11,7 @@
     <table class="ui selectable celled striped table">
       <thead>
         <tr class="center aligned">
+          <th>編號</th>
           <th>綁定站點</th>
           <th>問題類型</th>
           <th>選項</th>
@@ -20,6 +21,7 @@
         {% if questions %}
           {% for question in questions %}
             <tr class="center aligned">
+              <td class="collapsing">{{ question.id }}</td>
               <td class="collapsing">{{ question.linked_station }}</td>
               {% if question.question_type == 1 %}
                 <td class="collapsing">是非</td>
