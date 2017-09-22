@@ -1043,10 +1043,21 @@ def group_list_page(request):
     if not request.user.is_administrator():
         return HttpResponseForbidden()
 
+    group_list = UserGroup.objects.all().order_by('id')
+    paginator = Paginator(group_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        groups = paginator.page(page)
+    except PageNotAnInteger:
+        groups = paginator.page(1)
+    except EmptyPage:
+        groups = paginator.page(paginator.num_pages)
+
     context = {
         'email': request.user.email,
-        'groups': UserGroup.objects.all(),
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id'),
+        'groups': groups
     }
 
     return render(request, 'app/group_list_page.html', context)
