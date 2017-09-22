@@ -201,7 +201,7 @@ class Question(models.Model):
 
 class QuestionChoice(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    choice = models.CharField(max_length=50)
+    choice_content = models.CharField(max_length=50)
     is_answer = models.BooleanField(default=False)
 
     def __repr__(self):

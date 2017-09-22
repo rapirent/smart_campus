@@ -1114,13 +1114,13 @@ def question_add_page(request):
                 if answer_order == order:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice=choice,
+                        choice_content=choice,
                         is_answer=True
                     )
                 else:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice=choice,
+                        choice_content=choice,
                         is_answer=False
                     )
             return HttpResponseRedirect('/questions/')
@@ -1144,6 +1144,7 @@ def question_add_page(request):
 def question_edit_page(request, pk):
     question = get_object_or_404(Question, pk=pk)
 
+    # the post will send the choice model id to indicate which one to edit
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
         print(form)
