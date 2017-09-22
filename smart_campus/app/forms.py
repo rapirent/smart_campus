@@ -86,9 +86,8 @@ class PartialTravelPlanForm(ModelForm):
         exclude = ['stations']
 
 
-class PartialQuestionForm(ModelForm):
+class QuestionForm(ModelForm):
 
     class Meta:
         model = Question
-        # Becaouse the now the system just need the multiple choice type
-        exclude = ['question_type']
+        fields = '__all__'

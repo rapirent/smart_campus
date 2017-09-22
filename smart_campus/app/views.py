@@ -27,7 +27,7 @@ from .models import (
     UserReward, UserGroup,
     TravelPlan, Role,
     TravelPlanStations,
-    Choice, QuestionChoice
+    QuestionChoice
 )
 from .forms import (
     StationForm,
@@ -459,43 +459,6 @@ def get_linked_stations(request):
         data = [station.id for station in stations]
 
         return JsonResponse(data={'data': data}, status=200)
-
-
-@csrf_exempt
-@require_POST
-def get_unanswered_question(request):
-    """API requesting a single question"""
-    station_id = request.POST.get('station_id')
-    email = request.POST.get('email')
-
-    station = Station.objects.filter(id=station_id).first()
-    user = User.objects.filter(email=email).first()
-
-    if not user or not station:
-        return HttpResponse('Either user or station does not exist', status=400)
-
-    questions = Question.objects.filter(linked_station=station)
-    user_answered_questions = Question.objects.filter(user=user)
-
-    # Get questions that the user hasn't answered yet
-    not_answered_questions = questions.difference(user_answered_questions)
-
-    if not_answered_questions.exists():
-        # pick 1 question randomly
-        question = random.sample(list(not_answered_questions), 1)[0]
-        ans = question.choices.filter(questionchoice__is_answer=True).first()
-        data = {
-            'content': question.content,
-            'type': question.question_type,
-            'choices': [choice.content for choice in question.choices.all()],
-            'answer': ans.content
-        }
-        # Add to answered questions
-        user.answered_questions.add(question)
-
-        return JsonResponse(data=data, status=200)
-
-    return HttpResponse('No unanswered question available for the user', status=404)
 
 
 @csrf_exempt
@@ -1109,10 +1072,12 @@ def travelplan_delete_page(request, pk):
 def question_list_page(request):
     if request.user.is_administrator():
         stations = Station.objects.all()
-        question_list = Question.objects.all()
+        question_list = Question.objects.all().order_by('id')
     else:
         stations = Satation.objects.filter(owner_group=request.user.group)
-        question_list = Question.objects.filter(linked_station__in=stations)
+        question_list = Question.objects.filter(
+            linked_station__in=stations
+        ).order_by('id')
 
     paginator = Paginator(question_list, 10)
 
@@ -1122,7 +1087,6 @@ def question_list_page(request):
     except PageNotAnInteger:
         questions = paginator.page(1)
     except EmptyPage:
-        """Page number is out of range"""
         questions = paginator.page(paginator.num_pages)
 
     context = {
@@ -1136,32 +1100,42 @@ def question_list_page(request):
 
 @login_required
 def question_add_page(request):
+
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+
+        if form.is_valid():
+            question = form.save()
+
+            choices = request.POST.getlist('choices')
+            answer_order = int(request.POST.get('answer', 1))
+
+            for order, choice in enumerate(choices, start=1):
+                if answer_order == order:
+                    QuestionChoice.objects.create(
+                        question=question,
+                        choice=choice,
+                        is_answer=True
+                    )
+                else:
+                    QuestionChoice.objects.create(
+                        question=question,
+                        choice=choice,
+                        is_answer=False
+                    )
+            return HttpResponseRedirect('/questions/')
+    else:
+        form = QuestionForm()
+
     if request.user.is_administrator():
         stations = Station.objects.all()
     else:
         stations = Satation.objects.filter(owner_group=request.user.group)
 
-    if request.method == 'POST':
-        form = QuestionForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            question = form.save()
-
-            for i in range(1, 5):
-                choice_name = 'choice{0}'.format(i)
-                if data[choice_name]:
-                    choice = Choice.objects.get_or_create(content=data[choice_name])[0]
-                    is_answer = (choice_name == data['answer'])
-                    QuestionChoice.objects.create(question=question, choice=choice, is_answer=is_answer)
-            return HttpResponseRedirect('/questions/')
-    else:
-        form = QuestionForm()
-
     context = {
         'email': request.user.email,
         'categories': StationCategory.objects.all().order_by('id'),
-        'stations': stations.order_by('id'),
-        'form': form
+        'stations': stations.order_by('id')
     }
     return render(request, 'app/question_add_page.html', context)
 
@@ -1169,48 +1143,44 @@ def question_add_page(request):
 @login_required
 def question_edit_page(request, pk):
     question = get_object_or_404(Question, pk=pk)
+
     if request.method == 'POST':
         form = QuestionForm(request.POST, instance=question)
+        print(form)
+        print(request.POST)
+
         if form.is_valid():
-            data = form.cleaned_data
-            question = form.save()
-            question.choices.clear()
-            question.save()
+            pass
 
-            for i in range(1, 5):
-                choice_name = 'choice{0}'.format(i)
-                if data[choice_name]:
-                    choice = Choice.objects.get_or_create(content=data[choice_name])[0]
-                    is_answer = (choice_name == data['answer'])
-                    QuestionChoice.objects.create(question=question, choice=choice, is_answer=is_answer)
-
-            # Clear unused choices
-            Choice.objects.filter(questionchoice__question=None).delete()
-
-            return HttpResponseRedirect('/questions/')
+        form_data = form.cleaned_data
+        form_data['choices'] = request.POST.getList('choices')
+        form_data['answer_id'] = request.POST.get('answer', 1)
     else:
         form = QuestionForm()
-
-    choices = list(QuestionChoice.objects.filter(question=question))
-    answer = ''
-    for index, choice in enumerate(choices, 1):
-        if choice.is_answer is True:
-            answer = 'choice{0}'.format(index)
-
-    form_data = {
-        'content': question.content,
-        'linked_station': question.linked_station,
-        'choice1': choices[0].choice.content,
-        'choice2': choices[1].choice.content,
-        'choice3': choices[2].choice.content,
-        'choice4': choices[3].choice.content,
-        'answer': answer
-    }
 
     if request.user.is_administrator():
         stations = Station.objects.all()
     else:
         stations = Station.objects.filter(owner_group=request.user.group)
+
+    question_choices = QuestionChoice.objects.filter(
+        question=question
+    ).order_by('id')
+
+    form_data = {
+        'content': question.content,
+        'linked_station': question.linked_station,
+        'choices': [
+            choice
+            for choice in question_choices
+        ],
+        'answer_id': [
+            QuestionChoice.objects.filter(
+                question=question,
+                is_answer=True
+            ).first().id
+        ]
+    }
 
     context = {
         'email': request.user.email,
