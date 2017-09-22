@@ -7,80 +7,80 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui text container">
-  <form class="ui big borderless form" action="" method="POST" id="question_form">
-    {% csrf_token %}
-    <div class="required five wide field">
-      <label>題目內容</label>
-      <input type="text" name="content">
-    </div>
-    <div class="grouped fields">
-      <label>選項及答案勾選</label>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            <input type="radio" name="answer" value="1" checked="cheked">
-            <label>選項一</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice_contents">
-        </div>
+  <div class="ui text container">
+    <form class="ui big borderless form" action="" method="POST" id="question_form">
+      {% csrf_token %}
+      <div class="required five wide field">
+        <label>題目內容</label>
+        <input type="text" name="content">
       </div>
-      <div class="inline required fields">
+      <div class="grouped fields">
+        <label>選項及答案勾選</label>
+        <div class="inline required fields">
           <div class="field">
             <div class="ui toggle checkbox">
-              <input type="radio" name="answer" value="2">
-              <label>選項二</label>
+              <input type="radio" name="answer" value="1" checked="cheked">
+              <label>選項一</label>
             </div>
           </div>
           <div class="required five wide field">
             <input type="text" name="choice_contents">
           </div>
         </div>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            <input type="radio" name="answer" value="3">
-            <label>選項三</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice_contents" >
-        </div>
-      </div>
-      <div class="inline required fields">
-        <div class="field">
-          <div class="ui toggle checkbox">
-            <input type="radio" name="answer" value="4">
-            <label>選項四</label>
-          </div>
-        </div>
-        <div class="required five wide field">
-          <input type="text" name="choice_contents">
-        </div>
-      </div>
-    </div>
-    <div class="field">
-      <div class="ui inline floating dropdown labeled search icon button">
-        <input type="hidden" name="linked_station">
-        <i class="search icon"></i>
-        <span class="text" id="selectedStationId">選擇站點</span>
-        <div class="menu" id="selectionMenu">
-          {% if stations %}
-            {% for station in stations %}
-              <div class="item" data-value="{{ station.id }}" category="{{ station.category }}">
-                {{ station.name }}
+        <div class="inline required fields">
+            <div class="field">
+              <div class="ui toggle checkbox">
+                <input type="radio" name="answer" value="2">
+                <label>選項二</label>
               </div>
-            {% endfor %}
-          {% endif %}
+            </div>
+            <div class="required five wide field">
+              <input type="text" name="choice_contents">
+            </div>
+          </div>
+        <div class="inline required fields">
+          <div class="field">
+            <div class="ui toggle checkbox">
+              <input type="radio" name="answer" value="3">
+              <label>選項三</label>
+            </div>
+          </div>
+          <div class="required five wide field">
+            <input type="text" name="choice_contents" >
+          </div>
+        </div>
+        <div class="inline required fields">
+          <div class="field">
+            <div class="ui toggle checkbox">
+              <input type="radio" name="answer" value="4">
+              <label>選項四</label>
+            </div>
+          </div>
+          <div class="required five wide field">
+            <input type="text" name="choice_contents">
+          </div>
         </div>
       </div>
-    </div>
-    <button class="ui submit teal button" type="submit">新增</button>
-    <div class="ui error message"></div>
-  </form>
-</div>
+      <div class="field">
+        <div class="ui inline floating dropdown labeled search icon button">
+          <input type="hidden" name="linked_station">
+          <i class="search icon"></i>
+          <span class="text" id="selectedStationId">選擇站點</span>
+          <div class="menu" id="selectionMenu">
+            {% if stations %}
+              {% for station in stations %}
+                <div class="item" data-value="{{ station.id }}" category="{{ station.category }}">
+                  {{ station.name }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <button class="ui submit teal button" type="submit">新增</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
 {% endblock %}
 
 {% block script %}

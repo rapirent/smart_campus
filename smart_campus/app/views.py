@@ -1115,13 +1115,13 @@ def question_add_page(request):
                 if answer_order == order:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice_content=choice_contnet,
+                        content=choice_contnet,
                         is_answer=True
                     )
                 else:
                     QuestionChoice.objects.create(
                         question=question,
-                        choice_content=choice_contnet,
+                        content=choice_contnet,
                         is_answer=False
                     )
             return HttpResponseRedirect('/questions/')
@@ -1165,7 +1165,7 @@ def question_edit_page(request, pk):
                 edited_choice = QuestionChoice.objects.get(
                     id=choice_id
                 )
-                edited_choice.choice_content = edited_content
+                edited_choice.content = edited_content
                 edited_choice.save()
 
             answer_choice = QuestionChoice.objects.get(id=answer_id)
