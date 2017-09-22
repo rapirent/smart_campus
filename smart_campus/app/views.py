@@ -198,9 +198,9 @@ def station_list_by_category_page(request, pk):
             'id': station.id,
             'name': station.name,
             'primary_image': StationImage.objects.filter(
-                    station=station,
-                    is_primary=True
-                ).first(),
+                station=station,
+                is_primary=True
+            ).first(),
             'category': station.category,
             'beacon': Beacon.objects.filter(
                 station=station
@@ -664,21 +664,22 @@ def reward_edit_page(request, pk):
     reward = get_object_or_404(Reward, pk=pk)
     if request.method == 'POST':
         reward_form = RewardForm(request.POST, request.FILES, instance=reward)
-
+        print(request.POST)
         if reward_form.is_valid():
             reward_form.save()
 
             return HttpResponseRedirect('/rewards/')
 
     if request.user.is_administrator():
-        stations = Station.objects.all()
+        stations = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(owner_group=request.user.group).order_by('id')
 
     form_data = {
         'name': reward.name,
         'description': reward.description,
-        'related_station': reward.related_station
+        'related_station': reward.related_station,
+        'image': reward.image
     }
     context = {
         'email': request.user.email,

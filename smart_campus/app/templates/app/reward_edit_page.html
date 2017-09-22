@@ -1,13 +1,11 @@
 {% extends 'app/base.html' %}
 {% load static %}
+
 {% block stylesheet %}
   {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
-<style rel="stylesheet" type="text/css">
-  .ui.text.container {
-    margin-bottom: 1em;
-  }
-</style>
+
 {% block content%}
 <div class="ui text container">
   <form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="reward_form">
@@ -20,32 +18,45 @@
       <label>獎勵描述</label>
       <textarea rows="2" form="reward_form" name="description" placeholder="類別描述">{{ form_data.description }}</textarea>
     </div>
-    <div class="five wide field">
-      <label>圖片上傳(取代)</label>
-      <div class="ui action input">
-        <input type="text" placeholder="img 1" readonly="">
-        <input id="image" name="image" type="file" accept="image/*" style="display: none;">
-        <div class="ui icon button">
-          <i class="attach icon"></i>
+    <div class="field">
+      <label>圖片更新</label>
+      <div class="ui grid">
+        <div class="column">
+          <img class="ui medium image" src="{{ form_data.image.url }}">
         </div>
       </div>
-    </div>
-    <div class="five wide field">
-      <label>綁定站點</label>
-      <div class="ui selection dropdown">
-        <input type="hidden" name="related_station" value="{{ form_data.related_station.id }}">
-        <i class="dropdown icon"></i>
-        <div class="default text">請選擇站點...</div>
-        <div class="menu">
-          {% if stations %} {% for station in stations %}
-          <div class="item" value="{{ station.id }}" data-value="{{ station.id }}">
-            {{ station.name }}
+      <div class="ui grid">
+        <div class="column">
+          <div class="five wide field">
+            <div class="ui action input">
+              <input type="text" placeholder="請上傳圖片" readonly="">
+              <input id="img1" name="image" type="file" accept="image/*" style="display: none;">
+              <div class="ui icon button">
+                <i class="attach icon"></i>
+              </div>
+            </div>
           </div>
-          {% endfor %} {% endif %}
         </div>
       </div>
     </div>
-    <button class="ui submit teal button" type="submit">新增</button>
+    <div class="field">
+      <label>站點更新</label>
+      <div class="ui inline floating dropdown labeled search icon button">
+        <input type="hidden" name="related_station" value="{{ form_data.related_station.id }}">
+        <i class="search icon"></i>
+        <span class="text" id="selectedStationId">選擇站點</span>
+        <div class="menu" id="selectionMenu">
+          {% if stations %}
+            {% for station in stations %}
+              <div class="item" data-value="{{ station.id }}">
+                {{ station.name }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <button class="ui submit teal button" type="submit">儲存變更</button>
     <div class="ui error message"></div>
   </form>
 </div>
@@ -53,42 +64,5 @@
 
 {% block script %}
   {{ block.super }}
-  <script>
-    $('.ui.selection').dropdown();
-    $(".ui.icon.button").click(function () {
-      $(this).parent().find("input:file").click();
-    });
-
-    $('input:file', '.ui.action.input')
-      .on('change', function (e) {
-        var name = e.target.files[0].name;
-        $('input:text', $(e.target).parent()).val(name);
-      });
-    $('.ui.radio.checkbox')
-      .checkbox();
-    $(document).ready(function() {
-      $(".ui.form").form({
-        fields: {
-          name: {
-            identifier: "name",
-            rules: [
-              {
-                type: "empty",
-                prompt: "請輸入類別名稱"
-              }
-            ]
-          },
-          description: {
-            identifier: "description",
-            rules: [
-              {
-                type: "empty",
-                prompt: "請輸入描述"
-              }
-            ]
-          },
-        }
-      });
-    });
-  </script>
+  <script src="{% static 'app/js/reward_edit_page.js' %}"></script>
 {% endblock %}
