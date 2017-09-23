@@ -164,7 +164,7 @@ def station_list_page(request):
             owner_group=request.user.group
         ).order_by('id')
 
-    paginator = Paginator(station_list, 2)
+    paginator = Paginator(station_list, 10)
 
     page = request.GET.get('page', 1)
     try:
@@ -1037,3 +1037,45 @@ def travelplan_delete_page(request, pk):
     travelplan.delete()
 
     return HttpResponseRedirect('/travelplans/')
+
+
+@login_required
+@csrf_exempt
+def station_search_page(request):
+    query = request.GET.get('query', 1)
+    if request.user.can(Permission.ADMIN):
+        station_list = Station.objects.filter(
+            name__search=query
+        ).order_by('id')
+    else:
+        station_list = Station.objects.filter(
+            name__search=query,
+            owner_group=request.user.group
+        ).order_by('id')
+
+    paginator = Paginator(station_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primary_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
+
+    context = {
+        'email': request.user.email,
+        'stations': stations,
+        'categories': StationCategory.objects.all().order_by('id')
+    }
+
+    return render(request, 'app/station_list.html', context)

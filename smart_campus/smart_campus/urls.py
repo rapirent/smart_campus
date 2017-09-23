@@ -35,6 +35,8 @@ urlpatterns = [
     url(r'^station_image/(?P<pk>\d+)/delete/$', app.views.delete_station_image, name='Delete Station Image'),
     url(r'^stations/(?P<pk>\d+)/delete/$', app.views.station_delete_page,
         name='Delete Station Page'),
+    url(r'stations/search$', app.views.station_search_page,
+        name='Station Search Page'),
 
     # Categories
     url(r'^add_category/$', app.views.category_add_page,

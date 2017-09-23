@@ -1,0 +1,12 @@
+.ui.left.icon.input {
+  max-width: 50%;
+  float: left;
+  -webkit-transition: all .3s;
+  -moz-transition: all .3s;
+  -o-transition: all .3s;
+}
+
+.ui.left.icon.input:hover,
+.ui.left.icon.input:focus {
+  max-width: 100%;
+}
