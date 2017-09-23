@@ -1079,3 +1079,32 @@ def station_search_page(request):
     }
 
     return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def beacon_search_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    query = request.GET.get('query', 1)
+    beacon_list = Beacon.objects.filter(
+        beacon_id__search=query
+    ).order_by('beacon_id')
+    paginator = Paginator(beacon_list, 10)
+
+    # Try to get the page number
+    page = request.GET.get('page', 1)
+    try:
+        beacons = paginator.page(page)
+    except PageNotAnInteger:
+        beacons = paginator.page(1)
+    except EmptyPage:
+        beacons = paginator.page(paginator.num_pages)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'beacons': beacons
+    }
+
+    return render(request, 'app/beacon_list_page.html', context)

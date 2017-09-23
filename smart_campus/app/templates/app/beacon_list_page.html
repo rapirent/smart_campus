@@ -4,10 +4,21 @@
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/search.css" %}">
 {% endblock %}
 
 {% block content %}
   <div class="ui borderless center aligned text container">
+    <div class="ui items">
+      <div class="item">
+        <div class="ui search" id="search" >
+          <div class="ui icon input">
+            <input name="name" type="text" id="searchBeacon" placeholder="請輸入站點名稱" valeu="">
+            <i class="search link icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
     <table class="ui selectable celled striped table">
       <thead>
         <tr class="center aligned">
@@ -72,4 +83,5 @@
 
 {% block script %}
   {{ block.super }}
+  <script src="{% static 'app/js/beacon_search.js' %}"></script>
 {% endblock %}
