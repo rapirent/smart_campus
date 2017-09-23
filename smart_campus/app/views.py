@@ -49,6 +49,7 @@ def validate_administrator(function=None):
 
     return wrapper
 
+
 @csrf_exempt
 @require_POST
 def signup(request):
