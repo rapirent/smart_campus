@@ -152,33 +152,35 @@ def index(request):
 
 @login_required
 def station_list_page(request):
-    """Show all stations managed by the user's group"""
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all().order_by('id')
+        station_list = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(
+        station_list = Station.objects.filter(
             owner_group=request.user.group
         ).order_by('id')
 
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
+    paginator = Paginator(station_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primary_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
 
     context = {
         'email': request.user.email,
-        'stations': station_data,
+        'stations': stations,
         'categories': StationCategory.objects.all().order_by('id')
     }
 
@@ -910,34 +912,7 @@ def station_delete_page(request, pk):
 
     station.delete()
 
-    if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
-    else:
-        stations = Station.objects.filter(owner_group=request.user.group)
-
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
-
-    context = {
-        'email': request.user.email,
-        'stations': station_data,
-        'categories': StationCategory.objects.all().order_by('id')
-    }
-
-    return render(request, 'app/station_list.html', context)
+    return HttpResponseRedirect('/stations/')
 
 
 @login_required
@@ -1217,3 +1192,73 @@ def question_delete_page(request, pk):
     question.delete()
 
     return HttpResponseRedirect('/questions/')
+
+
+@csrf_exempt
+def station_search_page(request):
+    query = request.GET.get('query', 1)
+    if request.user.can(Permission.ADMIN):
+        station_list = Station.objects.filter(
+            name__contains=query
+        ).order_by('id')
+    else:
+        station_list = Station.objects.filter(
+            name__contains=query,
+            owner_group=request.user.group
+        ).order_by('id')
+
+    paginator = Paginator(station_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primary_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
+
+    context = {
+        'email': request.user.email,
+        'stations': stations,
+        'categories': StationCategory.objects.all().order_by('id')
+    }
+
+    return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def beacon_search_page(request):
+    if not request.user.is_administrator():
+        return HttpResponseForbidden()
+
+    query = request.GET.get('query', 1)
+    beacon_list = Beacon.objects.filter(
+        beacon_id__contains=query
+    ).order_by('beacon_id')
+    paginator = Paginator(beacon_list, 10)
+
+    # Try to get the page number
+    page = request.GET.get('page', 1)
+    try:
+        beacons = paginator.page(page)
+    except PageNotAnInteger:
+        beacons = paginator.page(1)
+    except EmptyPage:
+        beacons = paginator.page(paginator.num_pages)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'beacons': beacons
+    }
+
+    return render(request, 'app/beacon_list_page.html', context)

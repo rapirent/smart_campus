@@ -36,6 +36,8 @@ urlpatterns = [
     url(r'^station_image/(?P<pk>\d+)/delete/$', app.views.delete_station_image, name='Delete Station Image'),
     url(r'^stations/(?P<pk>\d+)/delete/$', app.views.station_delete_page,
         name='Delete Station Page'),
+    url(r'stations/search$', app.views.station_search_page,
+        name='Station Search Page'),
 
     # Categories
     url(r'^add_category/$', app.views.category_add_page,
@@ -70,6 +72,9 @@ urlpatterns = [
         name='Beacon Edit Page'),
     url(r'^beacons/(?P<pk>[^/]+)/delete/$', app.views.beacon_delete_page,
         name='Beacon Delete Page'),
+    url(r'beacons/search$', app.views.beacon_search_page,
+        name='Beacon Search Page'),
+
     url(r'^travelplans/$', app.views.travelplan_list_page,
         name='TravelPlan List Page'),
     url(r'^travelplans/new$', app.views.travelplan_add_page,
