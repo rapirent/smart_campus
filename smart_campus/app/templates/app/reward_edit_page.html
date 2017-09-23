@@ -7,59 +7,59 @@
 {% endblock %}
 
 {% block content%}
-<div class="ui text container">
-  <form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="reward_form">
-    {% csrf_token %}
-    <div class="required five wide field">
-      <label>獎勵名稱</label>
-      <input type="text" name="name" placeholder="類別名稱" value="{{ form_data.name}}">
-    </div>
-    <div class="required field">
-      <label>獎勵描述</label>
-      <textarea rows="2" form="reward_form" name="description" placeholder="類別描述">{{ form_data.description }}</textarea>
-    </div>
-    <div class="field">
-      <label>圖片更新</label>
-      <div class="ui grid">
-        <div class="column">
-          <img class="ui medium image" src="{{ form_data.image.url }}">
-        </div>
+  <div class="ui text container">
+    <form class="ui big borderless form" action="" method="POST" enctype="multipart/form-data" id="reward_form">
+      {% csrf_token %}
+      <div class="required five wide field">
+        <label>獎勵名稱</label>
+        <input type="text" name="name" placeholder="類別名稱" value="{{ form_data.name}}">
       </div>
-      <div class="ui grid">
-        <div class="column">
-          <div class="five wide field">
-            <div class="ui action input">
-              <input type="text" placeholder="請上傳圖片" readonly="">
-              <input id="img1" name="image" type="file" accept="image/*" style="display: none;">
-              <div class="ui icon button">
-                <i class="attach icon"></i>
+      <div class="required field">
+        <label>獎勵描述</label>
+        <textarea rows="2" form="reward_form" name="description" placeholder="類別描述">{{ form_data.description }}</textarea>
+      </div>
+      <div class="field">
+        <label>圖片更新</label>
+        <div class="ui grid">
+          <div class="column">
+            <img class="ui medium image" src="{{ form_data.image.url }}">
+          </div>
+        </div>
+        <div class="ui grid">
+          <div class="column">
+            <div class="five wide field">
+              <div class="ui action input">
+                <input type="text" placeholder="請上傳圖片" readonly="">
+                <input id="img1" name="image" type="file" accept="image/*" style="display: none;">
+                <div class="ui icon button">
+                  <i class="attach icon"></i>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <div class="field">
-      <label>站點更新</label>
-      <div class="ui inline floating dropdown labeled search icon button">
-        <input type="hidden" name="related_station" value="{{ form_data.related_station.id }}">
-        <i class="search icon"></i>
-        <span class="text" id="selectedStationId">選擇站點</span>
-        <div class="menu" id="selectionMenu">
-          {% if stations %}
-            {% for station in stations %}
-              <div class="item" data-value="{{ station.id }}">
-                {{ station.name }}
-              </div>
-            {% endfor %}
-          {% endif %}
+      <div class="field">
+        <label>站點更新</label>
+        <div class="ui inline floating dropdown labeled search icon button">
+          <input type="hidden" name="related_station" value="{{ form_data.related_station.id }}">
+          <i class="search icon"></i>
+          <span class="text" id="selectedStationId">選擇站點</span>
+          <div class="menu" id="selectionMenu">
+            {% if stations %}
+              {% for station in stations %}
+                <div class="item" data-value="{{ station.id }}">
+                  {{ station.name }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
         </div>
       </div>
-    </div>
-    <button class="ui submit teal button" type="submit">儲存變更</button>
-    <div class="ui error message"></div>
-  </form>
-</div>
+      <button class="ui submit teal button" type="submit">儲存變更</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
 {% endblock %}
 
 {% block script %}
