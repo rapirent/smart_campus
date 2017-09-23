@@ -23,11 +23,7 @@
             <tr class="center aligned">
               <td class="collapsing">{{ question.id }}</td>
               <td class="collapsing">{{ question.linked_station }}</td>
-              {% if question.question_type == 1 %}
                 <td class="collapsing">是非</td>
-              {% else %}
-                <td class="collapsing">選擇</td>
-              {% endif %}
               <td class="collapsing">
                 <div class="ui mini buttons">
                   <a class="ui basic green floated button" href="{% url 'Question Edit Page' question.id %}">修改</a>
@@ -70,9 +66,9 @@
       OR
     </div>
     <a class="ui teal labeled icon button" href="{% url 'Question Add Page' %}">
-        新增問題
-        <i class="add icon"></i>
-      </a>
+      新增問題
+      <i class="add icon"></i>
+    </a>
   </div>
 {% endblock %}
 

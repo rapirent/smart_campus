@@ -199,7 +199,7 @@ class Question(models.Model):
         return str(self.id)
 
 
-class QuestionChoice(models.Model):
+class Choice(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
     content = models.CharField(max_length=50)
     is_answer = models.BooleanField(default=False)

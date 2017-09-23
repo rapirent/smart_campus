@@ -27,7 +27,7 @@ from .models import (
     UserReward, UserGroup,
     TravelPlan, Role,
     TravelPlanStations,
-    QuestionChoice
+    Choice
 )
 from .forms import (
     StationForm,
@@ -1113,13 +1113,13 @@ def question_add_page(request):
 
             for order, choice_contnet in enumerate(choice_contents, start=1):
                 if answer_order == order:
-                    QuestionChoice.objects.create(
+                    Choice.objects.create(
                         question=question,
                         content=choice_contnet,
                         is_answer=True
                     )
                 else:
-                    QuestionChoice.objects.create(
+                    Choice.objects.create(
                         question=question,
                         content=choice_contnet,
                         is_answer=False
@@ -1155,20 +1155,20 @@ def question_edit_page(request, pk):
             edited_contents = request.POST.getlist('choice_contents')
             choice_ids = request.POST.getlist('choice_ids')
             answer_id = int(request.POST.get('answer', 1))
-            question_choices = QuestionChoice.objects.filter(question=question)
+            question_choices = Choice.objects.filter(question=question)
 
             for question_choice in question_choices:
                 question_choice.is_answer = False
                 question_choice.save()
 
             for edited_content, choice_id in zip(edited_contents, choice_ids):
-                edited_choice = QuestionChoice.objects.get(
+                edited_choice = Choice.objects.get(
                     id=choice_id
                 )
                 edited_choice.content = edited_content
                 edited_choice.save()
 
-            answer_choice = QuestionChoice.objects.get(id=answer_id)
+            answer_choice = Choice.objects.get(id=answer_id)
             answer_choice.is_answer = True
             answer_choice.save()
             return HttpResponseRedirect('/questions/')
@@ -1184,7 +1184,7 @@ def question_edit_page(request, pk):
     else:
         stations = Station.objects.filter(owner_group=request.user.group)
 
-    question_choices = QuestionChoice.objects.filter(
+    question_choices = Choice.objects.filter(
         question=question
     ).order_by('id')
 
@@ -1195,7 +1195,7 @@ def question_edit_page(request, pk):
             choice
             for choice in question_choices
         ],
-        'answer_id': QuestionChoice.objects.filter(
+        'answer_id': Choice.objects.filter(
             question=question,
             is_answer=True
         ).first().id
