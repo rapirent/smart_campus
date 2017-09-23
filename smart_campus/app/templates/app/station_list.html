@@ -39,6 +39,27 @@
         {% endfor %}
       {% endif %}
     </div>
+    {% if stations.has_other_pages %}
+      <div class="ui pagination  menu">
+        {% if stations.has_previous %}
+          <a class="icon item" href="?page={{ stations.previous_page_number }}">
+            <i class="left chevron icon"></i>
+          </a>
+        {% endif %}
+        {% for page in stations.paginator.page_range %}
+          {% if stations.nubmer == page %}
+            <div class="active item">{{ page }}</div>
+          {% else %}
+            <a class="item" href="?page={{ page }}">{{ page }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if stations.has_next %}
+          <a class="icon item" href="?page={{ stations.next_page_number }}">
+            <i class="right chevron icon"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
     <div class="ui horizontal divider">
         OR
     </div>

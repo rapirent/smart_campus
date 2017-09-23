@@ -157,34 +157,36 @@ def index(request):
 
 @login_required
 def station_list_page(request):
-    """Show all stations managed by the user's group"""
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all().order_by('id')
+        station_list = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(
+        station_list = Station.objects.filter(
             owner_group=request.user.group
         ).order_by('id')
 
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
+    paginator = Paginator(station_list, 2)
+
+    page = request.GET.get('page', 1)
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primary_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
 
     context = {
         'email': request.user.email,
-        'stations': station_data,
-        'categories': StationCategory.objects.all()
+        'stations': stations,
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/station_list.html', context)
@@ -786,7 +788,6 @@ def beacon_list_page(request):
     except PageNotAnInteger:
         beacons = paginator.page(1)
     except EmptyPage:
-        """Page number is out of range"""
         beacons = paginator.page(paginator.num_pages)
 
     context = {
