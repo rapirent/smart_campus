@@ -4,11 +4,20 @@
 {% block stylesheet %}
   {{ block.super }}
   <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/search.css" %}">
 {% endblock %}
 
 {% block content %}
   <div class="ui borderless center aligned text container">
     <div class="ui divided items">
+      <div class="item">
+        <div class="ui search" id="search" >
+          <div class="ui icon input">
+            <input name="name" type="text" id="searchStation" placeholder="請輸入Beacon ID" valeu="">
+            <i class="search link icon"></i>
+          </div>
+        </div>
+      </div>
       {% if stations %}
         {% for station in stations %}
           <div class="item">
@@ -39,6 +48,27 @@
         {% endfor %}
       {% endif %}
     </div>
+    {% if stations.has_other_pages %}
+      <div class="ui pagination  menu">
+        {% if stations.has_previous %}
+          <a class="icon item" href="?page={{ stations.previous_page_number }}">
+            <i class="left chevron icon"></i>
+          </a>
+        {% endif %}
+        {% for page in stations.paginator.page_range %}
+          {% if stations.nubmer == page %}
+            <div class="active item">{{ page }}</div>
+          {% else %}
+            <a class="item" href="?page={{ page }}">{{ page }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if stations.has_next %}
+          <a class="icon item" href="?page={{ stations.next_page_number }}">
+            <i class="right chevron icon"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
     <div class="ui horizontal divider">
         OR
     </div>
@@ -47,4 +77,9 @@
       <i class="add icon"></i>
     </a>
   </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{% static 'app/js/station_search.js' %}"></script>
 {% endblock %}
