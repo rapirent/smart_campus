@@ -1132,11 +1132,11 @@ def station_search_page(request):
     query = request.GET.get('query', 1)
     if request.user.can(Permission.ADMIN):
         station_list = Station.objects.filter(
-            name__search=query
+            name__contains=query
         ).order_by('id')
     else:
         station_list = Station.objects.filter(
-            name__search=query,
+            name__contains=query,
             owner_group=request.user.group
         ).order_by('id')
 
@@ -1174,7 +1174,7 @@ def beacon_search_page(request):
 
     query = request.GET.get('query', 1)
     beacon_list = Beacon.objects.filter(
-        beacon_id__search=query
+        beacon_id__contains=query
     ).order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
