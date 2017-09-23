@@ -145,7 +145,7 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    categories = StationCategory.objects.all()
+    categories = StationCategory.objects.all().order_by('id')
     context = {'email': request.user.email, 'categories': categories}
     return render(request, 'app/index.html', context)
 
@@ -179,7 +179,7 @@ def station_list_page(request):
     context = {
         'email': request.user.email,
         'stations': station_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/station_list.html', context)
@@ -212,7 +212,7 @@ def station_list_by_category_page(request, pk):
     context = {
         'email': request.user.email,
         'stations': station_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/station_list.html', context)
@@ -278,7 +278,7 @@ def station_edit_page(request, pk):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacon_set,
         'form': form,
         'form_data': form_data,
@@ -367,7 +367,7 @@ def station_new_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacon_set,
         'form': form,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
@@ -577,7 +577,7 @@ def category_add_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/category_add_page.html', context)
@@ -629,7 +629,7 @@ def reward_list_page(request):
     context = {
         'email': request.user.email,
         'rewards': Reward.objects.all(),
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/reward_list_page.html', context)
@@ -646,14 +646,14 @@ def reward_add_page(request):
             context = {
                 'rewards': Reward.objects.all(),
                 'email': request.user.email,
-                'categories': StationCategory.objects.all()
+                'categories': StationCategory.objects.all().order_by('id')
             }
 
             return render(request, 'app/reward_list_page.html', context)
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/reward_add_page.html', context)
@@ -683,7 +683,7 @@ def reward_edit_page(request, pk):
     }
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'stations': stations,
         'form_data': form_data
     }
@@ -719,7 +719,7 @@ def manager_list_page(request):
     context = {
         'email': request.user.email,
         'managers': User.objects.exclude(role__name='User'),
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -749,7 +749,7 @@ def manager_add_page(request):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_add_page.html', context)
@@ -785,7 +785,7 @@ def manager_edit_page(request, pk):
         'groups': groups,
         'form': form,
         'form_data': form_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_edit_page.html', context)
@@ -821,7 +821,7 @@ def beacon_list_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacons
     }
 
@@ -934,7 +934,7 @@ def station_delete_page(request, pk):
     context = {
         'email': request.user.email,
         'stations': station_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/station_list.html', context)
@@ -960,7 +960,7 @@ def travelplan_add_page(request):
             travelplan_form.save()
 
             context = {
-                'categories': StationCategory.objects.all(),
+                'categories': StationCategory.objects.all().order_by('id'),
                 'email': request.user.email,
                 'travelplans': TravelPlan.objects.all()
             }
@@ -970,7 +970,7 @@ def travelplan_add_page(request):
         travelplan_form = PartialTravelPlanForm()
 
     context = {
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'email': request.user.email,
         'form': travelplan_form
     }
@@ -1016,7 +1016,7 @@ def travelplan_edit_page(request, pk):
                         changed_travelplan.first().save()
 
             context = {
-                'categories': StationCategory.objects.all(),
+                'categories': StationCategory.objects.all().order_by('id'),
                 'email': request.user.email,
                 'travelplans': TravelPlan.objects.all()
             }
@@ -1051,7 +1051,7 @@ def travelplan_edit_page(request, pk):
         'travelplanstations': travelplanstations,
         'selected_stations': selected_stations,
         'form_data': form_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/travelplan_edit_page.html', context)
@@ -1203,7 +1203,7 @@ def question_edit_page(request, pk):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'form': form,
         'form_data': form_data,
         'stations': stations
