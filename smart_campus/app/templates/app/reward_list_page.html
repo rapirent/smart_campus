@@ -8,13 +8,7 @@
 
 {% block content %}
   <div class="ui borderless center aligned text container">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="ui info message">
-          {{ message }}
-        </div>
-      {% endfor %}
-    {% endif %}
+    {% include 'app/form_message_marco.html' %}
     {% if rewards %}
       {% for reward in rewards %}
         <div class="ui cards">

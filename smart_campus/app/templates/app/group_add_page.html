@@ -8,13 +8,7 @@
 
 {% block content %}
   <div class="ui text container">
-    {% if messages %}
-      {% for message in messages %}
-      <div class="ui info message">
-        {{ message }}
-      </div>
-      {% endfor %}
-    {% endif %}
+    {% include 'marco/form_message_marco.html' %}
     <form class="ui big borderless form" action="" method="POST" id="group_form">
       {% csrf_token %}
       <div class="required five wide field">

@@ -10,15 +10,7 @@
 {% block content %}
   <div class="ui container">
     <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-      {% for field in form %}
-        {% if field.errors %}
-          <div class="ui negative message">
-            {% for error in field.errors %}
-              <li>{{ field.label }}: {{ error|escape }}</li>
-            {% endfor %}
-          </div>
-        {% endif %}
-      {% endfor %}
+      {% include 'marco/form_error_marco.html' %}
       {% csrf_token %}
       <div class="fields">
         <div class="field">

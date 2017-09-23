@@ -15,6 +15,7 @@ from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import IntegrityError
 
 import os
 import random
@@ -81,10 +82,24 @@ def login(request):
             'nickname': user.nickname,
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
-            'reward': [reward.id for reward in UserReward.objects.filter(user=user).order_by('timestamp')],
-            'favorite_stations': [station.id for station in user.favorite_stations.all()],
+            'reward': [
+                reward.id
+                for reward in UserReward.objects.filter(user=user).order_by('timestamp')
+            ],
+            'favorite_stations': [
+                station.id
+                for station in user.favorite_stations.all()
+            ],
         }
-        return JsonResponse(data={'message': 'Login success', 'data': user_data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+        return JsonResponse(
+            data={
+                'message': 'Login success',
+                'data': user_data
+            },
+            status=200,
+            json_dumps_params={'ensure_ascii': False},
+            content_type='application/json; charset=utf-8'
+        )
 
     return HttpResponse('Login failed', status=401)
 
@@ -359,7 +374,12 @@ def get_all_rewards(request):
         for reward in Reward.objects.all()
     ]
 
-    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(
+        data={'data': data},
+        status=200,
+        json_dumps_params={'ensure_ascii': False},
+        content_type='application/json; charset=utf-8'
+    )
 
 
 @csrf_exempt
@@ -786,7 +806,6 @@ def beacon_list_page(request):
     except PageNotAnInteger:
         beacons = paginator.page(1)
     except EmptyPage:
-        """Page number is out of range"""
         beacons = paginator.page(paginator.num_pages)
 
     context = {
@@ -1075,7 +1094,7 @@ def group_add_page(request):
             try:
                 UserGroup.objects.create(name=group_name)
                 return HttpResponseRedirect('/groups/')
-            except:
+            except IntegrityError:
                 messages.warning(request, 'This group name already exists!')
         else:
             messages.warning(request, 'Group name input is not given!')
@@ -1103,7 +1122,7 @@ def group_edit_page(request, pk):
                 group_instance.name = group_name
                 group_instance.save()
                 return HttpResponseRedirect('/groups/')
-            except:
+            except IntegrityError:
                 messages.warning(request, 'This group name already exists!')
         else:
             messages.warning(request, 'Group name input is not given!')

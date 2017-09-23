@@ -7,24 +7,18 @@
 {% endblock %}
 
 {% block content %}
-<div class="ui text container">
-  {% if messages %}
-    {% for message in messages %}
-    <div class="ui info message">
-          {{ message }}
-    </div>
-    {% endfor %}
-  {% endif %}
-  <form class="ui big borderless form" action="" method="POST" id="group_form">
-    {% csrf_token %}
-    <div class="required five wide field">
-      <label>群組名稱</label>
-      <input type="text" name="name" placeholder="類別名稱" value="{{ group }}">
-    </div>
-    <button class="ui submit teal button" type="submit">儲存</button>
-    <div class="ui error message"></div>
-  </form>
-</div>
+  <div class="ui text container">
+    {% include 'marco/form_message_marco.html' %}
+    <form class="ui big borderless form" action="" method="POST" id="group_form">
+      {% csrf_token %}
+      <div class="required five wide field">
+        <label>群組名稱</label>
+        <input type="text" name="name" placeholder="類別名稱" value="{{ group }}">
+      </div>
+      <button class="ui submit teal button" type="submit">儲存</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
 {% endblock %}
 
 {% block script %}
