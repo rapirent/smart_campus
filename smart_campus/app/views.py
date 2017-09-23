@@ -16,6 +16,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
+from functools import wraps
 
 import os
 import random
@@ -38,6 +39,15 @@ from .forms import (
     PartialTravelPlanForm
 )
 
+
+def validate_administrator(function=None):
+    @wraps(function)
+    def wrapper(request):
+        if not request.user.is_administrator():
+            return HttpResponseForbidden()
+        return function(request)
+
+    return wrapper
 
 @csrf_exempt
 @require_POST
@@ -688,10 +698,8 @@ def reward_add_page(request):
 
 
 @login_required
+@validate_administrator
 def manager_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager_list = User.objects.exclude(role__name='User').order_by('email')
     paginator = Paginator(manager_list, 10)
 
@@ -715,10 +723,8 @@ def manager_list_page(request):
 
 
 @login_required
+@validate_administrator
 def manager_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     if request.method == 'POST':
         form = ManagerForm(request.POST)
         password = request.POST.get('password')
@@ -745,10 +751,8 @@ def manager_add_page(request):
 
 
 @login_required
+@validate_administrator
 def manager_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
@@ -781,10 +785,8 @@ def manager_edit_page(request, pk):
 
 
 @login_required
+@validate_administrator
 def manager_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager = get_object_or_404(User, pk=pk)
     manager.delete()
 
@@ -792,10 +794,8 @@ def manager_delete_page(request, pk):
 
 
 @login_required
+@validate_administrator
 def beacon_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon_list = Beacon.objects.all().order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
@@ -818,10 +818,8 @@ def beacon_list_page(request):
 
 
 @login_required
+@validate_administrator
 def beacon_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     if request.method == 'POST':
         form = BeaconForm(request.POST)
         if form.is_valid():
@@ -842,10 +840,8 @@ def beacon_add_page(request):
 
 
 @login_required
+@validate_administrator
 def beacon_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon = get_object_or_404(Beacon, pk=pk)
 
     if request.method == 'POST':
@@ -879,10 +875,8 @@ def beacon_edit_page(request, pk):
 
 
 @login_required
+@validate_administrator
 def beacon_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon = get_object_or_404(Beacon, pk=pk)
     beacon.delete()
 
@@ -1058,10 +1052,8 @@ def travelplan_delete_page(request, pk):
 
 
 @login_required
+@validate_administrator
 def group_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     group_list = UserGroup.objects.all().order_by('id')
     paginator = Paginator(group_list, 10)
 
@@ -1083,10 +1075,8 @@ def group_list_page(request):
 
 
 @login_required
+@validate_administrator
 def group_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     if request.method == 'POST':
         group_name = request.POST.get('name')
 
@@ -1107,10 +1097,9 @@ def group_add_page(request):
     return render(request, 'app/group_add_page.html', context)
 
 
+@validate_administrator
 @login_required
 def group_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
 
     group_instance = get_object_or_404(UserGroup, pk=pk)
 
@@ -1137,10 +1126,8 @@ def group_edit_page(request, pk):
 
 
 @login_required
+@validate_administrator
 def group_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     group_instance = get_object_or_404(UserGroup, pk=pk)
     group_instance.delete()
 

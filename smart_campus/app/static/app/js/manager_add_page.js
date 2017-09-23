@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $(".ui.selection.dropdown").dropdown();
+  $(".ui.selection.dropdown").dropdown()
 
   $(document).ready(function() {
     $(".ui.form").form({
@@ -36,6 +36,6 @@ $(document).ready(function() {
           ]
         }
       }
-    });
-  });
-});
+    })
+  })
+})
