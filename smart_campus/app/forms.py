@@ -15,6 +15,7 @@ from .models import(
     User,
     Beacon,
     TravelPlan,
+    Question
 )
 
 
@@ -47,6 +48,17 @@ class PartialRewardForm(ModelForm):
         exclude = ['related_station']
 
 
+class RewardForm(ModelForm):
+    class Meta:
+        model = Reward
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(RewardForm, self).__init__(*args, **kwargs)
+        self.fields['image'].required = False
+        self.fields['related_station'].required = False
+
+
 class ManagerForm(ModelForm):
     class Meta:
         model = User
@@ -72,3 +84,9 @@ class PartialTravelPlanForm(ModelForm):
     class Meta:
         model = TravelPlan
         exclude = ['stations']
+
+
+class QuestionForm(ModelForm):
+    class Meta:
+        model = Question
+        fields = '__all__'
