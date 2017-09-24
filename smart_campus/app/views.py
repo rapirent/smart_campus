@@ -46,7 +46,6 @@ def validate_administrator(function=None):
         if not request.user.is_administrator():
             return HttpResponseForbidden()
         return function(request)
-
     return wrapper
 
 
@@ -104,7 +103,7 @@ def login(request):
         }
         return JsonResponse(
             data={
-                'message': 'Login success',
+                'message': 'Login succeeded',
                 'data': user_data
             },
             status=200,
@@ -590,7 +589,7 @@ def add_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update succeed",
+                "message": "Favorite stations update successfully",
                 "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
@@ -641,7 +640,7 @@ def remove_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update succeed",
+                "message": "Favorite stations update successfully",
                 "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
