@@ -40,12 +40,12 @@ from .forms import (
 )
 
 
-def validate_administrator(function=None):
+def required_administrator(function=None):
     @wraps(function)
-    def wrapper(request):
+    def wrapper(request, *args, **kwargs):
         if not request.user.is_administrator():
             return HttpResponseForbidden()
-        return function(request)
+        return function(request, *args, **kwargs)
     return wrapper
 
 
@@ -167,16 +167,9 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    categories = StationCategory.objects.all()
+    categories = StationCategory.objects.all().order_by('id')
 
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
-    context = {'email': request.user.email, 'categories': categories_data}
+    context = {'email': request.user.email, 'categories': categories}
     return render(request, 'app/index.html', context)
 
 
@@ -700,7 +693,7 @@ def reward_add_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def manager_list_page(request):
     manager_list = User.objects.exclude(role__name='User').order_by('email')
     paginator = Paginator(manager_list, 10)
@@ -725,7 +718,7 @@ def manager_list_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def manager_add_page(request):
     if request.method == 'POST':
         form = ManagerForm(request.POST)
@@ -753,7 +746,7 @@ def manager_add_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def manager_edit_page(request, pk):
     manager = get_object_or_404(User, pk=pk)
 
@@ -787,7 +780,7 @@ def manager_edit_page(request, pk):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def manager_delete_page(request, pk):
     manager = get_object_or_404(User, pk=pk)
     manager.delete()
@@ -796,7 +789,7 @@ def manager_delete_page(request, pk):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def beacon_list_page(request):
     beacon_list = Beacon.objects.all().order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
@@ -820,7 +813,7 @@ def beacon_list_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def beacon_add_page(request):
     if request.method == 'POST':
         form = BeaconForm(request.POST)
@@ -842,7 +835,7 @@ def beacon_add_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def beacon_edit_page(request, pk):
     beacon = get_object_or_404(Beacon, pk=pk)
 
@@ -877,7 +870,7 @@ def beacon_edit_page(request, pk):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def beacon_delete_page(request, pk):
     beacon = get_object_or_404(Beacon, pk=pk)
     beacon.delete()
@@ -1054,7 +1047,7 @@ def travelplan_delete_page(request, pk):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def group_list_page(request):
     group_list = UserGroup.objects.all().order_by('id')
     paginator = Paginator(group_list, 10)
@@ -1077,7 +1070,7 @@ def group_list_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def group_add_page(request):
     if request.method == 'POST':
         group_name = request.POST.get('name')
@@ -1100,7 +1093,7 @@ def group_add_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def group_edit_page(request, pk):
     group_instance = get_object_or_404(UserGroup, pk=pk)
 
@@ -1168,7 +1161,7 @@ def station_search_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def beacon_search_page(request):
 
     query = request.GET.get('query', 1)
@@ -1196,7 +1189,7 @@ def beacon_search_page(request):
 
 
 @login_required
-@validate_administrator
+@required_administrator
 def group_delete_page(request, pk):
     group_instance = get_object_or_404(UserGroup, pk=pk)
     group_instance.delete()
