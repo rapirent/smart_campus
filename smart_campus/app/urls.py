@@ -11,8 +11,6 @@ urlpatterns = [
     url('^get_all_stations/$', views.get_all_stations, name='Get All Station'),
     url('^get_linked_stations/$', views.get_linked_stations,
         name='Get Linked Station'),
-    url('^get_unanswered_question/$', views.get_unanswered_question,
-        name='Get Question'),
     url('^update_user_coins/$', views.update_user_coins,
         name='Update User Coins'),
     url('^update_user_experience_point/$', views.update_user_experience_point,

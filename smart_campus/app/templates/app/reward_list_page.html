@@ -27,9 +27,9 @@
                 {{ reward.name }}
               </div>
             </div>
-            <div class="extra content">
-              <div class="ui basic green left floated button">修改</div>
-              <div class="ui basic red right floated button">刪除</div>
+            <div class="ui two bottom attached buttons">
+              <a class="ui basic green left floated button" href="{% url 'Reward Edit Page' reward.id %}">修改</a>
+              <a class="ui basic red right floated button" href="{% url 'Reward Delete Page' reward.id %}">刪除</a>
             </div>
           </div>
         </div>

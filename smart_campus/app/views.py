@@ -26,15 +26,18 @@ from .models import (
     Beacon, StationImage, Question,
     UserReward, UserGroup,
     TravelPlan, Role,
-    TravelPlanStations
+    TravelPlanStations,
+    Choice
 )
 from .forms import (
     StationForm,
     StationCategoryForm,
     ManagerForm,
     PartialRewardForm,
+    PartialTravelPlanForm,
+    RewardForm,
     BeaconForm,
-    PartialTravelPlanForm
+    QuestionForm
 )
 
 
@@ -142,16 +145,8 @@ def logout_page(request):
 
 @login_required
 def index(request):
-    categories = StationCategory.objects.all()
-
-    categories_data = [
-        {
-            'name': category.name,
-        }
-        for category in categories
-    ]
-
-    context = {'email': request.user.email, 'categories': categories_data}
+    categories = StationCategory.objects.all().order_by('id')
+    context = {'email': request.user.email, 'categories': categories}
     return render(request, 'app/index.html', context)
 
 
@@ -186,6 +181,39 @@ def station_list_page(request):
     context = {
         'email': request.user.email,
         'stations': stations,
+        'categories': StationCategory.objects.all().order_by('id')
+    }
+
+    return render(request, 'app/station_list.html', context)
+
+
+@login_required
+def station_list_by_category_page(request, pk):
+    category = get_object_or_404(StationCategory, pk=pk)
+    if request.user.can(Permission.ADMIN):
+        stations = Station.objects.filter(category=category)
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group, category=category)
+
+    station_data = [
+        {
+            'id': station.id,
+            'name': station.name,
+            'primary_image': StationImage.objects.filter(
+                station=station,
+                is_primary=True
+            ).first(),
+            'category': station.category,
+            'beacon': Beacon.objects.filter(
+                station=station
+            ).first()
+        }
+        for station in stations
+    ]
+
+    context = {
+        'email': request.user.email,
+        'stations': station_data,
         'categories': StationCategory.objects.all().order_by('id')
     }
 
@@ -252,7 +280,7 @@ def station_edit_page(request, pk):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacon_set,
         'form': form,
         'form_data': form_data,
@@ -341,7 +369,7 @@ def station_new_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacon_set,
         'form': form,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
@@ -394,6 +422,7 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
+            'rewards': [station.id for station in station.reward_set.all()],
             'image': {
                 'primary':
                     '{0}{1}{2}'.format(
@@ -432,43 +461,6 @@ def get_linked_stations(request):
         data = [station.id for station in stations]
 
         return JsonResponse(data={'data': data}, status=200)
-
-
-@csrf_exempt
-@require_POST
-def get_unanswered_question(request):
-    """API requesting a single question"""
-    station_id = request.POST.get('station_id')
-    email = request.POST.get('email')
-
-    station = Station.objects.filter(id=station_id).first()
-    user = User.objects.filter(email=email).first()
-
-    if not user or not station:
-        return HttpResponse('Either user or station does not exist', status=400)
-
-    questions = Question.objects.filter(linked_station=station)
-    user_answered_questions = Question.objects.filter(user=user)
-
-    # Get questions that the user hasn't answered yet
-    not_answered_questions = questions.difference(user_answered_questions)
-
-    if not_answered_questions.exists():
-        # pick 1 question randomly
-        question = random.sample(list(not_answered_questions), 1)[0]
-        ans = question.choices.filter(questionchoice__is_answer=True).first()
-        data = {
-            'content': question.content,
-            'type': question.question_type,
-            'choices': [choice.content for choice in question.choices.all()],
-            'answer': ans.content
-        }
-        # Add to answered questions
-        user.answered_questions.add(question)
-
-        return JsonResponse(data=data, status=200)
-
-    return HttpResponse('No unanswered question available for the user', status=404)
 
 
 @csrf_exempt
@@ -587,7 +579,7 @@ def category_add_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/category_add_page.html', context)
@@ -639,7 +631,7 @@ def reward_list_page(request):
     context = {
         'email': request.user.email,
         'rewards': Reward.objects.all(),
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/reward_list_page.html', context)
@@ -656,17 +648,56 @@ def reward_add_page(request):
             context = {
                 'rewards': Reward.objects.all(),
                 'email': request.user.email,
-                'categories': StationCategory.objects.all()
+                'categories': StationCategory.objects.all().order_by('id')
             }
 
             return render(request, 'app/reward_list_page.html', context)
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/reward_add_page.html', context)
+
+
+@login_required
+def reward_edit_page(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    if request.method == 'POST':
+        reward_form = RewardForm(request.POST, request.FILES, instance=reward)
+
+        if reward_form.is_valid():
+            reward_form.save()
+
+            return HttpResponseRedirect('/rewards/')
+
+    if request.user.is_administrator():
+        stations = Station.objects.all().order_by('id')
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group).order_by('id')
+
+    form_data = {
+        'name': reward.name,
+        'description': reward.description,
+        'related_station': reward.related_station,
+        'image': reward.image
+    }
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all().order_by('id'),
+        'stations': stations,
+        'form_data': form_data
+    }
+    return render(request, 'app/reward_edit_page.html', context)
+
+
+@login_required
+def reward_delete_page(request, pk):
+    reward = get_object_or_404(Reward, pk=pk)
+    reward.delete()
+
+    return HttpResponseRedirect('/rewards/')
 
 
 @login_required
@@ -689,8 +720,8 @@ def manager_list_page(request):
 
     context = {
         'email': request.user.email,
-        'managers': managers,
-        'categories': StationCategory.objects.all()
+        'managers': User.objects.exclude(role__name='User'),
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -720,7 +751,7 @@ def manager_add_page(request):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_add_page.html', context)
@@ -756,7 +787,7 @@ def manager_edit_page(request, pk):
         'groups': groups,
         'form': form,
         'form_data': form_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_edit_page.html', context)
@@ -792,7 +823,7 @@ def beacon_list_page(request):
 
     context = {
         'email': request.user.email,
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'beacons': beacons
     }
 
@@ -832,7 +863,7 @@ def beacon_edit_page(request, pk):
 
     if request.method == 'POST':
         form = BeaconForm(request.POST, instance=beacon)
-        print(request.POST)
+
         if form.is_valid():
             data = form.cleaned_data
             beacon = form.save(commit=False)
@@ -881,34 +912,7 @@ def station_delete_page(request, pk):
 
     station.delete()
 
-    if request.user.can(Permission.ADMIN):
-        stations = Station.objects.all()
-    else:
-        stations = Station.objects.filter(owner_group=request.user.group)
-
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
-
-    context = {
-        'email': request.user.email,
-        'stations': station_data,
-        'categories': StationCategory.objects.all()
-    }
-
-    return render(request, 'app/station_list.html', context)
+    return HttpResponseRedirect('/stations/')
 
 
 @login_required
@@ -931,7 +935,7 @@ def travelplan_add_page(request):
             travelplan_form.save()
 
             context = {
-                'categories': StationCategory.objects.all(),
+                'categories': StationCategory.objects.all().order_by('id'),
                 'email': request.user.email,
                 'travelplans': TravelPlan.objects.all()
             }
@@ -941,7 +945,7 @@ def travelplan_add_page(request):
         travelplan_form = PartialTravelPlanForm()
 
     context = {
-        'categories': StationCategory.objects.all(),
+        'categories': StationCategory.objects.all().order_by('id'),
         'email': request.user.email,
         'form': travelplan_form
     }
@@ -987,7 +991,7 @@ def travelplan_edit_page(request, pk):
                         changed_travelplan.first().save()
 
             context = {
-                'categories': StationCategory.objects.all(),
+                'categories': StationCategory.objects.all().order_by('id'),
                 'email': request.user.email,
                 'travelplans': TravelPlan.objects.all()
             }
@@ -1022,7 +1026,7 @@ def travelplan_edit_page(request, pk):
         'travelplanstations': travelplanstations,
         'selected_stations': selected_stations,
         'form_data': form_data,
-        'categories': StationCategory.objects.all()
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/travelplan_edit_page.html', context)
@@ -1040,16 +1044,166 @@ def travelplan_delete_page(request, pk):
 
 
 @login_required
+def question_list_page(request):
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+        question_list = Question.objects.all().order_by('id')
+    else:
+        stations = Satation.objects.filter(owner_group=request.user.group)
+        question_list = Question.objects.filter(
+            linked_station__in=stations
+        ).order_by('id')
+
+    paginator = Paginator(question_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        questions = paginator.page(page)
+    except PageNotAnInteger:
+        questions = paginator.page(1)
+    except EmptyPage:
+        questions = paginator.page(paginator.num_pages)
+
+    context = {
+        'questions': questions,
+        'email': request.user.email,
+        'categories': StationCategory.objects.all().order_by('id')
+    }
+
+    return render(request, 'app/question_list_page.html', context)
+
+
+@login_required
+def question_add_page(request):
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+
+        if form.is_valid():
+            question = form.save()
+
+            choice_contents = request.POST.getlist('choice_contents')
+            # The post will send a choice content list,
+            # and a answer_order to indicate which one in te list is the answer
+            answer_order = int(request.POST.get('answer', 1))
+
+            for order, choice_contnet in enumerate(choice_contents, start=1):
+                if answer_order == order:
+                    Choice.objects.create(
+                        question=question,
+                        content=choice_contnet,
+                        is_answer=True
+                    )
+                else:
+                    Choice.objects.create(
+                        question=question,
+                        content=choice_contnet,
+                        is_answer=False
+                    )
+            return HttpResponseRedirect('/questions/')
+    else:
+        form = QuestionForm()
+
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Satation.objects.filter(owner_group=request.user.group)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all().order_by('id'),
+        'stations': stations.order_by('id')
+    }
+    return render(request, 'app/question_add_page.html', context)
+
+
+@login_required
+def question_edit_page(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+
+    # The post will send the choice model id to indicate which one to edit
+    if request.method == 'POST':
+        form = QuestionForm(request.POST, instance=question)
+
+        if form.is_valid():
+            form.save()
+
+            edited_contents = request.POST.getlist('choice_contents')
+            choice_ids = request.POST.getlist('choice_ids')
+            answer_id = int(request.POST.get('answer', 1))
+            question_choices = Choice.objects.filter(question=question)
+
+            for question_choice in question_choices:
+                question_choice.is_answer = False
+                question_choice.save()
+
+            for edited_content, choice_id in zip(edited_contents, choice_ids):
+                edited_choice = Choice.objects.get(
+                    id=choice_id
+                )
+                edited_choice.content = edited_content
+                edited_choice.save()
+
+            answer_choice = Choice.objects.get(id=answer_id)
+            answer_choice.is_answer = True
+            answer_choice.save()
+            return HttpResponseRedirect('/questions/')
+
+        form_data = form.cleaned_data
+        form_data['choices'] = request.POST.getlist('choices')
+        form_data['answer_id'] = request.POST.get('answer', 1)
+    else:
+        form = QuestionForm()
+
+    if request.user.is_administrator():
+        stations = Station.objects.all()
+    else:
+        stations = Station.objects.filter(owner_group=request.user.group)
+
+    question_choices = Choice.objects.filter(
+        question=question
+    ).order_by('id')
+
+    form_data = {
+        'content': question.content,
+        'linked_station': question.linked_station,
+        'choices': [
+            choice
+            for choice in question_choices
+        ],
+        'answer_id': Choice.objects.filter(
+            question=question,
+            is_answer=True
+        ).first().id
+    }
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all().order_by('id'),
+        'form': form,
+        'form_data': form_data,
+        'stations': stations
+    }
+    return render(request, 'app/question_edit_page.html', context)
+
+
+@login_required
+def question_delete_page(request, pk):
+    question = get_object_or_404(Question, pk=pk)
+    question.delete()
+
+    return HttpResponseRedirect('/questions/')
+
+
 @csrf_exempt
 def station_search_page(request):
     query = request.GET.get('query', 1)
     if request.user.can(Permission.ADMIN):
         station_list = Station.objects.filter(
-            name__search=query
+            name__contains=query
         ).order_by('id')
     else:
         station_list = Station.objects.filter(
-            name__search=query,
+            name__contains=query,
             owner_group=request.user.group
         ).order_by('id')
 
@@ -1088,7 +1242,7 @@ def beacon_search_page(request):
 
     query = request.GET.get('query', 1)
     beacon_list = Beacon.objects.filter(
-        beacon_id__search=query
+        beacon_id__contains=query
     ).order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
