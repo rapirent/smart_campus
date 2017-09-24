@@ -43,7 +43,14 @@
       <div class="menu">
         {% if categories %}
           {% for category in categories %}
-            <div class="item" href="">{{ category.name }}</div>
+            <div class="item">
+              <i class="dropdown icon"></i>
+              <span class="text">{{ category.name }}</span>
+              <div class="menu">
+                <a class="item" href="{% url 'Station List By Category Page' category.id %}">查看</a>
+                <a class="item" href="">刪除</a>
+              </div>
+            </div>
           {% endfor %}
         {% endif %}
         <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
@@ -64,7 +71,7 @@
       </div>
     </div>
     <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
-    <a class="item" href="">管理挑戰</a>
+    <a class="item" href="{% url 'Question List Page' %}">管理挑戰</a>
     <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>
     <a class="item" href="{% url 'TravelPlan List Page' %}">管理行程</a>
     <div class="right menu">

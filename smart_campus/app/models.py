@@ -181,42 +181,31 @@ class Role(models.Model):
         return self.name
 
 
-class QuestionType:
-    BINARY = 0x01
-    MULTIPLE_CHOICE = 0x02
+class YesNoQuestion(models.Model):
+    content = models.CharField(max_length=254)
+    answer = models.BooleanField(default=True)
 
 
 class Question(models.Model):
     content = models.CharField(max_length=254)
-
-    question_type = models.IntegerField(
-        choices=(
-            (QuestionType.BINARY, 'True or False'),
-            (QuestionType.MULTIPLE_CHOICE, 'MuitipleChoice'),
-        ),
-        default=QuestionType.MULTIPLE_CHOICE,
+    linked_station = models.ForeignKey(
+        'Station',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
     )
-    choices = models.ManyToManyField(
-        'Choice',
-        through='QuestionChoice',
-    )
-    linked_station = models.ForeignKey('Station', null=True, on_delete=models.SET_NULL)
 
     def __repr__(self):
         return str(self.id)
 
 
 class Choice(models.Model):
-    content = models.CharField(max_length=50)
-
-    def __str__(self):
-        return self.content
-
-
-class QuestionChoice(models.Model):
     question = models.ForeignKey('Question', on_delete=models.CASCADE)
-    choice = models.ForeignKey('Choice', on_delete=models.CASCADE)
+    content = models.CharField(max_length=50)
     is_answer = models.BooleanField(default=False)
+
+    def __repr__(self):
+        return str(self.id)
 
 
 class Station(models.Model):
@@ -269,7 +258,7 @@ class Station(models.Model):
 
 
 class StationCategory(models.Model):
-    name = models.CharField(max_length=254)
+    name = models.CharField(max_length=254, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
