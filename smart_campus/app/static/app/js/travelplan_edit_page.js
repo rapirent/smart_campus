@@ -67,11 +67,13 @@ $(document).ready(function() {
   })
   $('[id=deleteStep]').each( function() {
     $(this).on( "click", function() {
-      let index = order.indexOf($(this).attr('num'))
+      let num = $(this).attr('num')
+      let index = order.indexOf(num)
       if (index > -1) {
         order.splice(index, 1)
       }
-      $('div[data-id=' + $(this).attr('num') + ']').remove()
+      $('[data-value=' + num  + ']').show()
+      $('div[data-id=' + num + ']').remove()
     })
   })
   $('#addStationButton').on('click', function() {
@@ -86,7 +88,10 @@ $(document).ready(function() {
         )
       let selector = "div[data-id=" + selectedId + "]"
       let removeButtonSelector = "a[num=" +  selectedId + "]"
-      $('.item.active.selected').remove()
+      $('.item.active.selected').attr({
+        'class': 'item',
+        'id': 'hideItem'
+      }).hide()
       $('#selectedStationId').empty()
       $(document).on('mouseover', selector, function() {
         $(this).removeClass("completed step")
@@ -97,13 +102,16 @@ $(document).ready(function() {
         $(this).addClass("completed step")
       })
       $(document).on('click', removeButtonSelector, function() {
-        let index = order.indexOf($(this).attr('num'))
+        let num = $(this).attr('num')
+        let index = order.indexOf(num)
         if (index > -1) {
           order.splice(index, 1)
         }
-        $('div[data-id=' + $(this).attr('num') + ']').remove()
+        $('[data-value=' + num  + ']').show()
+        $('div[data-id=' + num + ']').remove()
       })
       order.push(selectedId)
+      selectedId = null
     }
   })
   $(".ui.icon.button").click(function () {

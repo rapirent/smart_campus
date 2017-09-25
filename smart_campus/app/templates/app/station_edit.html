@@ -10,7 +10,7 @@
 {% block content %}
   <div class="ui container">
     <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-      {% include 'marco/form_error_marco.html' %}
+      {% include 'marco/form_error_macro.html' with form=form %}
       {% csrf_token %}
       <div class="fields">
         <div class="field">

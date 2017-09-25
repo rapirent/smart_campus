@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block stylesheet %}
-  {{ block.super }}>
+  {{ block.super }}
   <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
   <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
 {% endblock %}
@@ -10,7 +10,7 @@
 {% block content %}
   <div class="ui container">
     <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
-      {% include 'marco/form_error_marco.html' %}
+      {% include 'marco/form_error_macro.html' with form=form %}
       {% csrf_token %}
       <div class="fields">
         <div class="required field">

@@ -8,7 +8,7 @@
 
 {% block content %}
   <div class="ui borderless center aligned text container">
-    {% include 'marco/form_message_marco.html' %}
+    {% include 'marco/form_message_marco.html' with messages=messages %}
     {% if rewards %}
       {% for reward in rewards %}
         <div class="ui cards">
