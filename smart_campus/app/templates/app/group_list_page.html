@@ -1,0 +1,69 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+    <table class="ui selectable celled striped table">
+      <thead>
+        <tr class="center aligned">
+          <th class="ten wide">群組名稱</th>
+          <th class="six wide">選項</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if groups %}
+          {% for group in groups %}
+            <tr class="center aligned">
+              <td class="collapsing">{{ group.name }}</td>
+              <td class="collapsing">
+                <div class="ui mini buttons">
+                  <a class="ui basic green floated button" href="{% url 'Group Edit Page' group.id %}">修改</a>
+                  <a class="ui basic red floated button" href="{% url 'Group Delete Page' group.id %}">刪除</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      </tbody>
+      <tfoot>
+        {% if groups.has_other_pages %}
+          <tr class="center aligned collapsing">
+            <th colspan="2">
+              <div class="ui pagination menu">
+                {% if groups.has_previous %}
+                  <a class="icon item" href="?page={{ groups.previous_page_number }}">
+                    <i class="left chevron icon"></i>
+                  </a>
+                {% endif %}
+                {% for page in groups.paginator.page_range %}
+                  {% if groups.number == page %}
+                    <div class="active item">{{ page }}</div>
+                  {% else %}
+                    <a class="item" href="?page={{ page }}">{{ page }}</a>
+                  {% endif %}
+                {% endfor %}
+                {% if groups.has_next %}
+                  <a class="icon item" href="?page={{ groups.next_page_number }}">
+                    <i class="right chevron icon"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </th>
+          </tr>
+        {% endif %}
+      </tfoot>
+    </table>
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Group Add Page' %}">
+      新增群組
+      <i class="add icon"></i>
+    </a>
+  </div>
+{% endblock %}

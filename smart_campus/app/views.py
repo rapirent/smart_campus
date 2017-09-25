@@ -15,10 +15,13 @@ from django.contrib.gis.geos import Point
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db import IntegrityError
 
 import os
 import random
 import json
+from functools import wraps
+
 
 from .models import (
     User, Reward, Permission,
@@ -39,6 +42,15 @@ from .forms import (
     BeaconForm,
     QuestionForm
 )
+
+
+def administrator_required(function=None):
+    @wraps(function)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_administrator():
+            return HttpResponseForbidden()
+        return function(request, *args, **kwargs)
+    return wrapper
 
 
 @csrf_exempt
@@ -84,10 +96,24 @@ def login(request):
             'nickname': user.nickname,
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
-            'reward': [reward.id for reward in UserReward.objects.filter(user=user).order_by('timestamp')],
-            'favorite_stations': [station.id for station in user.favorite_stations.all()],
+            'reward': [
+                reward.id
+                for reward in UserReward.objects.filter(user=user).order_by('timestamp')
+            ],
+            'favorite_stations': [
+                station.id
+                for station in user.favorite_stations.all()
+            ],
         }
-        return JsonResponse(data={'message': 'Login success', 'data': user_data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+        return JsonResponse(
+            data={
+                'message': 'Login succeeded',
+                'data': user_data
+            },
+            status=200,
+            json_dumps_params={'ensure_ascii': False},
+            content_type='application/json; charset=utf-8'
+        )
 
     return HttpResponse('Login failed', status=401)
 
@@ -146,6 +172,7 @@ def logout_page(request):
 @login_required
 def index(request):
     categories = StationCategory.objects.all().order_by('id')
+
     context = {'email': request.user.email, 'categories': categories}
     return render(request, 'app/index.html', context)
 
@@ -389,7 +416,12 @@ def get_all_rewards(request):
         for reward in Reward.objects.all()
     ]
 
-    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(
+        data={'data': data},
+        status=200,
+        json_dumps_params={'ensure_ascii': False},
+        content_type='application/json; charset=utf-8'
+    )
 
 
 @csrf_exempt
@@ -481,7 +513,7 @@ def update_user_coins(request):
         return HttpResponse('Invalid input of coins', status=400)
 
     data = {
-        'message': 'Coins record of {0} successfully updated'.format(email),
+        'message': 'Coins record of {0} update succeed'.format(email),
         'data': {'coins': user.earned_coins}
     }
 
@@ -506,7 +538,7 @@ def update_user_experience_point(request):
         return HttpResponse('Invalid input of experience point', status=400)
 
     data = {
-        'message': 'Experience point record of {0} successfully updated'.format(email),
+        'message': 'Experience point record of {0} update succeed'.format(email),
         'data': {'experience_point': user.experience_point}
     }
 
@@ -662,6 +694,7 @@ def reward_add_page(request):
 
 
 @login_required
+@administrator_required
 def reward_edit_page(request, pk):
     reward = get_object_or_404(Reward, pk=pk)
     if request.method == 'POST':
@@ -702,9 +735,6 @@ def reward_delete_page(request, pk):
 
 @login_required
 def manager_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager_list = User.objects.exclude(role__name='User').order_by('email')
     paginator = Paginator(manager_list, 10)
 
@@ -728,10 +758,8 @@ def manager_list_page(request):
 
 
 @login_required
+@administrator_required
 def manager_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     if request.method == 'POST':
         form = ManagerForm(request.POST)
         password = request.POST.get('password')
@@ -758,10 +786,8 @@ def manager_add_page(request):
 
 
 @login_required
+@administrator_required
 def manager_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager = get_object_or_404(User, pk=pk)
 
     if request.method == 'POST':
@@ -794,10 +820,8 @@ def manager_edit_page(request, pk):
 
 
 @login_required
+@administrator_required
 def manager_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     manager = get_object_or_404(User, pk=pk)
     manager.delete()
 
@@ -805,10 +829,8 @@ def manager_delete_page(request, pk):
 
 
 @login_required
+@administrator_required
 def beacon_list_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon_list = Beacon.objects.all().order_by('beacon_id')
     paginator = Paginator(beacon_list, 10)
 
@@ -831,10 +853,8 @@ def beacon_list_page(request):
 
 
 @login_required
+@administrator_required
 def beacon_add_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     if request.method == 'POST':
         form = BeaconForm(request.POST)
         if form.is_valid():
@@ -855,10 +875,8 @@ def beacon_add_page(request):
 
 
 @login_required
+@administrator_required
 def beacon_edit_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon = get_object_or_404(Beacon, pk=pk)
 
     if request.method == 'POST':
@@ -892,10 +910,8 @@ def beacon_edit_page(request, pk):
 
 
 @login_required
+@administrator_required
 def beacon_delete_page(request, pk):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
-
     beacon = get_object_or_404(Beacon, pk=pk)
     beacon.delete()
 
@@ -1041,6 +1057,79 @@ def travelplan_delete_page(request, pk):
     travelplan.delete()
 
     return HttpResponseRedirect('/travelplans/')
+
+
+@login_required
+@administrator_required
+def group_list_page(request):
+    group_list = UserGroup.objects.all().order_by('id')
+    paginator = Paginator(group_list, 10)
+
+    page = request.GET.get('page', 1)
+    try:
+        groups = paginator.page(page)
+    except PageNotAnInteger:
+        groups = paginator.page(1)
+    except EmptyPage:
+        groups = paginator.page(paginator.num_pages)
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all().order_by('id'),
+        'groups': groups
+    }
+
+    return render(request, 'app/group_list_page.html', context)
+
+
+@login_required
+@administrator_required
+def group_add_page(request):
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+
+        if group_name:
+            try:
+                UserGroup.objects.create(name=group_name)
+                return HttpResponseRedirect('/groups/')
+            except IntegrityError:
+                messages.warning(request, 'This group name already exists!')
+        else:
+            messages.warning(request, 'Group name input is not given!')
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all()
+    }
+
+    return render(request, 'app/group_add_page.html', context)
+
+
+@login_required
+@administrator_required
+def group_edit_page(request, pk):
+    group_instance = get_object_or_404(UserGroup, pk=pk)
+
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+
+        if group_name:
+            try:
+                group_instance.name = group_name
+                group_instance.save()
+                return HttpResponseRedirect('/groups/')
+            except IntegrityError:
+                messages.warning(request, 'This group name already exists!')
+        else:
+            messages.warning(request, 'Group name input is not given!')
+
+    context = {
+        'email': request.user.email,
+        'categories': StationCategory.objects.all(),
+        'group': group_instance.name
+    }
+
+    return render(request, 'app/group_edit_page.html', context)
 
 
 @login_required
@@ -1236,9 +1325,8 @@ def station_search_page(request):
 
 
 @login_required
+@administrator_required
 def beacon_search_page(request):
-    if not request.user.is_administrator():
-        return HttpResponseForbidden()
 
     query = request.GET.get('query', 1)
     beacon_list = Beacon.objects.filter(
@@ -1262,3 +1350,12 @@ def beacon_search_page(request):
     }
 
     return render(request, 'app/beacon_list_page.html', context)
+
+
+@login_required
+@administrator_required
+def group_delete_page(request, pk):
+    group_instance = get_object_or_404(UserGroup, pk=pk)
+    group_instance.delete()
+
+    return HttpResponseRedirect('/groups/')
