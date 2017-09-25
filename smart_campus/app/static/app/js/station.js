@@ -12,7 +12,7 @@ function initMap() {
       location_arr[i][0],
       location_arr[i][1],
       location_arr[i][2]
-    );
+    )
   }
 }
 
