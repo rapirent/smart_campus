@@ -16,11 +16,12 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
-from functools import wraps
 
 import os
 import random
 import json
+from functools import wraps
+
 
 from .models import (
     User, Reward, Permission,
@@ -512,7 +513,7 @@ def update_user_coins(request):
         return HttpResponse('Invalid input of coins', status=400)
 
     data = {
-        'message': 'Coins record of {0} successfully updated'.format(email),
+        'message': 'Coins record of {0} update succeed'.format(email),
         'data': {'coins': user.earned_coins}
     }
 
@@ -537,7 +538,7 @@ def update_user_experience_point(request):
         return HttpResponse('Invalid input of experience point', status=400)
 
     data = {
-        'message': 'Experience point record of {0} successfully updated'.format(email),
+        'message': 'Experience point record of {0} update succeed'.format(email),
         'data': {'experience_point': user.experience_point}
     }
 
@@ -582,7 +583,7 @@ def add_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update successfully",
+                "message": "Favorite stations update succeed",
                 "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
@@ -633,7 +634,7 @@ def remove_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update successfully",
+                "message": "Favorite stations update succeed",
                 "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
