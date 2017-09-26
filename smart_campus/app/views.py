@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET, require_safe
 from django.contrib import auth
 from django.http import (
     HttpResponseRedirect,
@@ -16,6 +16,8 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
+from django.core import serializers
+
 
 import os
 import random
@@ -1359,3 +1361,56 @@ def group_delete_page(request, pk):
     group_instance.delete()
 
     return HttpResponseRedirect('/groups/')
+
+
+@require_GET
+@csrf_exempt
+def get_unanswered_question(request):
+    station_id = request.GET.get('station_id')
+    email = request.GET.get('email')
+
+    station = Station.objects.filter(id=station_id).first()
+    user = User.objects.filter(email=email).first()
+
+    if not user or not station:
+        return HttpResponse('Either user or station does not exist', status=400)
+
+    unanswered_questions = Question.objects.exclude(user__pk=email).filter(
+        linked_station=station
+    )
+
+    random_index = random.randint(0, unanswered_questions.count() - 1)
+    random_unanswered_question = unanswered_questions[random_index]
+
+    choices = []
+    for i, choice in enumerate(Choice.objects.filter(question=random_unanswered_question)):
+        choices.append(choice.content)
+        if choice.is_answer:
+            index = i + 1
+
+    return JsonResponse(
+        data={
+            'content': random_unanswered_question.content,
+            'choices': choices,
+            'answer': index,
+            'question_id': random_unanswered_question.id
+        },
+        status=200
+    )
+
+
+@require_POST
+@csrf_exempt
+def add_answered_question(request):
+    question_id = request.POST.get('question_id')
+    email = request.POST.get('email')
+
+    question = Question.objects.filter(id=question_id).first()
+    user = User.objects.filter(email=email).first()
+
+    if not user or not question:
+        return HttpResponse('Either user or question does not exist', status=400)
+
+    user.answered_questions.add(question)
+
+    return HttpResponse('Add answered question succeeded', status=200)
