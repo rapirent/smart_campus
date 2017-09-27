@@ -1385,7 +1385,7 @@ def get_unanswered_question(request):
     ).filter(linked_station=station)
 
     random_index = random.randint(0, unanswered_questions.count() - 1)
-    random_unanswered_question = unanswered_questions[random_index]
+    random_unanswered_question = random.sample(list(unanswered_questions), 1)[0]
 
     choices = []
     for i, choice in enumerate(Choice.objects.filter(question=random_unanswered_question)):
