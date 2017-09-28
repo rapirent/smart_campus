@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET, require_safe
 from django.contrib import auth
 from django.http import (
     HttpResponseRedirect,
@@ -16,6 +16,8 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
+from django.core import serializers
+
 
 import os
 import random
@@ -61,18 +63,18 @@ def signup(request):
     Register new users
 
     """
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
     password = request.POST.get('password')
     nickname = request.POST.get('nickname', '')
 
-    if not email or not password:
+    if not user_email or not password:
         return HttpResponse('Either email or password input is missing.', status=400)
 
-    if User.objects.filter(email=email).exists():
+    if User.objects.filter(email=user_email).exists():
         return HttpResponse('The email is already taken, try another!', status=400)
 
     try:
-        User.objects.create_user(email, password, nickname)
+        User.objects.create_user(user_email, password, nickname)
     except ValueError:
         return HttpResponse('Invalid email address.', status=400)
 
@@ -87,9 +89,9 @@ def login(request):
     Handle login requests from app
 
     """
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
     password = request.POST.get('password')
-    user = auth.authenticate(request, username=email, password=password)
+    user = auth.authenticate(request, username=user_email, password=password)
     if user is not None:
         auth.login(request, user)
         user_data = {
@@ -126,8 +128,8 @@ def logout(request):
     Handle logout requests from app
 
     """
-    email = request.POST.get('email')
-    request.user = User.objects.filter(email=email).first()
+    user_email = request.POST.get('email')
+    request.user = User.objects.filter(email=user_email).first()
 
     if not request.user:
         return HttpResponse('User does not exist', status=404)
@@ -144,9 +146,9 @@ def login_page(request):
 
     """
     if request.method == 'POST':
-        email = request.POST.get('email')
+        user_email = request.POST.get('email')
         password = request.POST.get('password')
-        user = auth.authenticate(request, username=email, password=password)
+        user = auth.authenticate(request, username=user_email, password=password)
 
         if not user:
             messages.warning(request, 'Login failed!')
@@ -499,9 +501,9 @@ def get_linked_stations(request):
 @require_POST
 def update_user_coins(request):
     coins = request.POST.get('coins')
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=user_email).first()
 
     if not user or not coins:
         return HttpResponse('Either user does not exist or coins input is not given', status=400)
@@ -513,7 +515,7 @@ def update_user_coins(request):
         return HttpResponse('Invalid input of coins', status=400)
 
     data = {
-        'message': 'Coins record of {0} update succeed'.format(email),
+        'message': 'Coins record of {0} update succeed'.format(user_email),
         'data': {'coins': user.earned_coins}
     }
 
@@ -524,9 +526,9 @@ def update_user_coins(request):
 @require_POST
 def update_user_experience_point(request):
     experience_point = request.POST.get('experience_point')
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=user_email).first()
 
     if not user or not experience_point:
         return HttpResponse('Either user does not exist or experience_point input is not given', status=400)
@@ -538,7 +540,7 @@ def update_user_experience_point(request):
         return HttpResponse('Invalid input of experience point', status=400)
 
     data = {
-        'message': 'Experience point record of {0} update succeed'.format(email),
+        'message': 'Experience point record of {0} update succeed'.format(user_email),
         'data': {'experience_point': user.experience_point}
     }
 
@@ -549,10 +551,10 @@ def update_user_experience_point(request):
 @require_POST
 def add_user_reward(request):
     """POST a reward id and update the user data"""
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
     reward_id = request.POST.get('reward_id')
 
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=user_email).first()
     reward = Reward.objects.filter(id=reward_id).first()
 
     if not user or not reward:
@@ -570,10 +572,10 @@ def add_user_reward(request):
 @require_POST
 def add_user_favorite_stations(request):
     station_id = request.POST.get('station_id')
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
 
     station = Station.objects.filter(id=station_id).first()
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=user_email).first()
 
     if not user or not station:
         return HttpResponse('Either user or station does not exist', status=400)
@@ -621,10 +623,10 @@ def category_add_page(request):
 @require_POST
 def remove_user_favorite_stations(request):
     station_id = request.POST.get('station_id')
-    email = request.POST.get('email')
+    user_email = request.POST.get('email')
 
     station = Station.objects.filter(id=station_id).first()
-    user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=user_email).first()
 
     if not user or not station:
         return HttpResponse('Either user or station does not exist', status=400)
@@ -654,7 +656,12 @@ def get_all_travel_plans(request):
         for plan in TravelPlan.objects.all()
     ]
 
-    return JsonResponse(data={'data': data}, status=200, json_dumps_params={'ensure_ascii': False}, content_type='application/json; charset=utf-8')
+    return JsonResponse(
+        data={'data': data},
+        status=200,
+        json_dumps_params={'ensure_ascii': False},
+        content_type='application/json; charset=utf-8'
+    )
 
 
 @login_required
@@ -1359,3 +1366,56 @@ def group_delete_page(request, pk):
     group_instance.delete()
 
     return HttpResponseRedirect('/groups/')
+
+
+@require_GET
+@csrf_exempt
+def get_unanswered_question(request):
+    station_id = request.GET.get('station_id')
+    user_email = request.GET.get('email')
+
+    station = Station.objects.filter(id=station_id).first()
+    user = User.objects.filter(email=user_email).first()
+
+    if not user or not station:
+        return HttpResponse('Either user or station does not exist', status=400)
+
+    unanswered_questions = Question.objects.exclude(
+        user__pk=user_email
+    ).filter(linked_station=station)
+
+    random_index = random.randint(0, unanswered_questions.count() - 1)
+    random_unanswered_question = random.sample(list(unanswered_questions), 1)[0]
+
+    choices = []
+    for i, choice in enumerate(Choice.objects.filter(question=random_unanswered_question)):
+        choices.append(choice.content)
+        if choice.is_answer:
+            index = i + 1
+
+    return JsonResponse(
+        data={
+            'content': random_unanswered_question.content,
+            'choices': choices,
+            'answer': index,
+            'question_id': random_unanswered_question.id
+        },
+        status=200
+    )
+
+
+@require_POST
+@csrf_exempt
+def add_answered_question(request):
+    question_id = request.POST.get('question_id')
+    user_email = request.POST.get('email')
+
+    question = Question.objects.filter(id=question_id).first()
+    user = User.objects.filter(email=user_email).first()
+
+    if not user or not question:
+        return HttpResponse('Either user or question does not exist', status=400)
+
+    user.answered_questions.add(question)
+
+    return HttpResponse('Add answered question succeeded', status=200)
