@@ -28,6 +28,7 @@ python manage.py runserver --settings=smart_campus.settings.local_settings
 - `POSTGRESQL_PASSWORD`
 - `POSTGRESQL_HOST`
 - `POSTGRESQL_PORT`
+- `DJANGO_SETTINGS_MODULE`
 
 ```sh
 export SECRET_KEY='Some hard to guess value'
@@ -36,12 +37,21 @@ export POSTGRESQL_USER='user_name'
 export POSTGRESQL_PASSWORD='user_pwd'
 export POSTGRESQL_HOST='db_host'
 export POSTGRESQL_PORT='db_port'
+export DJANGO_SETTINGS_MODULE="smart_campus.settings.production"
 ```
-#### Runserver
+#### Nginx, uwsgi setup
+- [Setting up Django and your web server with uWSGI and nginx](http://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)
+
+#### Run uwsgi
+##### Start
 ```sh
-python manage.py runserver --settings=smart_campus.settings.production
+uwsgi --ini server-settings/smart_campus.ini
 ```
 
+##### Stop
+```sh
+sudo killall -s INT uwsgi
+```
 
 ## Testing
 
