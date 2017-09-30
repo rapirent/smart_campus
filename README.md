@@ -41,6 +41,7 @@ export DJANGO_SETTINGS_MODULE="smart_campus.settings.production"
 ```
 #### Nginx, uwsgi setup
 - [Setting up Django and your web server with uWSGI and nginx](http://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)
+- Put your nginx settings file *.conf in /etc/nginx/sites-enabled/
 
 #### Run uwsgi
 ##### Start
