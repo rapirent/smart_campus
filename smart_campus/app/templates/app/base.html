@@ -35,9 +35,13 @@
 
 <body>
 {% block nav %}
-  <div class="ui borderless main menu" id="selection">
-    <a class="header item" href="{% url 'index' %}">成大智慧校園管理平台</a>
-    <div class="ui dropdown item" id="selection">
+  <div class="ui borderless main teal inverted menu">
+    <a class="header item" href="{% url 'index' %}" id="home">
+      <i class="large home icon"></i>
+      成大智慧校園管理平台
+    </a>
+    <div class="ui dropdown item" id="station">
+      <i class="large street view icon"></i>
       管理站點及通知
       <i class="dropdown icon"></i>
       <div class="menu">
@@ -55,10 +59,14 @@
         {% endif %}
         <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
         <hr>
-        <a class="item" href="{% url 'Category Add Page' %}">新增類別</a>
+        <a class="item" href="{% url 'Category Add Page' %}">
+          <i class="add square icon"></i>
+          新增類別
+        </a>
       </div>
     </div>
-    <div class="ui dropdown item" id="selection">
+    <div class="ui dropdown item" id="user">
+      <i class="large users icon"></i>
       使用者管理
       <i class="dropdown icon"></i>
       <div class="menu">
@@ -70,18 +78,37 @@
         </a>
       </div>
     </div>
-    <a class="item" href="{% url 'Reward List Page' %}">管理收藏品</a>
-    <a class="item" href="{% url 'Question List Page' %}">管理挑戰</a>
-    <a class="item" href="{% url 'Beacon List Page' %}">管理beacon</a>
-    <a class="item" href="{% url 'TravelPlan List Page' %}">管理行程</a>
+    <a class="item" href="{% url 'Reward List Page' %}" id="reward">
+      <i class="large trophy icon"></i>
+      管理收藏品
+    </a>
+    <a class="item" href="{% url 'Question List Page' %}" id="question">
+      <i class="large game icon"></i>
+      管理挑戰
+    </a>
+    <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
+      <i class="large bluetooth icon"></i>
+      管理beacon
+    </a>
+    <a class="item" href="{% url 'TravelPlan List Page' %}" id="itinerary">
+      <i class="large map signs  icon"></i>
+      管理行程
+    </a>
     <div class="right menu">
       <div class="header item">
+        <i class="large mail outline icon"></i>
         {% if email %}
           {{ email }}
         {% endif %}
       </div>
-      <a class="item" href="{% url 'Logout Page' %}" >登出</a>
-      <a class="item" href="">Help</a>
+      <a class="item" href="{% url 'Logout Page' %}" >
+        <i class="large sign out icon"></i>
+        登出
+      </a>
+      <a class="item" href="" id="help">
+        <i class="large help circle icon"></i>
+        Help
+      </a>
     </div>
   </div>
 {% endblock %}
