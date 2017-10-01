@@ -35,11 +35,31 @@
 
 <body>
 {% block nav %}
-  <div class="ui borderless main teal inverted menu">
-    <a class="header item" href="{% url 'index' %}" id="home">
+  <div class="ui vertical inverted sidebar menu">
+    <a class="header item" href="{% url 'index' %}"  id="home">
       <i class="large home icon"></i>
-      成大智慧校園管理平台
+       Home
     </a>
+    <div class="item">
+      <i class="large mail icon"></i>
+      {% if email %}
+        {{ email }}
+      {% endif %}
+    </div>
+    <a class="item" href="{% url 'Logout Page' %}" >
+      <i class="large sign out icon"></i>
+      登出
+    </a>
+    <a class="item" href="" id="help">
+      <i class="large help circle icon"></i>
+      Help
+    </a>
+ </div>
+  <div class="ui borderless main teal inverted menu">
+    <div class="ui title borderless item launch button">
+      <i class="sidebar icon"></i>
+      成大智慧校園管理平台
+    </div>
     <div class="ui dropdown item" id="station">
       <i class="large street view icon"></i>
       管理站點及通知
@@ -94,22 +114,6 @@
       <i class="large map signs  icon"></i>
       管理行程
     </a>
-    <div class="right menu">
-      <div class="header item">
-        <i class="large mail outline icon"></i>
-        {% if email %}
-          {{ email }}
-        {% endif %}
-      </div>
-      <a class="item" href="{% url 'Logout Page' %}" >
-        <i class="large sign out icon"></i>
-        登出
-      </a>
-      <a class="item" href="" id="help">
-        <i class="large help circle icon"></i>
-        Help
-      </a>
-    </div>
   </div>
 {% endblock %}
 

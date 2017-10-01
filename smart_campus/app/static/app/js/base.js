@@ -9,4 +9,5 @@ $(document).ready(function () {
         .siblings()
         .removeClass('active')
     })
+    $('.ui.sidebar').sidebar('attach events', '.launch.button', 'slide out');
 })
