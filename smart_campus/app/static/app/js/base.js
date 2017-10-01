@@ -2,12 +2,5 @@ $(document).ready(function () {
   $('.ui.menu .ui.dropdown').dropdown({
     on: 'hover'
   })
-  $('.item')
-    .on('click', function () {
-      $(this)
-        .addClass('active')
-        .siblings()
-        .removeClass('active')
-    })
-    $('.ui.sidebar').sidebar('attach events', '.launch.button', 'slide out');
+  $('.ui.sidebar').sidebar('attach events', '.launch.button', 'slide out');
 })
