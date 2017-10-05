@@ -16,3 +16,5 @@ DATABASES = {
         'PORT':  get_env_variable('POSTGRESQL_PORT'),
     },
 }
+
+MEDIA_ROOT = '/var/www/smartcampus.csie.ncku.edu.tw/media'
