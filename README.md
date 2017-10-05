@@ -15,6 +15,10 @@
 $ pip install -r requirements/dev.txt
 ```
 ## Setup and Run
+Set system locale to utf8
+```sh
+export LC_ALL='en_US.utf8'
+```
 ### Develop: Use local settings file
 Define your own `local_settings.py` under `settings/`
 #### Runserver
@@ -53,7 +57,10 @@ uwsgi --ini server-settings/smart_campus.ini
 ```sh
 sudo killall -s INT uwsgi
 ```
-
+##### View log
+```sh
+sudo tail -f /var/log/smartcampus/smartcampus.log
+```
 ## Testing
 
 ### Run Test
