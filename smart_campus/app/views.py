@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.conf import settings
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.files.uploadedfile import UploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.core import serializers
@@ -180,6 +180,7 @@ def index(request):
 
 
 @login_required
+@csrf_exempt
 def station_list_page(request):
     if request.user.can(Permission.ADMIN):
         station_list = Station.objects.all().order_by('id')
@@ -275,7 +276,7 @@ def station_edit_page(request, pk):
 
             # Add new images
             for key, value in data.items():
-                if isinstance(value, InMemoryUploadedFile):
+                if isinstance(value, UploadedFile):
                     StationImage.objects.create(
                         station=station,
                         image=value,
@@ -377,7 +378,7 @@ def station_new_page(request):
 
             # Add images
             for key, value in data.items():
-                if isinstance(value, InMemoryUploadedFile):
+                if isinstance(value, UploadedFile):
                     is_primary = (key == 'img{0}'.format(data['main_img_num']))
                     StationImage.objects.create(
                         station=station,
