@@ -15,23 +15,23 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="password"
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="password"
 
-        $password
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="nickname"
+            $password
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="nickname"
 
-        $nickname
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+            $nickname
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 + Response 201 (text/plain)
 
@@ -57,19 +57,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="password"
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="password"
 
-        $password
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $password
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 200 (application/json)
 
@@ -96,15 +96,15 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 200 (text/plain)
 
@@ -159,15 +159,15 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="beacon_id"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="beacon_id"
 
-        $beacon_id
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $beacon_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 200 (application/json)
 
@@ -187,19 +187,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="coins"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="coins"
 
-        $coins
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            $coins
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 404 (text/plain)
 
@@ -226,19 +226,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="experience_point"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="experience_point"
 
-        $experience_point
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            $experience_point
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 404 (text/plain)
 
@@ -250,12 +250,12 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
 + Response 200 (application/json)
 
-        {
-            'message': 'Experience point record of {0} update succeed',
-            'data': {
-                'experience_point': $user.experience_point
+            {
+                'message': 'Experience point record of {0} update succeed',
+                'data': {
+                    'experience_point': $user.experience_point
+                }
             }
-        }
 
 ## Add a reward to user [/add_user_reward]
 
@@ -265,19 +265,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="reward_id"
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="reward_id"
 
-        $reward_id
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $reward_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 404 (text/plain)
 
@@ -299,19 +299,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="station_id"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="station_id"
 
-        $station_id
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            $station_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 404 (text/plain)
 
@@ -332,19 +332,19 @@ smartcampus is a simple API allowing smartcampus mobile application to update th
 
     + Headers
 
-        Content-Length: $requestlen
+            Content-Length: $requestlen
 
     + Body
 
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="station_id"
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="station_id"
 
-        $station_id
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
-        Content-Disposition: form-data; name="email"
+            $station_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
 
-        $email
-        ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
 
 + Response 404 (text/plain)
 
