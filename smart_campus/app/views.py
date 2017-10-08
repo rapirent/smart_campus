@@ -78,7 +78,7 @@ def signup(request):
     except ValueError:
         return HttpResponse('Invalid email address.', status=400)
 
-    return HttpResponse('Registration succeeded!', status=200)
+    return HttpResponse('Registration succeeded!', status=201)
 
 
 @csrf_exempt
@@ -439,6 +439,7 @@ def get_all_stations(request):
                 'content': station's infomation content,
                 'category' (data: what category station belongs to,
                 'location': station's location,
+                'rewards': list of
                 'image': {
                     'primary': primary image url,
                     'others': list of the other image url
@@ -457,7 +458,7 @@ def get_all_stations(request):
             'content': station.content,
             'category': str(station.category),
             'location': station.location.get_coords(),
-            'rewards': [station.id for station in station.reward_set.all()],
+            'rewards': [reward.id for reward in station.reward_set.all()],
             'image': {
                 'primary':
                     '{0}{1}{2}'.format(
@@ -507,7 +508,7 @@ def update_user_coins(request):
     user = User.objects.filter(email=user_email).first()
 
     if not user or not coins:
-        return HttpResponse('Either user does not exist or coins input is not given', status=400)
+        return HttpResponse('Either user does not exist or coins input is not given', status=404)
 
     try:
         user.earned_coins = coins
@@ -532,7 +533,7 @@ def update_user_experience_point(request):
     user = User.objects.filter(email=user_email).first()
 
     if not user or not experience_point:
-        return HttpResponse('Either user does not exist or experience_point input is not given', status=400)
+        return HttpResponse('Either user does not exist or experience_point input is not given', status=404)
 
     try:
         user.experience_point = experience_point
@@ -579,7 +580,7 @@ def add_user_favorite_stations(request):
     user = User.objects.filter(email=user_email).first()
 
     if not user or not station:
-        return HttpResponse('Either user or station does not exist', status=400)
+        return HttpResponse('Either user or station does not exist', status=404)
 
     user.favorite_stations.add(station)
     user.save()
@@ -630,7 +631,7 @@ def remove_user_favorite_stations(request):
     user = User.objects.filter(email=user_email).first()
 
     if not user or not station:
-        return HttpResponse('Either user or station does not exist', status=400)
+        return HttpResponse('Either user or station does not exist', status=404)
 
     user.favorite_stations.remove(station)
     user.save()

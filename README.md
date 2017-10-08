@@ -69,3 +69,7 @@ $ pytest
 ```
 
 Note that test should be run in root directory instead of `smart_campus`.
+
+## [API Document Site](https://rapirent.github.io/smart_campus/index.html)
+
+## LICENSE
