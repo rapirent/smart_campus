@@ -77,7 +77,7 @@ $(document).ready(function() {
     })
   })
   $('#addStationButton').on('click', function() {
-    if(/^[\d\.]$/.test(selectedId)) {
+    if(/^\d+$/.test(selectedId)) {
       $('#sortable').append(
           '<div class="completed step" id="travelplan" data-id="' + selectedId +
           '"><i class="sort icon"></i><div class="content" id="category"><div class="title">' +
