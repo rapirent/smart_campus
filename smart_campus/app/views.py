@@ -653,7 +653,8 @@ def get_all_travel_plans(request):
             'name': plan.name,
             'description': plan.description,
             'station_sequence': [travelplanstation.station.id
-                                 for travelplanstation in plan.travelplanstations_set.all().order_by('order')]
+                                 for travelplanstation in plan.travelplanstations_set.all().order_by('order')],
+            'image': 'http://{0}{1}'.format(request.get_host(), plan.image.url)
         }
         for plan in TravelPlan.objects.all()
     ]
