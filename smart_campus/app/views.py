@@ -221,29 +221,33 @@ def station_list_page(request):
 def station_list_by_category_page(request, pk):
     category = get_object_or_404(StationCategory, pk=pk)
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.filter(category=category)
+        station_list = Station.objects.filter(category=category).order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group, category=category)
+        station_list = Station.objects.filter(owner_group=request.user.group, category=category).order_by('id')
 
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
+    paginator = Paginator(station_list, 10)
+
+    page = request.GET.get('page', 1)
+
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primaru_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
 
     context = {
         'email': request.user.email,
-        'stations': station_data,
+        'stations': stations,
         'categories': StationCategory.objects.all().order_by('id')
     }
 
