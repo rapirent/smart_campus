@@ -283,6 +283,12 @@ def station_edit_page(request, pk):
                         is_primary=False
                     )
 
+            # link the reward related to the station
+            reward = Reward.objects.filter(id=request.POST.get('reward')).first()
+            if reward:
+                station.reward_set.clear()
+                station.reward_set.add(reward)
+
             return HttpResponseRedirect('/stations/')
 
         # if the datas failed in validation
@@ -299,6 +305,7 @@ def station_edit_page(request, pk):
             'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
+            'reward': station.reward_set.first()
         }
 
     if request.user.can(Permission.ADMIN):
@@ -315,7 +322,8 @@ def station_edit_page(request, pk):
         'form': form,
         'form_data': form_data,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
-        'images': StationImage.objects.filter(station_id=station.id)
+        'images': StationImage.objects.filter(station_id=station.id),
+        'rewards': Reward.objects.all()
     }
     return render(request, 'app/station_edit.html', context)
 
