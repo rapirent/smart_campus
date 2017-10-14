@@ -27,22 +27,25 @@
             {% endif %}
           </select>
         </div>
-        <div class="left floated field">
+        <div class="three wide field">
           <label>綁定收藏品</label>
-          <div class="ui inline floating dropdown labeled search icon button">
-          <input type="hidden" name="reward" value="{{ form_data.reward.id }}">
-          <i class="search icon"></i>
-          <span class="text" id="selectedRewardId">選擇收藏品</span>
-          <div class="menu" id="selectionMenu">
-            {% if rewards %}
-              {% for reward in rewards %}
-                <div class="item" data-value="{{ reward.id }}">
-                  {{ reward.name }}
-                </div>
-              {% endfor %}
-            {% endif %}
+          <div class="ui search selection dropdown"> 
+            <input type="hidden" name="reward" value="{{ form_data.reward.id|default:0 }}">
+            <i class="search icon"></i>
+            <div class="default text">選擇收藏品</div>
+            <div class="menu">
+              <div class="item" data-value="-1">
+                不綁定
+              </div>
+              {% if rewards %}
+                {% for reward in rewards %}
+                  <div class="item" data-value="{{ reward.id }}">
+                    {{ reward.name }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
           </div>
-        </div>
         </div>
       </div>
       <hr>
@@ -164,7 +167,6 @@
       $('.field .image').dimmer({
         on: 'hover'
       });
-      $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown();
     })
   </script>
 {% endblock %}

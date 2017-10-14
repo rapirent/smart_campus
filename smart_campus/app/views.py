@@ -284,9 +284,9 @@ def station_edit_page(request, pk):
                     )
 
             # link the reward related to the station
-            reward = Reward.objects.filter(id=request.POST.get('reward')).first()
+            station.reward_set.clear()
+            reward = Reward.objects.filter(id=request.POST.get('reward', -1)).first()
             if reward:
-                station.reward_set.clear()
                 station.reward_set.add(reward)
 
             return HttpResponseRedirect('/stations/')
@@ -323,7 +323,7 @@ def station_edit_page(request, pk):
         'form_data': form_data,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
         'images': StationImage.objects.filter(station_id=station.id),
-        'rewards': Reward.objects.all()
+        'rewards': Reward.objects.filter(related_station=None).union(station.reward_set.all())
     }
     return render(request, 'app/station_edit_page.html', context)
 
