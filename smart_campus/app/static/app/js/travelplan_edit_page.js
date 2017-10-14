@@ -39,7 +39,6 @@ $(document).ready(function() {
     }
     postData.append('order', JSON.stringify(order))
     postData.append('csrfmiddlewaretoken', window.CSRF_TOKEN)
-    console.log(order)
     $.ajax({
       url: window.location.pathname,
       type: 'POST',
