@@ -214,7 +214,7 @@ def station_list_page(request):
         'categories': StationCategory.objects.all().order_by('id')
     }
 
-    return render(request, 'app/station_list.html', context)
+    return render(request, 'app/station_list_page.html', context)
 
 
 @login_required
@@ -247,7 +247,7 @@ def station_list_by_category_page(request, pk):
         'categories': StationCategory.objects.all().order_by('id')
     }
 
-    return render(request, 'app/station_list.html', context)
+    return render(request, 'app/station_list_page.html', context)
 
 
 @login_required
@@ -325,7 +325,7 @@ def station_edit_page(request, pk):
         'images': StationImage.objects.filter(station_id=station.id),
         'rewards': Reward.objects.all()
     }
-    return render(request, 'app/station_edit.html', context)
+    return render(request, 'app/station_edit_page.html', context)
 
 
 @login_required
@@ -412,7 +412,7 @@ def station_new_page(request):
         'form': form,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
     }
-    return render(request, 'app/station_new.html', context)
+    return render(request, 'app/station_new_page.html', context)
 
 
 @csrf_exempt
