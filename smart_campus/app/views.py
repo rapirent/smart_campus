@@ -984,6 +984,7 @@ def travelplan_edit_page(request, pk):
     travelplan = get_object_or_404(TravelPlan, pk=pk)
 
     if request.method == 'POST':
+        print(request.POST)
         travelplan_form = PartialTravelPlanForm(
             request.POST,
             request.FILES,
@@ -992,29 +993,33 @@ def travelplan_edit_page(request, pk):
 
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
-
             json_order = json.loads(request.POST['order'])
+            exist_travelplan_stations = []
+            for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk):
+                exist_travelplan_stations.append(travelplan_station.station_id)
 
-            if not json_order:
-                for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk):
-                    travelplan_station.delete()
-
-            else:
-                for order, station_id in enumerate(json_order):
-                    changed_travelplan = TravelPlanStations.objects.filter(
+            for order, station_id in enumerate(json_order):
+                changed_travelplan = TravelPlanStations.objects.filter(
+                    travelplan_id=pk,
+                    station_id=station_id
+                )
+                if not changed_travelplan:
+                    TravelPlanStations.objects.create(
                         travelplan_id=pk,
-                        station_id=station_id
+                        station_id=station_id,
+                        order=order
                     )
+                else:
+                    changed_travelplan.first().order = order
+                    print(order)
+                    print(station_id)
+                    changed_travelplan.first().save()
+                    exist_travelplan_stations.remove(int(station_id))
 
-                    if not changed_travelplan:
-                        TravelPlanStations.objects.create(
-                            travelplan_id=pk,
-                            station_id=station_id,
-                            order=order
-                        )
-                    else:
-                        changed_travelplan.first().order = order
-                        changed_travelplan.first().save()
+            for travelplan_id in exist_travelplan_stations:
+                TravelPlanStations.objects.get(
+                    station_id=travelplan_id
+                ).delete()
 
             context = {
                 'categories': StationCategory.objects.all().order_by('id'),
@@ -1031,25 +1036,14 @@ def travelplan_edit_page(request, pk):
             'description': travelplan.description
         }
 
-    travelplanstations = TravelPlanStations.objects.filter(
-        travelplan_id=pk
-    ).order_by('order')
-
-    selected_stations_id = [
-        travelplanstation.station_id
-        for travelplanstation in travelplanstations
-    ]
-
-    selected_stations = [
-        Station.objects.get(id=station_id)
-        for station_id in selected_stations_id
-    ]
+    selected_stations = Station.objects.filter(
+        travelplanstations__travelplan_id=pk
+    ).order_by('travelplanstations__order')
 
     context = {
         'email': request.user.email,
-        'stations': Station.objects.all(),
+        'stations': Station.objects.exclude(travelplanstations__travelplan_id=pk),
         'travelplan': travelplan,
-        'travelplanstations': travelplanstations,
         'selected_stations': selected_stations,
         'form_data': form_data,
         'categories': StationCategory.objects.all().order_by('id')
