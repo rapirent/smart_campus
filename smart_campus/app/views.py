@@ -17,6 +17,7 @@ from django.core.files.uploadedfile import UploadedFile
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.core import serializers
+from django.core.exceptions import ValidationError
 
 
 import os
@@ -75,7 +76,7 @@ def signup(request):
 
     try:
         User.objects.create_user(user_email, password, nickname)
-    except ValueError:
+    except (ValueError, ValidationError):
         return HttpResponse('Invalid email address.', status=400)
 
     return HttpResponse('Registration succeeded!', status=201)
