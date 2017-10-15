@@ -54,71 +54,73 @@
       <i class="large help circle icon"></i>
       Help
     </a>
- </div>
-  <div class="ui borderless main teal inverted menu">
-    <div class="ui title borderless item launch button">
-      <i class="sidebar icon"></i>
-      成大智慧校園管理平台
-    </div>
-    <div class="ui dropdown item" id="station">
-      <i class="large street view icon"></i>
-      管理站點及通知
-      <i class="dropdown icon"></i>
-      <div class="menu">
-        {% if categories %}
-          {% for category in categories %}
-            <div class="item">
-              <i class="dropdown icon"></i>
-              <span class="text">{{ category.name }}</span>
-              <div class="menu">
-                <a class="item" href="{% url 'Station List By Category Page' category.id %}">查看</a>
-                <a class="item" href="">刪除</a>
-              </div>
-            </div>
-          {% endfor %}
-        {% endif %}
-        <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
-        <hr>
-        <a class="item" href="{% url 'Category Add Page' %}">
-          <i class="add square icon"></i>
-          新增類別
-        </a>
-      </div>
-    </div>
-    <div class="ui dropdown item" id="user">
-      <i class="large users icon"></i>
-      使用者管理
-      <i class="dropdown icon"></i>
-      <div class="menu">
-        <a class="item" href="{% url 'Manager List Page' %}">
-          管理者清單
-        </a>
-        <a class="item" href="{% url 'Group List Page' %}">
-          管理群組清單
-        </a>
-      </div>
-    </div>
-    <a class="item" href="{% url 'Reward List Page' %}" id="reward">
-      <i class="large trophy icon"></i>
-      管理收藏品
-    </a>
-    <a class="item" href="{% url 'Question List Page' %}" id="question">
-      <i class="large game icon"></i>
-      管理挑戰
-    </a>
-    <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
-      <i class="large bluetooth icon"></i>
-      管理beacon
-    </a>
-    <a class="item" href="{% url 'TravelPlan List Page' %}" id="itinerary">
-      <i class="large map signs  icon"></i>
-      管理行程
-    </a>
   </div>
-{% endblock %}
+  <div class="pusher">
+    <div class="ui borderless main teal inverted menu">
+      <div class="ui title borderless item launch button">
+        <i class="sidebar icon"></i>
+        成大智慧校園管理平台
+      </div>
+      <div class="ui dropdown item" id="station">
+        <i class="large street view icon"></i>
+        管理站點及通知
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          {% if categories %}
+            {% for category in categories %}
+              <div class="item">
+                <i class="dropdown icon"></i>
+                <span class="text">{{ category.name }}</span>
+                <div class="menu">
+                  <a class="item" href="{% url 'Station List By Category Page' category.id %}">查看</a>
+                  <a class="item" href="">刪除</a>
+                </div>
+              </div>
+            {% endfor %}
+          {% endif %}
+          <a class="item" href="{% url 'Station List Page' %}">全部站點</a>
+          <hr>
+          <a class="item" href="{% url 'Category Add Page' %}">
+            <i class="add square icon"></i>
+            新增類別
+          </a>
+        </div>
+      </div>
+      <div class="ui dropdown item" id="user">
+        <i class="large users icon"></i>
+        使用者管理
+        <i class="dropdown icon"></i>
+        <div class="menu">
+          <a class="item" href="{% url 'Manager List Page' %}">
+            管理者清單
+          </a>
+          <a class="item" href="{% url 'Group List Page' %}">
+            管理群組清單
+          </a>
+        </div>
+      </div>
+      <a class="item" href="{% url 'Reward List Page' %}" id="reward">
+        <i class="large trophy icon"></i>
+        管理收藏品
+      </a>
+      <a class="item" href="{% url 'Question List Page' %}" id="question">
+        <i class="large game icon"></i>
+        管理挑戰
+      </a>
+      <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
+        <i class="large bluetooth icon"></i>
+        管理beacon
+      </a>
+      <a class="item" href="{% url 'TravelPlan List Page' %}" id="itinerary">
+        <i class="large map signs  icon"></i>
+        管理行程
+      </a>
+    </div>
+  {% endblock %}
 
-{% block content %}
-{% endblock %}
+  {% block content %}
+  {% endblock %}
+</div>
 
 
 {% block script %}

@@ -221,29 +221,33 @@ def station_list_page(request):
 def station_list_by_category_page(request, pk):
     category = get_object_or_404(StationCategory, pk=pk)
     if request.user.can(Permission.ADMIN):
-        stations = Station.objects.filter(category=category)
+        station_list = Station.objects.filter(category=category).order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group, category=category)
+        station_list = Station.objects.filter(owner_group=request.user.group, category=category).order_by('id')
 
-    station_data = [
-        {
-            'id': station.id,
-            'name': station.name,
-            'primary_image': StationImage.objects.filter(
-                station=station,
-                is_primary=True
-            ).first(),
-            'category': station.category,
-            'beacon': Beacon.objects.filter(
-                station=station
-            ).first()
-        }
-        for station in stations
-    ]
+    paginator = Paginator(station_list, 10)
+
+    page = request.GET.get('page', 1)
+
+    try:
+        stations = paginator.page(page)
+    except PageNotAnInteger:
+        stations = paginator.page(1)
+    except EmptyPage:
+        stations = paginator.page(paginator.num_pages)
+
+    for station in stations:
+        station.primary_image = StationImage.objects.filter(
+            station=station,
+            is_primary=True
+        ).first()
+        station.beacon = Beacon.objects.filter(
+            station=station
+        ).first()
 
     context = {
         'email': request.user.email,
-        'stations': station_data,
+        'stations': stations,
         'categories': StationCategory.objects.all().order_by('id')
     }
 
@@ -1000,29 +1004,32 @@ def travelplan_edit_page(request, pk):
 
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
-
             json_order = json.loads(request.POST['order'])
+            exist_travelplan_stations = [
+                travelplan_station.station_id
+                for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk)
+            ]
 
-            if not json_order:
-                for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk):
-                    travelplan_station.delete()
-
-            else:
-                for order, station_id in enumerate(json_order):
-                    changed_travelplan = TravelPlanStations.objects.filter(
+            for order, station_id in enumerate(json_order):
+                changed_travelplan = TravelPlanStations.objects.filter(
+                    travelplan_id=pk,
+                    station_id=station_id
+                )
+                if not changed_travelplan:
+                    TravelPlanStations.objects.create(
                         travelplan_id=pk,
-                        station_id=station_id
+                        station_id=station_id,
+                        order=order
                     )
+                else:
+                    changed_travelplan.first().order = order
+                    changed_travelplan.first().save()
+                    exist_travelplan_stations.remove(int(station_id))
 
-                    if not changed_travelplan:
-                        TravelPlanStations.objects.create(
-                            travelplan_id=pk,
-                            station_id=station_id,
-                            order=order
-                        )
-                    else:
-                        changed_travelplan.first().order = order
-                        changed_travelplan.first().save()
+            for travelplan_id in exist_travelplan_stations:
+                TravelPlanStations.objects.get(
+                    station_id=travelplan_id
+                ).delete()
 
             context = {
                 'categories': StationCategory.objects.all().order_by('id'),
@@ -1039,25 +1046,14 @@ def travelplan_edit_page(request, pk):
             'description': travelplan.description
         }
 
-    travelplanstations = TravelPlanStations.objects.filter(
-        travelplan_id=pk
-    ).order_by('order')
-
-    selected_stations_id = [
-        travelplanstation.station_id
-        for travelplanstation in travelplanstations
-    ]
-
-    selected_stations = [
-        Station.objects.get(id=station_id)
-        for station_id in selected_stations_id
-    ]
+    selected_stations = Station.objects.filter(
+        travelplanstations__travelplan_id=pk
+    ).order_by('travelplanstations__order')
 
     context = {
         'email': request.user.email,
-        'stations': Station.objects.all(),
+        'stations': Station.objects.exclude(travelplanstations__travelplan_id=pk),
         'travelplan': travelplan,
-        'travelplanstations': travelplanstations,
         'selected_stations': selected_stations,
         'form_data': form_data,
         'categories': StationCategory.objects.all().order_by('id')

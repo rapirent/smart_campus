@@ -295,3 +295,6 @@ class TravelPlanStations(models.Model):
     travelplan = models.ForeignKey('TravelPlan', on_delete=models.CASCADE)
     station = models.ForeignKey('Station', on_delete=models.CASCADE)
     order = models.IntegerField()
+
+    class Meta:
+        ordering = ('order',)

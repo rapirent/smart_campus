@@ -2,10 +2,10 @@ $(document).ready(function() {
   let selectedId, selectedStationName, selectedCategory
   $('.ui.inline.floating.dropdown.labeled.search.icon.button').dropdown({
     onChange: function(value, text, $selectedItem) {
-                selectedId = value
-                selectedStationName = text
-                selectedCategory = $selectedItem.attr('category')
-              }
+      selectedId = value
+      selectedStationName = text
+      selectedCategory = $selectedItem.attr('category')
+    }
   })
 
   let el = document.getElementById('sortable')
