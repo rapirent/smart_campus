@@ -237,7 +237,7 @@ def station_list_by_category_page(request, pk):
         stations = paginator.page(paginator.num_pages)
 
     for station in stations:
-        station.primaru_image = StationImage.objects.filter(
+        station.primary_image = StationImage.objects.filter(
             station=station,
             is_primary=True
         ).first()
@@ -988,7 +988,6 @@ def travelplan_edit_page(request, pk):
     travelplan = get_object_or_404(TravelPlan, pk=pk)
 
     if request.method == 'POST':
-        print(request.POST)
         travelplan_form = PartialTravelPlanForm(
             request.POST,
             request.FILES,
@@ -998,9 +997,10 @@ def travelplan_edit_page(request, pk):
         if travelplan_form.is_valid():
             edited_travelplan = travelplan_form.save()
             json_order = json.loads(request.POST['order'])
-            exist_travelplan_stations = []
-            for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk):
-                exist_travelplan_stations.append(travelplan_station.station_id)
+            exist_travelplan_stations = [
+                travelplan_station.station_id
+                for travelplan_station in TravelPlanStations.objects.filter(travelplan_id=pk)
+            ]
 
             for order, station_id in enumerate(json_order):
                 changed_travelplan = TravelPlanStations.objects.filter(
@@ -1015,8 +1015,6 @@ def travelplan_edit_page(request, pk):
                     )
                 else:
                     changed_travelplan.first().order = order
-                    print(order)
-                    print(station_id)
                     changed_travelplan.first().save()
                     exist_travelplan_stations.remove(int(station_id))
 
