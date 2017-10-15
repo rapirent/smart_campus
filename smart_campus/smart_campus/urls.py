@@ -29,10 +29,12 @@ urlpatterns = [
 
     # Stations
     url(r'^stations/$', app.views.station_list_page, name='Station List Page'),
-    url(r'^stations/category/(?P<pk>\d+)/$', app.views.station_list_by_category_page, name='Station List By Category Page'),
+    url(r'^stations/category/(?P<pk>\d+)/$',
+        app.views.station_list_by_category_page, name='Station List By Category Page'),
     url(r'^stations/new/$', app.views.station_new_page, name='Add Station Page'),
     url(r'^stations/(?P<pk>\d+)/edit/$', app.views.station_edit_page, name='Edit Station Page'),
-    url(r'^station_image/(?P<pk>\d+)/set_primary/$', app.views.set_primary_station_image, name='Set Primary Station Image'),
+    url(r'^station_image/(?P<pk>\d+)/set_primary/$',
+        app.views.set_primary_station_image, name='Set Primary Station Image'),
     url(r'^station_image/(?P<pk>\d+)/delete/$', app.views.delete_station_image, name='Delete Station Image'),
     url(r'^stations/(?P<pk>\d+)/delete/$', app.views.station_delete_page,
         name='Delete Station Page'),
