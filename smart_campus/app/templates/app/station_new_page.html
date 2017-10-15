@@ -106,6 +106,11 @@
     {% endif %}
 
     var MAX_IMGS = {{ max_imgs }};
+    $(document).ready(function () {
+      const element = document.querySelector("trix-editor");
+      element.editor.setSelectedRange([0, 0]);
+      element.editor.insertHTML( '{{ form.cleaned_data.content|safe|escape }}' );
+    })
   </script>
   <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>

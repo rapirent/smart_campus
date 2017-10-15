@@ -35,7 +35,7 @@ let imgCount=1;
 // Add new file upload field and radio button
 $("#addimage").click( function(){
 
-  if (imgCount <= MAX_IMGS){
+  if (imgCount < MAX_IMGS){
     imgCount++;
 
     $('#uiAddImage').append(
