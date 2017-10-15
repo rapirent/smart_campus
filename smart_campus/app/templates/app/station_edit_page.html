@@ -13,11 +13,11 @@
       {% include 'marco/form_error_macro.html' with form=form %}
       {% csrf_token %}
       <div class="fields">
-        <div class="field">
+        <div class="required field">
           <label>名稱</label>
           <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form_data.name }}">
         </div>
-        <div class="field">
+        <div class="required field">
           <label>類別</label>
           <select class="ui selection dropdown" name="category">
             {% if categories %}
@@ -108,14 +108,14 @@
         <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="">
       </div>
       <hr>
-      <div class="field">
+      <div class="required field">
         <label>站點位置(預設為Beacon位置)</label>
         <br>
-        <div class="three wide field">
+        <div class="required three wide field">
           <label>緯度</label>
           <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" value="{{ form_data.lat|stringformat:'f' }}">
         </div>
-        <div class="three wide field">
+        <div class="required three wide field">
           <label>經度</label>
           <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" value="{{ form_data.lng|stringformat:'f' }}">
         </div>
