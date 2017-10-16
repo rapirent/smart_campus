@@ -76,8 +76,8 @@ def signup(request):
 
     try:
         User.objects.create_user(user_email, password, nickname)
-    except (ValueError, ValidationError):
-        return HttpResponse('Invalid email address.', status=400)
+    except (ValueError, ValidationError) as error:
+        return HttpResponse(error, status=400)
 
     return HttpResponse('Registration succeeded!', status=201)
 
@@ -99,8 +99,8 @@ def login(request):
             'nickname': user.nickname,
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
-            'reward': [
-                reward.id
+            'rewards': [
+                reward.reward.id
                 for reward in UserReward.objects.filter(user=user).order_by('timestamp')
             ],
             'favorite_stations': [
