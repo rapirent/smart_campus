@@ -23,8 +23,8 @@ urlpatterns = [
     url('^get_all_travel_plans/$', views.get_all_travel_plans,
         name='Get All Travel plans'),
     url('^add_user_reward/$', views.add_user_reward, name='Add User Reward'),
-    url('^get_unasnwered_question/$', views.get_unanswered_question,
-        name='Get Unanwswered questsion'),
+    url('^get_unanswered_question/$', views.get_unanswered_question,
+        name='Get Unanswered questsion'),
     url('^add_answered_question/$', views.add_answered_question,
         name='Add Answered Question')
 ]
