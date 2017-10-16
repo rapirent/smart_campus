@@ -1384,6 +1384,9 @@ def get_unanswered_question(request):
         user__pk=user_email
     ).filter(linked_station=station)
 
+    if not unanswered_questions:
+        return HttpResponse('No unanswered question available for the user', status=404)
+
     random_index = random.randint(0, unanswered_questions.count() - 1)
     random_unanswered_question = random.sample(list(unanswered_questions), 1)[0]
 
