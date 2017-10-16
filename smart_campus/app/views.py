@@ -100,8 +100,8 @@ def login(request):
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
             'rewards': [
-                reward.reward.id
-                for reward in UserReward.objects.filter(user=user).order_by('timestamp')
+                user_reward.reward.id
+                for user_reward in UserReward.objects.filter(user=user).order_by('timestamp')
             ],
             'favorite_stations': [
                 station.id
@@ -1403,7 +1403,9 @@ def get_unanswered_question(request):
             'answer': index,
             'question_id': random_unanswered_question.id
         },
-        status=200
+        status=200,
+        json_dumps_params={'ensure_ascii': False},
+        content_type='application/json; charset=utf-8'
     )
 
 
