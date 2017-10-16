@@ -24,7 +24,6 @@ function addMarker(title, lat, lng) {
   });
 
   marker.addListener('click', function() {
-    map.setZoom(16);
     map.setCenter(marker.getPosition())
     $("#selectbasic").val(marker.getTitle())
     $("#lat_input").val(marker.getPosition().lat())
@@ -36,7 +35,7 @@ let imgCount=1;
 // Add new file upload field and radio button
 $("#addimage").click( function(){
 
-  if (imgCount <= MAX_IMGS){
+  if (imgCount < MAX_IMGS){
     imgCount++;
 
     $('#uiAddImage').append(
@@ -66,4 +65,56 @@ $("#addimage").click( function(){
     $('.ui.radio.checkbox').checkbox()
 
   }
+})
+
+$(document).ready(function() {
+  $(".ui.form").form({
+    fields: {
+      name: {
+        identifier: "name",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請輸入站點名稱"
+          }
+        ]
+      },
+      category: {
+        identifier: "category",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請輸入類別"
+          }
+        ]
+      },
+      lng: {
+        identifier: "lng",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請輸入經度"
+          }
+        ]
+      },
+      lat: {
+        identifier: "lat",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請輸入緯度"
+          }
+        ]
+      },
+      beacon: {
+        identifier: "beacon",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請於地圖點選Beacon"
+          }
+        ]
+      },
+    }
+  })
 })

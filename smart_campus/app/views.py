@@ -215,7 +215,7 @@ def station_list_page(request):
         'categories': StationCategory.objects.all().order_by('id')
     }
 
-    return render(request, 'app/station_list.html', context)
+    return render(request, 'app/station_list_page.html', context)
 
 
 @login_required
@@ -252,7 +252,7 @@ def station_list_by_category_page(request, pk):
         'categories': StationCategory.objects.all().order_by('id')
     }
 
-    return render(request, 'app/station_list.html', context)
+    return render(request, 'app/station_list_page.html', context)
 
 
 @login_required
@@ -288,6 +288,12 @@ def station_edit_page(request, pk):
                         is_primary=False
                     )
 
+            # link the reward related to the station
+            station.reward_set.clear()
+            reward = Reward.objects.filter(id=request.POST.get('reward', -1)).first()
+            if reward:
+                station.reward_set.add(reward)
+
             return HttpResponseRedirect('/stations/')
 
         # if the datas failed in validation
@@ -304,6 +310,7 @@ def station_edit_page(request, pk):
             'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
+            'reward': station.reward_set.first()
         }
 
     if request.user.can(Permission.ADMIN):
@@ -320,9 +327,10 @@ def station_edit_page(request, pk):
         'form': form,
         'form_data': form_data,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
-        'images': StationImage.objects.filter(station_id=station.id)
+        'images': StationImage.objects.filter(station_id=station.id),
+        'rewards': Reward.objects.filter(related_station=None).union(station.reward_set.all())
     }
-    return render(request, 'app/station_edit.html', context)
+    return render(request, 'app/station_edit_page.html', context)
 
 
 @login_required
@@ -409,7 +417,7 @@ def station_new_page(request):
         'form': form,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
     }
-    return render(request, 'app/station_new.html', context)
+    return render(request, 'app/station_new_page.html', context)
 
 
 @csrf_exempt
