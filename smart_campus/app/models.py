@@ -33,8 +33,8 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.email_confirmed = False
         user.full_clean()
-        user.is_active = False
         user.save()
         return user
 
@@ -50,6 +50,7 @@ class User(AbstractBaseUser):
         blank=True,
         on_delete=models.SET_NULL
     )
+    email_confirmed = models.BooleanField(default=False)
 
     experience_point = models.IntegerField(default=0)
     earned_coins = models.IntegerField(default=0)
