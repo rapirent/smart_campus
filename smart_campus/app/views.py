@@ -53,7 +53,7 @@ from .forms import (
 from .tokens import account_activation_token
 
 
-def administrator_required(function=None):
+def administrator_required(function):
     @wraps(function)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_administrator():
@@ -62,11 +62,19 @@ def administrator_required(function=None):
     return wrapper
 
 
-def activate_required(function=None):
+def activate_required(function):
     @wraps(function)
     def wrapper(request, *args, **kargs):
+        try:
+            user_email = request.POST.get('email')
+            request.user = User.objects.get(email=user_email)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            # AnonymousUser
+            pass
+        if request.user.is_anonymous:
+            return HttpResponse('User cannot be found.', status=400)
         if not request.user.email_confirmed:
-            return HttpResponse('The user is not activate.', status=401)
+            return HttpResponse('The user is not activated.', status=401)
         return function(request, *args, **kargs)
     return wrapper
 
@@ -99,7 +107,8 @@ def signup(request):
         'user': user,
         'domain': request.get_host(),
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': account_activation_token.make_token(user)
+        'token': account_activation_token.make_token(user),
+        'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
     })
     mail_subject = '[Activate]Smart Campus App Account Activation'
     email = EmailMessage(mail_subject, message, to=[user_email])
@@ -1477,25 +1486,18 @@ def activate(request, uidb64, token):
 
 @csrf_exempt
 @require_POST
+@activate_required
 def reset_password(request):
-    user_email = request.POST.get('email')
-
-    if not user_email:
-        return HttpResponse('Email is missing.', status=400)
-
-    user = User.objects.filter(email=user_email).first()
-    if not user:
-        return HttpResponse('The user did not exist.', status=400)
-
     message = render_to_string('email/reset_password.html', {
         'prefix': 'https://' if request.is_secure() else 'http://',
-        'user': user,
+        'user': request.user,
         'domain': request.get_host(),
-        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-        'token': default_token_generator.make_token(user)
+        'uid': urlsafe_base64_encode(force_bytes(request.user.pk)),
+        'token': default_token_generator.make_token(request.user),
+        'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
     })
     mail_subject = '[ResetPassword]Smart Campus App Account Reset Password'
-    email = EmailMessage(mail_subject, message, to=[user_email])
+    email = EmailMessage(mail_subject, message, to=[request.user.email])
     email.send()
 
     return HttpResponse('Reset password email is been sent.', status=200)
