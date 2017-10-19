@@ -1,0 +1,55 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Smart Campus{% endblock %}
+{% block stylesheet %}
+  
+  <style type="text/css">
+  	textarea{
+	width: 500px;
+	height: 500px;
+	
+}
+  </style>
+{% endblock %}
+{% block nav %}{% endblock %}
+{% block content %}
+	<button type="button" id="btn">TEST</button>
+	<textarea id="tx" ></textarea>
+{% endblock %}
+{% block script %}
+	
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js" 
+	integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+	crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		var hookurl='http://140.116.103.199/'
+	$("#btn").click(function(){
+		$.ajax({
+		url: hookurl + 'smart_campus/get_linked_stations/',
+		type: 'post',
+		data: {
+		  'email': "jeff1jeffo@gmail.com",
+		  'station_id': 32,
+		  'password': 'jeff6415',
+		  'nickname': 'nereineopigwwwskngergnereineopig',
+		  'beacon_id': '801-12605-4188',
+		  'coins': 23,
+		  'experience_point': 20,
+		  'action': 'remove'
+		},
+		dataType: 'json',
+		success: function (data) {
+		  
+		  $("#tx").val(JSON.stringify(data))
+		  console.log(Object.keys(data).length)
+		  	
+		},
+		error: function(data){
+		    $("#tx").val(JSON.stringify(data))//Object.keys(data))
+		}
+  	})
+	})
+	</script>
+	
+{% endblock %}

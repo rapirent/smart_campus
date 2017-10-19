@@ -4,7 +4,7 @@ function initMap() {
   // Create a map object and specify the DOM element for display.
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 22.998684, lng: 120.218724},
-    zoom: 16
+    zoom: 12
   });
   // Add marker of beacons
   for(var i=0; i < location_arr.length; i++){
