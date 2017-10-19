@@ -34,7 +34,8 @@ class UserManager(BaseUserManager):
 
         user.set_password(password)
         user.full_clean()
-        user.save(using=self._db)
+        user.is_active = False
+        user.save()
         return user
 
 
