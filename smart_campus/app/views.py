@@ -24,12 +24,10 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth.tokens import default_token_generator
 
-
 import os
 import random
 import json
 from functools import wraps
-
 
 from .models import (
     User, Reward, Permission,
@@ -72,7 +70,7 @@ def activate_required(function):
             # AnonymousUser
             pass
         if request.user.is_anonymous:
-            return HttpResponse('User cannot be found.', status=400)
+            return HttpResponse('The user does not exist.', status=400)
         if not request.user.email_confirmed:
             return HttpResponse('The user is not activated.', status=401)
         return function(request, *args, **kargs)
@@ -110,7 +108,7 @@ def signup(request):
         'token': account_activation_token.make_token(user),
         'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
     })
-    mail_subject = '[Activate]Smart Campus App Account Activation'
+    mail_subject = '[NCKU Smart Campus App] Please activate your account'
     email = EmailMessage(mail_subject, message, to=[user_email])
     email.send()
 
@@ -1496,7 +1494,7 @@ def reset_password(request):
         'token': default_token_generator.make_token(request.user),
         'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
     })
-    mail_subject = '[ResetPassword]Smart Campus App Account Reset Password'
+    mail_subject = '[NCKU Smart Campus App] Reset account password'
     email = EmailMessage(mail_subject, message, to=[request.user.email])
     email.send()
 
