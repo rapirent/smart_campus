@@ -33,8 +33,9 @@ class UserManager(BaseUserManager):
         )
 
         user.set_password(password)
+        user.email_confirmed = False
         user.full_clean()
-        user.save(using=self._db)
+        user.save()
         return user
 
 
@@ -49,6 +50,7 @@ class User(AbstractBaseUser):
         blank=True,
         on_delete=models.SET_NULL
     )
+    email_confirmed = models.BooleanField(default=False)
 
     experience_point = models.IntegerField(default=0)
     earned_coins = models.IntegerField(default=0)
@@ -74,49 +76,14 @@ class User(AbstractBaseUser):
     def is_administrator(self):
         return self.can(Permission.ADMIN)
 
+    def is_activated(self):
+        return self.email_confirmed
+
     def __str__(self):
         return '{email} ({name})'.format(
             email=self.email,
             name=self.nickname
         )
-
-
-class AnonymousUser:
-    def __str__(self):
-        return 'AnonymousUser'
-
-    def save(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def delete(self):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def set_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def check_password(self, raw_password):
-        raise NotImplementedError("Django doesn't provide a DB representation for AnonymousUser.")
-
-    def can(self, permissions):
-        return False
-
-    def is_administrator(self):
-        return self.can(Permission.ADMIN)
-
-    @property
-    def is_anonymous(self):
-        return True
-
-    @property
-    def is_authenticated(self):
-        return False
-
-    @property
-    def is_active(self):
-        return False
-
-    def get_username(self):
-        return ""
 
 
 class UserGroup(models.Model):

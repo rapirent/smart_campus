@@ -18,13 +18,16 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db import IntegrityError
 from django.core import serializers
 from django.core.exceptions import ValidationError
-
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_text
+from django.contrib.auth.tokens import default_token_generator
 
 import os
 import random
 import json
 from functools import wraps
-
 
 from .models import (
     User, Reward, Permission,
@@ -45,14 +48,32 @@ from .forms import (
     BeaconForm,
     QuestionForm
 )
+from .tokens import account_activation_token
 
 
-def administrator_required(function=None):
+def administrator_required(function):
     @wraps(function)
     def wrapper(request, *args, **kwargs):
         if not request.user.is_administrator():
             return HttpResponseForbidden()
         return function(request, *args, **kwargs)
+    return wrapper
+
+
+def activate_required(function):
+    @wraps(function)
+    def wrapper(request, *args, **kargs):
+        try:
+            user_email = request.POST.get('email')
+            request.user = User.objects.get(email=user_email)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            # AnonymousUser
+            pass
+        if request.user.is_anonymous:
+            return HttpResponse('The user does not exist.', status=400)
+        if not request.user.email_confirmed:
+            return HttpResponse('The user is not activated.', status=401)
+        return function(request, *args, **kargs)
     return wrapper
 
 
@@ -75,9 +96,21 @@ def signup(request):
         return HttpResponse('The email is already taken, try another!', status=400)
 
     try:
-        User.objects.create_user(user_email, password, nickname)
+        user = User.objects.create_user(user_email, password, nickname)
     except (ValueError, ValidationError) as error:
         return HttpResponse(error, status=400)
+
+    message = render_to_string('email/activation.html', {
+        'prefix': 'https://' if request.is_secure() else 'http://',
+        'user': user,
+        'domain': request.get_host(),
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+        'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
+    })
+    mail_subject = '[NCKU Smart Campus App] Please activate your account'
+    email = EmailMessage(mail_subject, message, to=[user_email])
+    email.send()
 
     return HttpResponse('Registration succeeded!', status=201)
 
@@ -93,6 +126,7 @@ def login(request):
     user_email = request.POST.get('email')
     password = request.POST.get('password')
     user = auth.authenticate(request, username=user_email, password=password)
+
     if user is not None:
         auth.login(request, user)
         user_data = {
@@ -1432,3 +1466,60 @@ def add_answered_question(request):
     user.answered_questions.add(question)
 
     return HttpResponse('Add answered question succeeded', status=200)
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.email_confirmed = True
+        user.save()
+        return HttpResponse('Your email is activated.', status=200)
+
+    return HttpResponse('Activation link is invalid.', status=401)
+
+
+@csrf_exempt
+@require_POST
+@activate_required
+def reset_password(request):
+    message = render_to_string('email/reset_password.html', {
+        'prefix': 'https://' if request.is_secure() else 'http://',
+        'user': request.user,
+        'domain': request.get_host(),
+        'uid': urlsafe_base64_encode(force_bytes(request.user.pk)),
+        'token': default_token_generator.make_token(request.user),
+        'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
+    })
+    mail_subject = '[NCKU Smart Campus App] Reset account password'
+    email = EmailMessage(mail_subject, message, to=[request.user.email])
+    email.send()
+
+    return HttpResponse('Reset password email is been sent.', status=200)
+
+
+@csrf_exempt
+def reset_password_page(request, uidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if not user or not default_token_generator.check_token(user, token):
+        return HttpResponse('Reset Password link is invalid.', status=401)
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        user.set_password(password)
+        user.save()
+
+        return HttpResponse('Reset password succeeded', status=200)
+
+    context = {
+        'user': user
+    }
+
+    return render(request, 'app/reset_password_page.html', context)

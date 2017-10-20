@@ -26,5 +26,10 @@ urlpatterns = [
     url('^get_unanswered_question/$', views.get_unanswered_question,
         name='Get Unanswered questsion'),
     url('^add_answered_question/$', views.add_answered_question,
-        name='Add Answered Question')
+        name='Add Answered Question'),
+    url('^activate/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.activate, name='Activate'),
+    url('^reset_password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
+        views.reset_password_page, name='Reset Password Page'),
+    url('^reset_password/$', views.reset_password, name="Reset Password")
 ]
