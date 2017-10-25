@@ -815,7 +815,6 @@ def manager_list_page(request):
         'email': request.user.email,
         'managers': User.objects.exclude(role__name='User'),
         'categories': StationCategory.objects.all().order_by('id'),
-        'email': request.user.email,
     }
 
     return render(request, 'app/manager_list_page.html', context)
