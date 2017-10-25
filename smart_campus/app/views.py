@@ -39,7 +39,7 @@ from .models import (
     Choice
 )
 from .forms import (
-    StationForm,
+    PartialStationForm,
     StationCategoryForm,
     ManagerForm,
     PartialRewardForm,
@@ -299,11 +299,11 @@ def station_edit_page(request, pk):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        # Use custom StationForm to validate form datas
+        # Use custom PartialStationForm to validate form datas
         # is_valid() will be true if received data is good
         # There'll be error messages in 'form' instance if validation failed
         # cleaned_data will be the form inputs from the request
-        form = StationForm(request.POST, request.FILES, instance=station)
+        form = PartialStationForm(request.POST, request.FILES, instance=station)
         if form.is_valid():
             data = form.cleaned_data
             station = form.save(commit=False)
@@ -335,7 +335,7 @@ def station_edit_page(request, pk):
         # save the inputs back for redirection
         form_data = form.cleaned_data
     else:
-        form = StationForm()
+        form = PartialStationForm()
 
         # Load datas from the model instance
         form_data = {
@@ -345,13 +345,16 @@ def station_edit_page(request, pk):
             'beacon': station.beacon_set.first().name,
             'lng': station.location.x,
             'lat': station.location.y,
-            'reward': station.reward_set.first()
+            'reward': station.reward_set.first(),
+            'owner_group': station.owner_group,
         }
 
     if request.user.can(Permission.ADMIN):
         beacon_set = Beacon.objects.all()
+        user_groups = UserGroup.objects.all().order_by('id')
     elif request.user.can(Permission.EDIT):
         beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+        user_groups = UserGroup.objects.filter(name=request.user.group)
     else:
         return HttpResponseForbidden()
 
@@ -363,7 +366,8 @@ def station_edit_page(request, pk):
         'form_data': form_data,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
         'images': StationImage.objects.filter(station_id=station.id),
-        'rewards': Reward.objects.filter(related_station=None).union(station.reward_set.all())
+        'rewards': Reward.objects.filter(related_station=None).union(station.reward_set.all()),
+        'user_groups': user_groups,
     }
     return render(request, 'app/station_edit_page.html', context)
 
@@ -406,18 +410,17 @@ def delete_station_image(request, pk):
 
 
 @login_required
-def station_new_page(request):
+def station_add_page(request):
     if request.method == 'POST':
-        # Use custom StationForm to validate form datas
+        # Use custom PartialStationForm to validate form datas
         # is_valid() will be true if received data is good
         # There'll be error messages in 'form' instance if validation failed
         # cleaned_data will be the form inputs from the request
-        form = StationForm(request.POST, request.FILES)
+        form = PartialStationForm(request.POST, request.FILES)
         if form.is_valid():
             data = form.cleaned_data
             station = form.save(commit=False)
             station.location = Point(x=data['lng'], y=data['lat'])
-            station.owner_group = request.user.group
             station.save()
             # save first
             # need an instance to add beacons
@@ -436,12 +439,14 @@ def station_new_page(request):
 
             return HttpResponseRedirect('/stations/')
     else:
-        form = StationForm()
+        form = PartialStationForm()
 
     if request.user.can(Permission.ADMIN):
         beacon_set = Beacon.objects.all()
+        user_groups = UserGroup.objects.all().order_by('id')
     elif request.user.can(Permission.EDIT):
         beacon_set = Beacon.objects.filter(owner_group=request.user.group)
+        user_groups = UserGroup.objects.filter(name=request.user.group)
     else:
         return HttpResponseForbidden()
 
@@ -451,8 +456,9 @@ def station_new_page(request):
         'beacons': beacon_set,
         'form': form,
         'max_imgs': settings.MAX_IMGS_UPLOAD,
+        'user_groups': user_groups,
     }
-    return render(request, 'app/station_new_page.html', context)
+    return render(request, 'app/station_add_page.html', context)
 
 
 @csrf_exempt
@@ -838,7 +844,8 @@ def manager_add_page(request):
         'roles': roles,
         'groups': groups,
         'form': form,
-        'categories': StationCategory.objects.all().order_by('id')
+        'categories': StationCategory.objects.all().order_by('id'),
+        'email': request.user.email,
     }
 
     return render(request, 'app/manager_add_page.html', context)

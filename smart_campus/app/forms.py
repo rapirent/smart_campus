@@ -19,21 +19,21 @@ from .models import(
 )
 
 
-class StationForm(ModelForm):
+class PartialStationForm(ModelForm):
     beacon = CharField()
     lat = FloatField()
     lng = FloatField()
     main_img_num = IntegerField(required=False)
 
     def __init__(self, *args, **kwargs):
-        super(StationForm, self).__init__(*args, **kwargs)
+        super(PartialStationForm, self).__init__(*args, **kwargs)
         for i in range(1, settings.MAX_IMGS_UPLOAD + 1):
             field_name = 'img{0}'.format(i)
             self.fields[field_name] = ImageField(required=False)
 
     class Meta:
         model = Station
-        fields = ('name', 'content', 'category')
+        exclude = ['location']
 
 
 class StationCategoryForm(ModelForm):
