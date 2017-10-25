@@ -67,6 +67,7 @@
         {% endif %}
       </tfoot>
     </table>
+    {% if is_administrator %}
     <div class="ui horizontal divider">
       OR
     </div>
@@ -74,5 +75,6 @@
       新增管理者
       <i class="add icon"></i>
     </a>
+    {% endif %}
   </div>
 {% endblock %}
