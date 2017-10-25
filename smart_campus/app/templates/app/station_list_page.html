@@ -38,6 +38,10 @@
                   <i class="globe icon"></i>
                   {{ station.category}}
                 </div>
+                <div class="ui label">
+                  <i class="asterisk icon"></i>
+                  {{ station.owner_group.name}}
+                </div>
                 <div class="ui right floated buttons">
                   <a class="ui basic green button" href="{% url 'Edit Station Page' station.id %}">修改</a>
                   <a class="ui basic red button" href="{% url 'Delete Station Page' station.id %}">刪除</a>

@@ -27,9 +27,21 @@
             {% endif %}
           </select>
         </div>
-        <div class="three wide field">
+
+        <div class="required field">
+          <label>管理群組</label>
+          <select class="ui selection dropdown" name="owner_group">
+            {% if user_groups %}
+              {% for user_group in user_groups %}
+                <option value="{{ user_group.id }}" {% if form_data.owner_group|stringformat:"s" == user_group.name|stringformat:"s" %}selected{% endif %} >{{ user_group.name }}</option>
+              {% endfor %}
+            {% endif %}
+          </select>
+        </div>
+
+        <div class="field">
           <label>綁定收藏品</label>
-          <div class="ui search selection dropdown"> 
+          <div class="ui search selection dropdown">
             <input type="hidden" name="reward" value="{{ form_data.reward.id|default:0 }}">
             <i class="search icon"></i>
             <div class="default text">選擇收藏品</div>
@@ -47,6 +59,7 @@
             </div>
           </div>
         </div>
+
       </div>
       <hr>
       <div class="field">

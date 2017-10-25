@@ -35,6 +35,25 @@
             </div>
           </div>
         </div>
+
+        <div class="required field">
+          <label>管理群組</label>
+          <div class="ui selection dropdown">
+            <input type="hidden" name="owner_group">
+            <i class="dropdown icon"></i>
+            <div class="default text">請選擇群組...</div>
+            <div class="menu">
+              {% if user_groups %}
+                {% for user_group in user_groups %}
+                  <div class="item" value="{{ user_group.name }}" data-value="{{ user_group.id }}">
+                    {{ user_group.name }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
       </div>
       <hr>
 
