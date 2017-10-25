@@ -92,18 +92,22 @@
           </a>
         </div>
       </div>
-      <a class="item" href="{% url 'Reward List Page' %}" id="reward">
-        <i class="large trophy icon"></i>
-        管理收藏品
-      </a>
+      {% if is_administrator %}
+        <a class="item" href="{% url 'Reward List Page' %}" id="reward">
+          <i class="large trophy icon"></i>
+          管理收藏品
+        </a>
+      {% endif %}
       <a class="item" href="{% url 'Question List Page' %}" id="question">
         <i class="large game icon"></i>
         管理挑戰
       </a>
-      <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
-        <i class="large bluetooth icon"></i>
-        管理beacon
-      </a>
+      {% if is_administrator %}
+        <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
+          <i class="large bluetooth icon"></i>
+          管理beacon
+        </a>
+      {% endif %}
       <a class="item" href="{% url 'TravelPlan List Page' %}" id="itinerary">
         <i class="large map signs  icon"></i>
         管理行程

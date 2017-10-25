@@ -211,7 +211,11 @@ def logout_page(request):
 def index(request):
     categories = StationCategory.objects.all().order_by('id')
 
-    context = {'email': request.user.email, 'categories': categories}
+    context = {
+        'email': request.user.email,
+        'categories': categories,
+        'is_administrator': request.user.is_administrator,
+    }
     return render(request, 'app/index.html', context)
 
 
@@ -860,7 +864,7 @@ def manager_edit_page(request, pk):
         return HttpResponseForbidden()
 
     if request.method == 'POST':
-        form = PartialManagerForm(request.POST, instance=manager)
+        form = ManagerForm(request.POST, instance=manager)
         password = request.POST.get('password')
 
         if form.is_valid():
