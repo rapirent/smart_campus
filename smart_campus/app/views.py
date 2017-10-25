@@ -46,7 +46,8 @@ from .forms import (
     PartialTravelPlanForm,
     RewardForm,
     BeaconForm,
-    QuestionForm
+    QuestionForm,
+    PartialManagerForm
 )
 from .tokens import account_activation_token
 
@@ -210,7 +211,11 @@ def logout_page(request):
 def index(request):
     categories = StationCategory.objects.all().order_by('id')
 
-    context = {'email': request.user.email, 'categories': categories}
+    context = {
+        'email': request.user.email,
+        'categories': categories,
+        'is_administrator': request.user.is_administrator,
+    }
     return render(request, 'app/index.html', context)
 
 
@@ -813,8 +818,9 @@ def manager_list_page(request):
 
     context = {
         'email': request.user.email,
-        'managers': User.objects.exclude(role__name='User'),
-        'categories': StationCategory.objects.all().order_by('id'),
+        'is_administrator': request.user.is_administrator,
+        'managers': managers,
+        'categories': StationCategory.objects.all().order_by('id')
     }
 
     return render(request, 'app/manager_list_page.html', context)
@@ -854,12 +860,19 @@ def manager_add_page(request):
 def manager_edit_page(request, pk):
     manager = get_object_or_404(User, pk=pk)
 
+    if request.user == manager:
+        return HttpResponseForbidden()
+
     if request.method == 'POST':
         form = ManagerForm(request.POST, instance=manager)
+        password = request.POST.get('password')
 
         if form.is_valid():
             data = form.cleaned_data
-            form.save()
+            manager = form.save(commit=False)
+            if password:
+                manager.set_password(password)
+            manager.save()
             return HttpResponseRedirect('/managers/')
     else:
         form = ManagerForm()
@@ -867,7 +880,8 @@ def manager_edit_page(request, pk):
     form_data = {
         'email': manager.email,
         'role': manager.role,
-        'group': manager.group
+        'group': manager.group,
+        'nickname': manager.nickname,
     }
 
     roles = Role.objects.exclude(name='User')
@@ -877,7 +891,8 @@ def manager_edit_page(request, pk):
         'groups': groups,
         'form': form,
         'form_data': form_data,
-        'categories': StationCategory.objects.all().order_by('id')
+        'categories': StationCategory.objects.all().order_by('id'),
+        'email': request.user.email,
     }
 
     return render(request, 'app/manager_edit_page.html', context)
@@ -1194,7 +1209,7 @@ def question_list_page(request):
         stations = Station.objects.all()
         question_list = Question.objects.all().order_by('id')
     else:
-        stations = Satation.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(owner_group=request.user.group)
         question_list = Question.objects.filter(
             linked_station__in=stations
         ).order_by('id')
@@ -1251,7 +1266,7 @@ def question_add_page(request):
     if request.user.is_administrator():
         stations = Station.objects.all()
     else:
-        stations = Satation.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(owner_group=request.user.group)
 
     context = {
         'email': request.user.email,
@@ -1530,3 +1545,39 @@ def reset_password_page(request, uidb64, token):
     }
 
     return render(request, 'app/reset_password_page.html', context)
+
+
+@login_required
+def manager_edit_self_page(request, pk):
+    manager = get_object_or_404(User, pk=pk)
+
+    if request.user != manager:
+        return HttpResponseForbidden()
+
+    if request.method == 'POST':
+        form = PartialManagerForm(request.POST, instance=manager)
+        password = request.POST.get('password')
+
+        if form.is_valid():
+            data = form.cleaned_data
+            manager = form.save(commit=False)
+            if password:
+                manager.set_password(password)
+            manager.save()
+            return HttpResponseRedirect('/managers/')
+    else:
+        form = PartialManagerForm()
+
+    form_data = {
+        'email': manager.email,
+        'nickname': manager.nickname,
+    }
+
+    context = {
+        'form': form,
+        'form_data': form_data,
+        'categories': StationCategory.objects.all().order_by('id'),
+        'email': request.user.email,
+    }
+
+    return render(request, 'app/manager_edit_self_page.html', context)

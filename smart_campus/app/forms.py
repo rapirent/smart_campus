@@ -62,7 +62,7 @@ class RewardForm(ModelForm):
 class ManagerForm(ModelForm):
     class Meta:
         model = User
-        fields = ('email', 'group', 'role')
+        fields = ('email', 'group', 'role', 'nickname')
 
 
 class BeaconForm(ModelForm):
@@ -90,3 +90,9 @@ class QuestionForm(ModelForm):
     class Meta:
         model = Question
         fields = '__all__'
+
+
+class PartialManagerForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ('nickname',)

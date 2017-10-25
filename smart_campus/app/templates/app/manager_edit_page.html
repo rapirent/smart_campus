@@ -48,6 +48,18 @@
           </div>
         </div>
       </div>
+      <div class="field five wide field">
+        <label>暱稱</label>
+        <input type="text" name="nickname" value="{{ form_data.nickname }}">
+      </div>
+      <div class="five wide field">
+        <label>新密碼</label>
+        <input type="password" name="password" placeholder="密碼">
+      </div>
+      <div class="five wide field">
+        <label>請再輸入一次新密碼</label>
+        <input type="password" name="password2" placeholder="請再輸入一次密碼">
+      </div>
       <button class="ui submit teal button" type="submit">儲存</button>
       <div class="ui error message"></div>
     </form>
