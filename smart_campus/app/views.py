@@ -420,7 +420,6 @@ def station_add_page(request):
             data = form.cleaned_data
             station = form.save(commit=False)
             station.location = Point(x=data['lng'], y=data['lat'])
-            station.owner_group = request.user.group
             station.save()
             # save first
             # need an instance to add beacons
