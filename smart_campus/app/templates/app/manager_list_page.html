@@ -24,7 +24,7 @@
               <td class="collapsing">
                 <div class="ui mini buttons">
                   {% if manager.email == email %}
-                    <a class="ui basic green floated button" href="{% url 'Manager Edit Page' manager.email %}">修改</a>
+                    <a class="ui basic green floated button" href="{% url 'Manager Edit Self Page' manager.email %}">修改</a>
                     <i class="ui basic grey floated button" style="cursor: not-allowed;">刪除</i>
                   {% elif is_administrator %}
                     <a class="ui basic green floated button" href="{% url 'Manager Edit Page' manager.email %}">修改</a>

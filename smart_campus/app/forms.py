@@ -90,3 +90,9 @@ class QuestionForm(ModelForm):
     class Meta:
         model = Question
         fields = '__all__'
+
+
+class PartialManagerForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ('nickname',)

@@ -64,6 +64,8 @@ urlpatterns = [
         name='Manager Edit Page'),
     url(r'^managers/(?P<pk>[^/]+)/delete/$', app.views.manager_delete_page,
         name='Manager Delete Page'),
+    url(r'^managers/(?P<pk>[^/]+)/edit_self/$',
+        app.views.manager_edit_self_page, name='Manager Edit Self Page'),
 
     # Beacons
     url(r'^beacons/$', app.views.beacon_list_page,
