@@ -807,7 +807,8 @@ def manager_list_page(request):
 
     context = {
         'email': request.user.email,
-        'managers': User.objects.exclude(role__name='User'),
+        'is_administrator': request.user.is_administrator,
+        'managers': managers,
         'categories': StationCategory.objects.all().order_by('id')
     }
 
@@ -1523,3 +1524,7 @@ def reset_password_page(request, uidb64, token):
     }
 
     return render(request, 'app/reset_password_page.html', context)
+
+
+def manager_reset_password_page(request):
+    pass
