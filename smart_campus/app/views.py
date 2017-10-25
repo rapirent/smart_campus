@@ -1188,7 +1188,7 @@ def question_list_page(request):
         stations = Station.objects.all()
         question_list = Question.objects.all().order_by('id')
     else:
-        stations = Satation.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(owner_group=request.user.group)
         question_list = Question.objects.filter(
             linked_station__in=stations
         ).order_by('id')
@@ -1245,7 +1245,7 @@ def question_add_page(request):
     if request.user.is_administrator():
         stations = Station.objects.all()
     else:
-        stations = Satation.objects.filter(owner_group=request.user.group)
+        stations = Station.objects.filter(owner_group=request.user.group)
 
     context = {
         'email': request.user.email,
