@@ -409,7 +409,7 @@ def delete_station_image(request, pk):
 
 
 @login_required
-def station_new_page(request):
+def station_add_page(request):
     if request.method == 'POST':
         # Use custom PartialStationForm to validate form datas
         # is_valid() will be true if received data is good
@@ -458,7 +458,7 @@ def station_new_page(request):
         'max_imgs': settings.MAX_IMGS_UPLOAD,
         'user_groups': user_groups,
     }
-    return render(request, 'app/station_new_page.html', context)
+    return render(request, 'app/station_add_page.html', context)
 
 
 @csrf_exempt
