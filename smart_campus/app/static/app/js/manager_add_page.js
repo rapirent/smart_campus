@@ -33,6 +33,15 @@ $(document).ready(function() {
           }
         ]
       },
+      group: {
+        identifier: "group",
+        rules: [
+          {
+            type: "empty",
+            prompt: "請選擇群組"
+          }
+        ]
+      },
       role: {
         identifier: "role",
         rules: [
