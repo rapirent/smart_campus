@@ -67,7 +67,7 @@
         {% endif %}
       </tfoot>
     </table>
-    {% if is_administrator %}
+    {% if request.user.is_administrator %}
     <div class="ui horizontal divider">
       OR
     </div>

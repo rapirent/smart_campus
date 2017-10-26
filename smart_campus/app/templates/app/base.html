@@ -42,8 +42,8 @@
     </a>
     <div class="item">
       <i class="large mail icon"></i>
-      {% if email %}
-        {{ email }}
+      {% if request.user.email %}
+        {{ request.user.email }}
       {% endif %}
     </div>
     <a class="item" href="{% url 'Logout Page' %}" >
@@ -87,12 +87,14 @@
           <a class="item" href="{% url 'Manager List Page' %}">
             管理者清單
           </a>
-          <a class="item" href="{% url 'Group List Page' %}">
-            管理群組清單
-          </a>
+          {% if request.user.is_administrator %}
+            <a class="item" href="{% url 'Group List Page' %}">
+              管理群組清單
+            </a>
+          {% endif %}
         </div>
       </div>
-      {% if is_administrator %}
+      {% if request.user.is_administrator %}
         <a class="item" href="{% url 'Reward List Page' %}" id="reward">
           <i class="large trophy icon"></i>
           管理收藏品
@@ -102,7 +104,7 @@
         <i class="large game icon"></i>
         管理挑戰
       </a>
-      {% if is_administrator %}
+      {% if request.user.is_administrator %}
         <a class="item" href="{% url 'Beacon List Page' %}" id="beacon">
           <i class="large bluetooth icon"></i>
           管理beacon
