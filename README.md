@@ -43,6 +43,13 @@ export POSTGRESQL_HOST='db_host'
 export POSTGRESQL_PORT='db_port'
 export DJANGO_SETTINGS_MODULE="smart_campus.settings.production"
 ```
+
+### Setup Mail Server
+
+- Setup the mail user & password (using gmail in default) in settings/settings.py
+    - `EMAIL_HOST_USER`
+    - `EMAIL_HOST_PASSWORD`
+
 #### Nginx, uwsgi setup
 - [Setting up Django and your web server with uWSGI and nginx](http://uwsgi-docs.readthedocs.io/en/latest/tutorials/Django_and_nginx.html)
 - Put your nginx settings file *.conf in /etc/nginx/sites-enabled/
