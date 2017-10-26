@@ -5,6 +5,8 @@ from django.contrib.auth.base_user import (
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 
+import sys
+
 
 class Beacon(models.Model):
     beacon_id = models.CharField(max_length=200, primary_key=True)
@@ -37,6 +39,23 @@ class UserManager(BaseUserManager):
         user.full_clean()
         user.save()
         return user
+
+    def create_superuser(self, email, password=None, nickname=""):
+        try:
+            admin_role = Role.objects.get(name='Administrator')
+        except Role.DoesNotExist:
+            sys.stdout.write(
+                'Roles are not yet created when creating superuser.\n'
+                'Invoke "initroles" command to create default roles.\n'
+                '\n'
+            )
+            Role.insert_roles()
+            admin_role = Role.objects.get(name='Administrator')
+
+
+        user = self.create_user(email, password)
+        user.role = admin_role
+        user.save()
 
 
 class User(AbstractBaseUser):
