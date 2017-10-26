@@ -93,13 +93,12 @@ def signup(request):
     if not user_email or not password:
         return HttpResponse('Either email or password input is missing.', status=400)
 
-    if User.objects.filter(email=user_email).exists():
-        return HttpResponse('The email is already taken, try another!', status=400)
-
     try:
         user = User.objects.create_user(user_email, password, nickname)
     except (ValueError, ValidationError) as error:
         return HttpResponse(error, status=400)
+    except IntegrityError:
+        return HttpResponse('The email is already taken, try another!', status=400)
 
     message = render_to_string('email/activation.html', {
         'prefix': 'https://' if request.is_secure() else 'http://',
