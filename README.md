@@ -12,7 +12,8 @@
 1. [Install Software & Configure Environemnt](#sec1)
 2. [Setup Setting Files](#sec2)
 3. [Run Server](#sec3)
-4. [Testing](#sec4)
+4. [Setup default data](#sec4)
+5. [Testing](#sec5)
 
 <a name="sec1"></a>
 ## 1. Install Software & Configure Environemnt
