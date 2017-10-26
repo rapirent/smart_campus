@@ -119,6 +119,8 @@ Setup the mail user & password (using gmail in default) in settings/settings.py
 - `EMAIL_HOST_USER`
 - `EMAIL_HOST_PASSWORD`
 
+Note that you will have to enable 'insecure access' in your gmail account.
+
 <a name='sec3'></a>
 ## 3. Runserver
 
