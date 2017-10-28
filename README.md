@@ -137,6 +137,7 @@ python manage.py runserver --settings=smart_campus.settings.local_settings
 - Put your nginx settings file *.conf in /etc/nginx/sites-enabled/
 
 #### Run uwsgi
+Run uWSGI as root, but be sure to drop privileges with the uid and gid options in *.ini settings file
 ##### Start
 ```sh
 $ uwsgi --ini server-settings/smart_campus.ini
