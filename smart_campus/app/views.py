@@ -63,18 +63,14 @@ def administrator_required(function):
 
 def activate_required(function):
     @wraps(function)
-    def wrapper(request, *args, **kargs):
+    def wrapper(request, email, *args, **kargs):
         try:
-            user_email = request.POST.get('email')
-            request.user = User.objects.get(email=user_email)
+            request.user = User.objects.get(email=email)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-            # AnonymousUser
-            pass
-        if request.user.is_anonymous:
             return HttpResponse('The user does not exist.', status=400)
         if not request.user.email_confirmed:
             return HttpResponse('The user is not activated.', status=401)
-        return function(request, *args, **kargs)
+        return function(request, email, *args, **kargs)
     return wrapper
 
 
@@ -1477,7 +1473,7 @@ def activate(request, uidb64, token):
 @csrf_exempt
 @require_POST
 @activate_required
-def reset_password(request):
+def reset_password(request, email):
     message = render_to_string('email/reset_password.html', {
         'prefix': 'https://' if request.is_secure() else 'http://',
         'user': request.user,
@@ -1550,3 +1546,28 @@ def manager_edit_self_page(request, pk):
     }
 
     return render(request, 'app/manager_edit_self_page.html', context)
+
+
+@csrf_exempt
+@require_POST
+def resend_activation(request, email):
+    try:
+        user = User.objects.get(email=email)
+    except (TypeError, ValueError, OverflowError, User.DoestNotExist):
+        return HttpResponse('The user does not exist.', status=400)
+    if user.email_confirmed:
+        return HttpResponse('The user is already activated.', status=401)
+
+    message = render_to_string('email/activation.html', {
+        'prefix': 'https://' if request.is_secure() else 'http://',
+        'user': user,
+        'domain': request.get_host(),
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+        'token': account_activation_token.make_token(user),
+        'expired_days': settings.PASSWORD_RESET_TIMEOUT_DAYS
+    })
+    mail_subject = '[NCKU Smart Campus App] Please activate your account'
+    email = EmailMessage(mail_subject, message, to=[user.email])
+    email.send()
+
+    return HttpResponse('The activation email is sent!', status=201)

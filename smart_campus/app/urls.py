@@ -31,5 +31,8 @@ urlpatterns = [
         views.activate, name='Activate'),
     url('^reset_password/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
         views.reset_password_page, name='Reset Password Page'),
-    url('^reset_password/$', views.reset_password, name="Reset Password")
+    url('^reset_password/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$',
+        views.reset_password, name="Reset Password"),
+    url('^resend_activation/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$',
+        views.resend_activation, name="Resend Activation Email")
 ]
