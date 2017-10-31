@@ -98,6 +98,8 @@ def signup(request):
         user = User.objects.create_user(user_email, password, nickname)
     except (ValueError, ValidationError) as error:
         return HttpResponse(error, status=400)
+    except IntegrityError:
+        return HttpResponse('The email is already taken, try another!', status=409)
 
     message = render_to_string('email/activation.html', {
         'prefix': 'https://' if request.is_secure() else 'http://',
