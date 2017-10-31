@@ -87,14 +87,14 @@ def signup(request):
     nickname = request.POST.get('nickname')
 
     if not user_email or not password or not nickname:
-        return HttpResponse('Either email, password or nickname input is missing.', status=404)
+        return HttpResponse('Either email, password or nickname input is missing.', status=422)
 
     try:
         user = User.objects.create_user(user_email, password, nickname)
     except (ValueError, ValidationError) as error:
         return HttpResponse(error, status=400)
     except IntegrityError:
-        return HttpResponse('The email is already taken, try another!', status=403)
+        return HttpResponse('The email is already taken, try another!', status=409)
 
     message = render_to_string('email/activation.html', {
         'prefix': 'https://' if request.is_secure() else 'http://',
