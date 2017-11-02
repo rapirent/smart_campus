@@ -1364,7 +1364,7 @@ def station_search_page(request):
         'categories': StationCategory.objects.all().order_by('id')
     }
 
-    return render(request, 'app/station_list.html', context)
+    return render(request, 'app/station_list_page.html', context)
 
 
 @login_required
