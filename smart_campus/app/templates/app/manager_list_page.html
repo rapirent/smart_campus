@@ -23,14 +23,14 @@
               <td class="collapsing">{{ manager.group.name }}</td>
               <td class="collapsing">
                 <div class="ui mini buttons">
-                  {% if manager.email == email %}
-                    <a class="ui basic green floated button" href="{% url 'Manager Edit Self Page' manager.email %}">修改</a>
+                  {% if manager.email == request.user.email %}
+                    <i class="ui basic grey floated button" style="cursor: not-allowed;">修改</i>
                     <i class="ui basic grey floated button" style="cursor: not-allowed;">刪除</i>
                   {% elif request.user.is_administrator %}
                     <a class="ui basic green floated button" href="{% url 'Manager Edit Page' manager.email %}">修改</a>
                     <a class="ui basic red floated button" href="{% url 'Manager Delete Page' manager.email %}">刪除</a>
                   {% else %}
-                    <i class="ui basic grey floated button" style="cursor: not-allowed;">修改</i>
+                    <a class="ui basic green floated button" href="{% url 'Manager Edit Self Page' manager.email %}">修改</a>
                     <i class="ui basic grey floated button" style="cursor: not-allowed;">刪除</i>
                   {% endif %}
                 </div>
