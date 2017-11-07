@@ -75,7 +75,10 @@ class User(AbstractBaseUser):
     earned_coins = models.IntegerField(default=0)
 
     answered_questions = models.ManyToManyField('Question')
-    visited_beacons = models.ManyToManyField('Beacon')
+    visited_beacons = models.ManyToManyField(
+        'Beacon',
+        through='UserVisitedBeacons'
+    )
     favorite_stations = models.ManyToManyField('Station')
 
     received_rewards = models.ManyToManyField(
@@ -103,6 +106,13 @@ class User(AbstractBaseUser):
             email=self.email,
             name=self.nickname
         )
+
+
+class UserVisitedBeacons(models.Model):
+    user = models.ForeignKey('User', on_delete=models.CASCADE)
+    beacon = models.ForeignKey('Beacon', on_delete=models.CASCADE)
+    # Automatically record the time this entry created
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class UserGroup(models.Model):
