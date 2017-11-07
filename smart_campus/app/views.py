@@ -36,7 +36,7 @@ from .models import (
     UserReward, UserGroup,
     TravelPlan, Role,
     TravelPlanStations,
-    Choice
+    Choice, UserVisitedBeacons
 )
 from .forms import (
     PartialStationForm,
@@ -541,6 +541,15 @@ def get_all_stations(request):
 def get_linked_stations(request):
     """API for retrieving list of stations linked to the Beacon"""
     beacon_id = request.POST.get('beacon_id')
+    user_email = request.POST.get('email')
+
+    user = User.objects.filter(email=user_email).first()
+    if not user:
+        return HttpResponse('User does not exist', status=404)
+
+    beacon = Beacon.objects.filter(beacon_id=beacon_id).first()
+    if beacon:
+        UserVisitedBeacons.objects.create(user=user, beacon=beacon)
 
     stations = Station.objects.filter(beacon__beacon_id=beacon_id)
     if not stations:
