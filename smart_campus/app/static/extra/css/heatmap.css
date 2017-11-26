@@ -1,0 +1,32 @@
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+}
+#mapid { height: 600px;width: 1200px; z-index:1;position: absolute;}
+#description {
+	width: 220px;
+	padding: 10px;
+	right: 10px;
+	top: 1%;
+	z-index: 2;
+	position: absolute;
+	box-shadow: 5px 5px 2px grey;
+}
+body {
+	font-family: Arial, "文泉驛正黑", "WenQuanYi Zen Hei", "儷黑 Pro", "LiHei Pro", "微軟正黑體", "Microsoft JhengHei", "標楷體", DFKai-SB, sans-serif;
+		font-size: 17px;
+}		
+#biggertext {
+	font-size: 50px;
+}
+#Switcher{
+	z-index: 2;
+}
+#number_header,#area_header,#other_header{
+	border-radius:10px 10px 0px 0px;
+}
+#number,#area,#other{
+	border-radius:0px 0px 10px 10px;
+}

@@ -1,0 +1,25 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}HeatMap{% endblock %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+  <link rel="stylesheet" type="text/css" href="{% static 'extra/css/heatmap.css' %}" />
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+  <div style="height: 600px;width: 1200px;" class="w3-display-middle">
+    <div id="mapid" ></div>
+  </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+  <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+  <script type="text/javascript" src="{% static 'extra/js/heatmap.js' %}"></script>
+{% endblock %}

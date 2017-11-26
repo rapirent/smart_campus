@@ -107,7 +107,10 @@ urlpatterns = [
     url(r'^questions/(?P<pk>\d+)/edit/$', app.views.question_edit_page,
         name='Question Edit Page'),
     url(r'^questions/(?P<pk>\d+)/delete/$', app.views.question_delete_page,
-        name='Question Delete Page')
+        name='Question Delete Page'),
+
+    # Extras
+    url(r'^heatview/$', app.views.beacon_heatmap_page, name='Beacon Heatmap Page')
 ]
 
 if settings.DEBUG:

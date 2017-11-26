@@ -28,6 +28,7 @@ import os
 import random
 import json
 from functools import wraps
+import pytz
 
 from .models import (
     User, Reward, Permission,
@@ -1586,3 +1587,24 @@ def resend_activation(request, email):
     email.send()
 
     return HttpResponse('The activation email is sent!', status=201)
+
+
+@login_required
+def beacon_heatmap_page(request):
+    return render(request, 'extra/heatmap.html')
+
+
+@login_required
+def get_beacon_detect_data(request):
+    data = [
+        {
+            'beacon_id': visit_record.beacon.name,
+            'lat': visit_record.beacon.location.y,
+            'lng': visit_record.beacon.location.x,
+            'date': str(visit_record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).date()),
+            'time': str(visit_record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).time()),
+        }
+        for visit_record in UserVisitedBeacons.objects.all()
+    ]
+
+    return JsonResponse(data={'data': data}, status=200)

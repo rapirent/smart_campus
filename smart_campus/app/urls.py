@@ -34,5 +34,6 @@ urlpatterns = [
     url('^reset_password/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$',
         views.reset_password, name="Reset Password"),
     url('^resend_activation/(?P<email>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$',
-        views.resend_activation, name="Resend Activation Email")
+        views.resend_activation, name="Resend Activation Email"),
+    url('^get_beacon_detect_data/$', views.get_beacon_detect_data, name="Get Beacon DetectData")
 ]
