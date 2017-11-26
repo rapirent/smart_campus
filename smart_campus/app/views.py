@@ -1073,9 +1073,10 @@ def travelplan_edit_page(request, pk):
                     changed_travelplan.first().save()
                     exist_travelplan_stations.remove(int(station_id))
 
-            for travelplan_id in exist_travelplan_stations:
-                TravelPlanStations.objects.get(
-                    station_id=travelplan_id
+            for station_id in exist_travelplan_stations:
+                TravelPlanStations.objects.filter(
+                    travelplan=travelplan,
+                    station_id=station_id
                 ).delete()
 
             context = {
