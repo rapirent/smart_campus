@@ -23,6 +23,7 @@ from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_text
 from django.contrib.auth.tokens import default_token_generator
+from django.db.models import Count
 
 import os
 import random
@@ -1596,7 +1597,7 @@ def beacon_heatmap_page(request):
 
 @login_required
 def get_beacon_detect_data(request):
-    data = [
+    each_entry_data = [
         {
             'beacon_id': visit_record.beacon.name,
             'lat': visit_record.beacon.location.y,
@@ -1607,4 +1608,22 @@ def get_beacon_detect_data(request):
         for visit_record in UserVisitedBeacons.objects.all()
     ]
 
-    return JsonResponse(data={'data': data}, status=200)
+    beacon_data=Beacon.objects.annotate(num=Count('uservisitedbeacons')).order_by('-num')
+    individual_detect_count = [
+        {
+            'beacon_id': beacon.name,
+            'lat': beacon.location.y,
+            'lng': beacon.location.x,
+            'count': beacon.num
+        }
+        for beacon in beacon_data
+    ]
+
+    return JsonResponse(
+        data={
+            'data': each_entry_data,
+            'data_with_each_detection_cnt': individual_detect_count,
+            'total': UserVisitedBeacons.objects.count()
+        },
+        status=200
+    )

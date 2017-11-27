@@ -8,14 +8,59 @@ baseMaps = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?acc
 }).addTo(mymap);
 
 var addressPoints = []
-
+var beacon_marker_data;
+var markerGroup = L.layerGroup();
 $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_data/', function (data) {
     //data is the JSON string
-    var records = data.data;
+    var records = data.data;//_with_each_detection_cnt;
     for (var entry in records){
-      addressPoints.push([records[entry].lat.toString(), records[entry].lng.toString()])
+      if (entry.count != 0) {
+        addressPoints.push([records[entry].lat.toString(), records[entry].lng.toString()])
+      }
     }
+    console.log(addressPoints)
+    var heat1 = L.heatLayer(addressPoints,{minOpacity:0.5, radius:15, blur:8, gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}});
+    heat1.addTo(mymap);
 
-    var heat1 = L.heatLayer(addressPoints,{minOpacity:0.6, radius:10, blur:0});
-    heat1.addTo(mymap); 
+    beacon_marker_data = data.data_with_each_detection_cnt;
+    for (var entry in beacon_marker_data){
+        var marker = L.marker([beacon_marker_data[entry].lat.toString(), beacon_marker_data[entry].lng.toString()]).addTo(markerGroup)
+            .bindPopup("偵測次數：" + beacon_marker_data[entry].count);
+    }
 });
+
+var btn_show_marker_clicked = false;
+$('#btn_show_marker').on('click', function() {
+    if (!beacon_marker_data) return;
+    if(!btn_show_marker_clicked){
+        markerGroup.addTo(mymap);
+        btn_show_marker_clicked = true;
+        $('#btn_show_marker').text('隱藏站點圖釘');
+    }else{
+        mymap.removeLayer(markerGroup);
+        btn_show_marker_clicked = false;
+        $('#btn_show_marker').text('顯示站點圖釘');
+    }
+});
+/*
+$(document)
+    .ready(function() {
+
+      // fix menu when passed
+      $('.masthead')
+        .visibility({
+          once: false,
+          onBottomPassed: function() {
+		console.log('passed');
+            $('.fixed.menu').transition('fade in');
+          },
+          onBottomPassedReverse: function() {
+            $('.fixed.menu').transition('fade out');
+          }
+        })
+      ;
+
+    })
+  ;
+*/
+$('#section-1').scroll(function () {$('#mapid').transition('pulse')}); 
