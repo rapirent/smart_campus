@@ -6,6 +6,37 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
   <link rel="stylesheet" type="text/css" href="{% static 'extra/css/heatmap.css' %}" />
+  <style>
+    .masthead {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 0em;
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 0px;
+      border-bottom: none;
+
+      background-color: #000000;
+      background-position: 50% 50%;
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+    }
+    .masthead:after {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      z-index: -1;
+      width: 100%;
+      height: 100%;
+      content: '';
+      background-size: cover;
+
+      opacity: 0.45;
+    }
+    .masthead.bg1:after {
+      background-image: url({% static 'extra/images/2-1.png' %});
+    }
+  </style>
 {% endblock %}
 
 {% block script %}
@@ -19,14 +50,103 @@
 {% endblock %}
 
 {% block content %}
+<script
+src="https://code.jquery.com/jquery-3.1.1.min.js"
+integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+crossorigin="anonymous"></script>
+<script>
+  $(document).ready(function() {
+    /*$('.top3').hover(function() {
+      $(this).transition('fly up').transition('fly up');
+    }, function(){});
+    
+    $('#section-1').hover(function () {
+      $('#mapid').transition('fade').transition('fly right');
+    }, function(){});*/
+    var section_offset = [
+      $('#section-1').offset().top,
+      $('#section-2').offset().top,
+      $('#section-3').offset().top,
+      $('#section-4').offset().top
+    ]
+    // $('a[href^="#"]').on('click', function(event) {
+    
+    //     var target = $( $(this).attr('href') );
+
+    //     if( target.length ) {
+    //         event.preventDefault();
+            
+    //         $('html, body').animate({
+    //             scrollTop: target.offset().top
+    //         }, 500);
+    //     }
+
+    // });
+   
+    $('#menu-item-1').click(function(){
+      $('body').animate({scrollTop: section_offset[0]}, 500);
+      
+    });
+    $('#menu-item-2').click(function(){
+      $('body').animate({scrollTop: section_offset[1]}, 500);
+    
+    });
+    $('#menu-item-3').click(function(){
+      $('body').animate({scrollTop: section_offset[2]}, 500);
+
+    });
+    $('#menu-item-4').click(function(){
+      $('body').animate({scrollTop: section_offset[3]}, 500);
+
+    });
+  });
+  window.CSRF_TOKEN = "{{ csrf_token }}"
+
+  // jQuery(document).ready(function($) {
+
+  //   $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');// 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
+
+  //   // $('#menu-item-1').click(function(){
+  //   //   $('body').animate({scrollTop: $('#section-1').offset().top}, 700);
+      
+  //   // });
+  //   // $('#menu-item-2').click(function(){
+  //   //   $('body').animate({scrollTop: $('#section-2').offset().top+$('#section-1').offset().top}, 700);
+    
+  //   // });
+  //   // $('#menu-item-3').click(function(){
+  //   //   $('body').animate({scrollTop: $('#section-3').offset().top-$('#section-2').offset().top}, 700);
+
+  //   // });
+  //   // $('#menu-item-4').click(function(){
+  //   //   $('body').animate({scrollTop: $('#section-4').offset().top-$('#section-3').offset().top}, 700);
+
+  //   // });
+    
+    
+
+
+  // });
+  
+</script>
+
 <!-- Following Menu -->
-<div class="ui inverted  large top fixed menu menu-bg">
+<div class="ui large top fixed menu menu-bg">
   <div class="ui container">
-    <div class="ui large secondary  menu">
-    <a href="#section-1" class="item">即時熱點</a>
-    <a href="#section-2" class="item">熱門站點</a>
-    <a class="item">Company</a>
-    <a class="item">Careers</a>
+    <div class="ui large secondary menu">
+      <div id="menu-item-1">
+        <a href="#section-1" class="item">即時熱點</a>
+      </div>
+      <div id="menu-item-2">
+        <a href="#section-2" class="item">熱門站點</a>
+      </div>
+      <div id="menu-item-3">
+        <a href="#section-3" class="item">冷門站點</a>
+      </div>
+      <div id="menu-item-4">
+        <a href="#section-4" class="item">各日人流動態</a>
+      </div>
+      <a href="/" class="item">回管理後台</a>
     </div>
   </div>
 </div>
@@ -44,70 +164,146 @@
 
 <!-- Page Contents -->
 <div class="pusher">
-  <div class="ui inverted vertical masthead center aligned segment">
+  <div class="ui  masthead segment bg1">
     <div class="ui text container">
-      <h1 class="ui inverted header">
+      <h1 class="ui header">
         智慧校園
       </h1>
-      <h2>iBeacon使用一覽</h2>
+      <h2 class="ui header">iBeacon即時動態</h2>
     </div>
 
   </div>
-<div id="section-1" class="ui vertical stripe segment">
-  <div class="ui middle aligned stackable grid container">
-    <div class="row">
-      <h2 class="ui header">即時iBeacon偵測統計熱點圖</h2>
-    </div>
-    <button id="btn_show_marker" class="ui button one wide" type="button">顯示站點圖釘</button>
-    <div class="row" style="height: 800px;width: 1200px;">
-      <div id="mapid"></div>
+  <div id="section-1" class="ui vertical stripe segment">
+    <div class="ui middle aligned stackable grid container">
+      <div class="row">
+        <h2 class="ui header">即時iBeacon偵測統計熱點圖</h2>
+      </div>
+      <button id="btn_show_marker" class="ui button one wide" type="button">顯示站點圖釘</button>
+      <div class="row" style="height: 800px;width: 1200px;">
+        <div id="mapid"></div>
+      </div>
     </div>
   </div>
-</div>
+  
   <div id="section-2" class="ui vertical stripe segment">
     <div class="ui middle aligned stackable grid container">
       <div class="row">
         <div class="column">
-        <h2 class="ui header">累積熱門站點</h2>
+          <h1 class="ui header">累積熱門站點</h1>
         </div>
       </div>
-      <div class="row">
+      <div class="row top3">
         <div class="eight wide column">
-          <h3 class="ui header">Station1</h3>
-          <p>We can give your company superpowers to do things that they never thought possible. Let us delight your customers and empower your needs...through pure data analytics.</p>
-          <h3 class="ui header">We Make Bananas That Can Dance</h3>
-          <p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be bioengineered.</p>
+          <h3 class="ui header">TOP1</h3>
+          <h3 class="ui header">{{top3_stations.0.name}}</h3>
+          <p>偵測次數： {{top3_stations.0.count}} 次</p>
+          <!-- <h3 class="ui header">We Make Bananas That Can Dance</h3>
+          <p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be bioengineered.</p> -->
         </div>
         <div class="six wide right floated column">
-          <img src="https://smartcampus.csie.ncku.edu.tw/media/images/station/B02-3.png" class="ui large bordered rounded image">
+          <img src="https://smartcampus.csie.ncku.edu.tw/{{top3_stations.0.image}}" class="ui large bordered rounded image">
         </div>
       </div>
-      <div class="row">
+      <!-- <div class="row">
         <div class="center aligned column">
           <a class="ui huge button">Check Them Out</a>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 
-
-  <div class="ui vertical stripe quote segment">
+  <div class="ui vertical stripe quote segment top3">
     <div class="ui equal width stackable internally celled grid">
       <div class="center aligned row">
         <div class="column">
-          <h3>"What a Company"</h3>
-          <p>That is what they all say about us</p>
+          <h3>TOP2</h3>
+          <h4>{{top3_stations.1.name}}</h4>
+          <p>偵測次數： {{top3_stations.1.count}} 次</p>
+          <p>
+            <img src="https://smartcampus.csie.ncku.edu.tw/{{top3_stations.1.image}}" class="ui medium rounded middle aligned image">
+          </p>
         </div>
         <div class="column">
-          <h3>"I shouldn't have gone with their competitor."</h3>
+          <h3>TOP3</h3>
+          <h4>{{top3_stations.2.name}}</h4>
+          <p>偵測次數： {{top3_stations.2.count}} 次</p>
           <p>
-            <img src="" class="ui avatar image"> <b>Nan</b> Chief Fun Officer Acme Toys
+            <img src="https://smartcampus.csie.ncku.edu.tw/{{top3_stations.2.image}}" class="ui medium rounded middle aligned image"> 
           </p>
         </div>
       </div>
     </div>
   </div>
-
+  
+  <div id="section-3" class="ui vertical stripe quote segment">
+    <div class="ui top aligned stackable equal width grid container">
+      <div class="row">
+        <div class="column">
+          <h1 class="ui header">冷門站點</h1>
+        </div>
+      </div>
+      <div class="row">
+        
+        <div class="column">
+          <h3>{{last3_stations.0.name}}</h3>
+          <p>偵測次數： {{last3_stations.0.count}} 次</p>
+          <p>
+            <img src="https://smartcampus.csie.ncku.edu.tw/{{last3_stations.0.image}}" class="ui medium rounded middle aligned image">
+          </p>
+        </div>
+        <div class="column">
+          <h3>{{last3_stations.1.name}}</h3>
+          <p>偵測次數： {{last3_stations.1.count}} 次</p>
+          <p>
+            <img src="https://smartcampus.csie.ncku.edu.tw/{{last3_stations.1.image}}" class="ui medium rounded middle aligned image"> 
+          </p>
+        </div>
+        <div class="column">
+          <h3>{{last3_stations.2.name}}</h3>
+          <p>偵測次數： {{last3_stations.2.count}} 次</p>
+          <p>
+            <img src="https://smartcampus.csie.ncku.edu.tw/{{last3_stations.2.image}}" class="ui medium rounded middle aligned image"> 
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="section-4" class="ui vertical stripe segment">
+    <div class="ui middle aligned stackable grid container">
+      <div class="row">
+        <h2 class="ui header">各日人流動態</h2>
+      </div>
+      <div class="row ui buttons">
+          
+        <button class="ui icon button" onclick="changeDate(-7)">
+          <i class="angle double left icon"></i>
+         
+        </button>
+        <button class="ui icon button" onclick="changeDate(-1)">
+            <i class="left chevron icon"></i>
+        </button>
+        <button class="ui button" onclick="changeDate(0)">
+          Today
+        </button>
+        <button class="ui icon button" onclick="changeDate(1)">
+         
+          <i class="right chevron icon"></i>
+        </button>
+        <button class="ui icon button" onclick="changeDate(7)">
+            
+          <i class="angle double right icon"></i>
+        </button>
+      </div>
+      <div class="centered row">
+          <h3 id="date" class="ui header"></h3>
+      </div>
+      <div class="row" style="height: 800px;width: 1200px;">
+        <div id="mapid2"></div>
+      </div>
+    </div>
+  </div>
+<!--   
   <div class="ui vertical stripe segment">
     <div class="ui text container">
       <h3 class="ui header">Breaking The Grid, Grabs Your Attention</h3>
@@ -121,7 +317,7 @@
       <a class="ui large button">I'm Still Quite Interested</a>
     </div>
   </div>
-
+-->
 
   <div class="ui inverted vertical footer segment">
     <div class="ui container">
@@ -129,27 +325,27 @@
         <div class="three wide column">
           <h4 class="ui inverted header">About</h4>
           <div class="ui inverted link list">
-            <a href="#" class="item">Sitemap</a>
+            <!-- <a href="#" class="item">Sitemap</a>
             <a href="#" class="item">Contact Us</a>
             <a href="#" class="item">Religious Ceremonies</a>
-            <a href="#" class="item">Gazebo Plans</a>
+            <a href="#" class="item">Gazebo Plans</a> -->
           </div>
         </div>
         <div class="three wide column">
           <h4 class="ui inverted header">Services</h4>
           <div class="ui inverted link list">
-            <a href="#" class="item">Banana Pre-Order</a>
+            <!-- <a href="#" class="item">Banana Pre-Order</a>
             <a href="#" class="item">DNA FAQ</a>
             <a href="#" class="item">How To Access</a>
-            <a href="#" class="item">Favorite X-Men</a>
+            <a href="#" class="item">Favorite X-Men</a> -->
           </div>
         </div>
         <div class="seven wide column">
           <h4 class="ui inverted header">Footer Header</h4>
-          <p>Extra space for a call to action inside the footer that could help re-engage users.</p>
+          <p>Extra</p>
         </div>
       </div>
     </div>
-  </div>
+  </div> 
 </div>
 {% endblock %}

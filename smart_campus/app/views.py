@@ -30,6 +30,7 @@ import random
 import json
 from functools import wraps
 import pytz
+import datetime
 
 from .models import (
     User, Reward, Permission,
@@ -1590,12 +1591,39 @@ def resend_activation(request, email):
     return HttpResponse('The activation email is sent!', status=201)
 
 
-@login_required
 def beacon_heatmap_page(request):
-    return render(request, 'extra/heatmap.html')
+    beacon_data=Beacon.objects.annotate(num=Count('uservisitedbeacons'))
+    top3_stations = []
+    for beacon in beacon_data.order_by('-num'):
+        if len(top3_stations) >= 3:
+            break
+        if beacon.station.exists():
+            top3_stations += [
+                {
+                    'id': station.id,
+                    'name': station.name,
+                    'image': station.get_primary_image(),
+                    'count': beacon.num
+                }
+                for station in beacon.station.all()
+            ]
+    last3_stations = []
+    for beacon in beacon_data.order_by('num'):
+        if len(last3_stations) >= 3:
+            break
+        if beacon.station.exists():
+            last3_stations += [
+                {
+                    'id': station.id,
+                    'name': station.name,
+                    'image': station.get_primary_image(),
+                    'count': beacon.num
+                }
+                for station in beacon.station.all()
+            ]
+    return render(request, 'extra/heatmap.html', {'top3_stations': top3_stations, 'last3_stations': last3_stations})
 
 
-@login_required
 def get_beacon_detect_data(request):
     each_entry_data = [
         {
@@ -1603,7 +1631,7 @@ def get_beacon_detect_data(request):
             'lat': visit_record.beacon.location.y,
             'lng': visit_record.beacon.location.x,
             'date': str(visit_record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).date()),
-            'time': str(visit_record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).time()),
+            'time': str(visit_record.timestamp.time()),
         }
         for visit_record in UserVisitedBeacons.objects.all()
     ]
@@ -1623,7 +1651,37 @@ def get_beacon_detect_data(request):
         data={
             'data': each_entry_data,
             'data_with_each_detection_cnt': individual_detect_count,
-            'total': UserVisitedBeacons.objects.count()
+            'total': UserVisitedBeacons.objects.count(),
         },
         status=200
     )
+
+
+@require_POST
+def get_beacon_detect_data_by_date(request):
+    year = request.POST.get('year')
+    month = request.POST.get('month')
+    day = request.POST.get('day')
+
+    time_start = datetime.datetime(int(year), int(month), int(day), 0, 0, 0)
+    time_end = datetime.datetime(int(year), int(month), int(day), 23, 59, 59)
+    local_start=pytz.timezone('Asia/Taipei').localize(time_start, is_dst=None)
+    local_end=pytz.timezone('Asia/Taipei').localize(time_end, is_dst=None)
+    one_day_record = UserVisitedBeacons.objects.filter(timestamp__range=(local_start,local_end))
+
+    data_by_hour = {}
+    for i in range(0,24):
+        data_by_hour[i] = []
+    
+    for record in one_day_record:
+        hr=record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).hour
+        data_by_hour[hr] += [
+            {
+                'beacon_id': record.beacon.name,
+                'lat': record.beacon.location.y,
+                'lng': record.beacon.location.x,
+                
+            }
+        ]
+
+    return JsonResponse(data_by_hour, status=200)
