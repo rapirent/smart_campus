@@ -31,6 +31,10 @@ import json
 from functools import wraps
 import pytz
 import datetime
+from selenium import webdriver
+from pyvirtualdisplay import Display
+import base64
+from time import sleep
 
 from .models import (
     User, Reward, Permission,
@@ -91,7 +95,7 @@ def signup(request):
 
     if not user_email or not password or not nickname:
         return HttpResponse('Either email, password or nickname input is missing.', status=422)
-    
+
     user_email = User.objects.normalize_email(user_email)
 
     if User.objects.filter(email=user_email).exists():
@@ -187,7 +191,8 @@ def login_page(request):
     if request.method == 'POST':
         user_email = request.POST.get('email')
         password = request.POST.get('password')
-        user = auth.authenticate(request, username=user_email, password=password)
+        user = auth.authenticate(
+            request, username=user_email, password=password)
 
         if not user:
             messages.warning(request, 'Login failed!')
@@ -263,7 +268,8 @@ def station_list_by_category_page(request, pk):
     if request.user.can(Permission.ADMIN):
         station_list = Station.objects.filter(category=category).order_by('id')
     else:
-        station_list = Station.objects.filter(owner_group=request.user.group, category=category).order_by('id')
+        station_list = Station.objects.filter(
+            owner_group=request.user.group, category=category).order_by('id')
 
     paginator = Paginator(station_list, 10)
 
@@ -306,7 +312,8 @@ def station_edit_page(request, pk):
         # is_valid() will be true if received data is good
         # There'll be error messages in 'form' instance if validation failed
         # cleaned_data will be the form inputs from the request
-        form = PartialStationForm(request.POST, request.FILES, instance=station)
+        form = PartialStationForm(
+            request.POST, request.FILES, instance=station)
         if form.is_valid():
             data = form.cleaned_data
             station = form.save(commit=False)
@@ -328,7 +335,8 @@ def station_edit_page(request, pk):
 
             # link the reward related to the station
             station.reward_set.clear()
-            reward = Reward.objects.filter(id=request.POST.get('reward', -1)).first()
+            reward = Reward.objects.filter(
+                id=request.POST.get('reward', -1)).first()
             if reward:
                 station.reward_set.add(reward)
 
@@ -525,7 +533,7 @@ def get_all_stations(request):
                 'others': [
                     '{0}{1}{2}'.format(prefix, domain, image_url)
                     for image_url in station.get_other_images()
-                ]
+                    ]
             }
         }
         for station in stations
@@ -651,8 +659,8 @@ def add_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update succeed",
-                "stations": [station.id for station in user.favorite_stations.all()]
+            "message": "Favorite stations update succeed",
+            "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
     )
@@ -701,8 +709,8 @@ def remove_user_favorite_stations(request):
 
     return JsonResponse(
         data={
-                "message": "Favorite stations update succeed",
-                "stations": [station.id for station in user.favorite_stations.all()]
+            "message": "Favorite stations update succeed",
+            "stations": [station.id for station in user.favorite_stations.all()]
         },
         status=200
     )
@@ -778,7 +786,8 @@ def reward_edit_page(request, pk):
     if request.user.is_administrator():
         stations = Station.objects.all().order_by('id')
     else:
-        stations = Station.objects.filter(owner_group=request.user.group).order_by('id')
+        stations = Station.objects.filter(
+            owner_group=request.user.group).order_by('id')
 
     form_data = {
         'name': reward.name,
@@ -1436,7 +1445,8 @@ def get_unanswered_question(request):
         return JsonResponse(data={}, status=200)
 
     random_index = random.randint(0, unanswered_questions.count() - 1)
-    random_unanswered_question = random.sample(list(unanswered_questions), 1)[0]
+    random_unanswered_question = random.sample(
+        list(unanswered_questions), 1)[0]
 
     choices = []
     for i, choice in enumerate(Choice.objects.filter(question=random_unanswered_question)):
@@ -1592,7 +1602,7 @@ def resend_activation(request, email):
 
 
 def beacon_heatmap_page(request):
-    beacon_data=Beacon.objects.annotate(num=Count('uservisitedbeacons'))
+    beacon_data = Beacon.objects.annotate(num=Count('uservisitedbeacons'))
     top3_stations = []
     for beacon in beacon_data.order_by('-num'):
         if len(top3_stations) >= 3:
@@ -1636,7 +1646,8 @@ def get_beacon_detect_data(request):
         for visit_record in UserVisitedBeacons.objects.all()
     ]
 
-    beacon_data=Beacon.objects.annotate(num=Count('uservisitedbeacons')).order_by('-num')
+    beacon_data = Beacon.objects.annotate(
+        num=Count('uservisitedbeacons')).order_by('-num')
     individual_detect_count = [
         {
             'beacon_id': beacon.name,
@@ -1665,23 +1676,153 @@ def get_beacon_detect_data_by_date(request):
 
     time_start = datetime.datetime(int(year), int(month), int(day), 0, 0, 0)
     time_end = datetime.datetime(int(year), int(month), int(day), 23, 59, 59)
-    local_start=pytz.timezone('Asia/Taipei').localize(time_start, is_dst=None)
-    local_end=pytz.timezone('Asia/Taipei').localize(time_end, is_dst=None)
-    one_day_record = UserVisitedBeacons.objects.filter(timestamp__range=(local_start,local_end))
+    local_start = pytz.timezone(
+        'Asia/Taipei').localize(time_start, is_dst=None)
+    local_end = pytz.timezone('Asia/Taipei').localize(time_end, is_dst=None)
 
-    data_by_hour = {}
-    for i in range(0,24):
-        data_by_hour[i] = []
-    
-    for record in one_day_record:
-        hr=record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).hour
-        data_by_hour[hr] += [
-            {
-                'beacon_id': record.beacon.name,
-                'lat': record.beacon.location.y,
-                'lng': record.beacon.location.x,
-                
-            }
+    count_by_user = User.objects.annotate(
+        count=Count('uservisitedbeacons')).exclude(count=0)
+    data_by_user = []
+    for user in count_by_user:
+        one_day_record = UserVisitedBeacons.objects.filter(
+            user=user, timestamp__range=(local_start, local_end))
+
+        data_by_hour = {}
+        for i in range(0, 24):
+            data_by_hour[i] = [[] for j in range(0, 60)]
+
+        for record in one_day_record:
+            hr = record.timestamp.astimezone(pytz.timezone('Asia/Taipei')).hour
+            minute = record.timestamp.astimezone(
+                pytz.timezone('Asia/Taipei')).minute
+            data_by_hour[hr][minute] += [
+                {
+                    'beacon_id': record.beacon.name,
+                    'lat': record.beacon.location.y,
+                    'lng': record.beacon.location.x,
+
+                }
+            ]
+        data_by_user.append(data_by_hour)
+
+    return JsonResponse(data={'data': data_by_user}, status=200)
+
+
+def get_beacon_detect_percentage_by_user(request):
+
+    count_by_user = User.objects.annotate(count=Count('uservisitedbeacons')).order_by(
+        '-count').exclude(email='visitMode@gmail.com').exclude(count=0)
+
+    total_detect = UserVisitedBeacons.objects.all().count()
+
+    data = [
+        float(user.count) / total_detect
+        for user in count_by_user
+    ]
+
+    categories = StationCategory.objects.all()
+
+    category_percentage_of_all_users = [
+
+    ]
+
+    for user in count_by_user:
+        category_cnt = {}
+        for cat in categories:
+            category_cnt[cat.name] = 0
+        user_visited = UserVisitedBeacons.objects.filter(user=user)
+        for entry in user_visited:
+            for station in entry.beacon.station.all():
+                category_cnt[station.category.name] += 1
+
+        category_percentage_of_all_users.append(category_cnt)
+
+    category_cnt = {}
+    for cat in categories:
+        category_cnt[cat.name] = 0
+    user_visited = UserVisitedBeacons.objects.filter(
+        user__email='visitMode@gmail.com')
+    for entry in user_visited:
+        for station in entry.beacon.station.all():
+            category_cnt[station.category.name] += 1
+
+    category_percentage_of_all_users.append(category_cnt)
+
+    current_time = datetime.datetime.now()
+    year = current_time.year
+    month = current_time.month
+    day = current_time.day
+    time_start = datetime.datetime(int(year), int(month), int(day), 0, 0, 0)
+    time_end = datetime.datetime(int(year), int(month), int(day), 23, 59, 59)
+    local_start = pytz.timezone(
+        'Asia/Taipei').localize(time_start, is_dst=None)
+    local_end = pytz.timezone('Asia/Taipei').localize(time_end, is_dst=None)
+    today_record = UserVisitedBeacons.objects.filter(
+        timestamp__range=(local_start, local_end))
+
+    return JsonResponse(data={'data': data, 'total': total_detect, 'today_total': today_record.count(), 'category_percentage': category_percentage_of_all_users}, status=200)
+
+
+@csrf_exempt
+@require_POST
+def get_user_web_screenshot(request):
+
+    user = User.objects.filter(email=request.POST.get('email')).first()
+
+    if not user:
+        return HttpResponse('User not exist', status=404)
+
+    display = Display(visible=0)
+    display.start()
+
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    browser = webdriver.Chrome(
+        executable_path='/usr/local/bin/chromedriver', chrome_options=chrome_options)
+    browser.set_window_size(1180, 825)
+    browser.implicitly_wait(10)
+
+    domain = request.get_host()
+    url = 'http://{0}/users/{1}/today_view/'.format(domain, user.email)
+    browser.get(url)
+
+    sleep(3)
+    img_base64 = browser.get_screenshot_as_base64()
+    # print(img_base64)
+    with open('{}/images/screenshot/{}.png'.format(settings.MEDIA_ROOT, user.email), "wb") as fh:
+        fh.write(base64.b64decode(img_base64))
+        print('IMAGE saved')
+
+    browser.close()
+    display.stop()
+
+    image_url = 'http://{}/media/images/screenshot/{}.png'.format(
+        domain, user.email)
+
+    return JsonResponse(data={'image_url': image_url}, status=200)
+
+
+def user_view_today_page(request, pk):
+
+    user = get_object_or_404(User, pk=pk)
+    current_time = datetime.datetime.now()
+    year = current_time.year
+    month = current_time.month
+    day = current_time.day
+    time_start = datetime.datetime(int(year), int(month), int(day), 0, 0, 0)
+    time_end = datetime.datetime(int(year), int(month), int(day), 23, 59, 59)
+    local_start = pytz.timezone(
+        'Asia/Taipei').localize(time_start, is_dst=None)
+    local_end = pytz.timezone('Asia/Taipei').localize(time_end, is_dst=None)
+    today_record = UserVisitedBeacons.objects.filter(
+        user=user, timestamp__range=(local_start, local_end))
+
+    path_array = [
+        [
+            record.beacon.location.y,
+            record.beacon.location.x
         ]
+        for record in today_record
+    ]
 
-    return JsonResponse(data_by_hour, status=200)
+    return render(request, 'extra/user_map.html', {'path': path_array})

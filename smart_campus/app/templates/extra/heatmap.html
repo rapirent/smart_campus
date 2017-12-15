@@ -42,6 +42,7 @@
 {% block script %}
   {{ block.super }}
   <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/visibility.js"></script>
+
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
   <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
   <script type="text/javascript" src="{% static 'extra/js/heatmap.js' %}"></script>
@@ -54,7 +55,9 @@
 src="https://code.jquery.com/jquery-3.1.1.min.js"
 integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
 crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
 <script>
+  var category_percentage;
   $(document).ready(function() {
     /*$('.top3').hover(function() {
       $(this).transition('fly up').transition('fly up');
@@ -63,70 +66,141 @@ crossorigin="anonymous"></script>
     $('#section-1').hover(function () {
       $('#mapid').transition('fade').transition('fly right');
     }, function(){});*/
+    
+
+    var data_arr = [
+    ];
+    var data_arr2 = [
+    ];
+    var dynamicColors = function() {
+            var max=255, min=Math.floor(Math.random() * (128-20))+20;
+            var r = Math.floor(Math.random() * (max-min))+min;
+            var g = Math.floor(Math.random() * (max-min))+min;
+            var b = Math.floor(Math.random() * (max-min))+min;
+            return "rgb(" + r + "," + g + "," + b + ")";
+         };
+
+   
+    
+    $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_percentage_by_user/', function (data) {
+      var sum=0;
+      $('.ui.statistic > .total').text(data.total);
+      $('.ui.statistic > .today').text(data.today_total);
+      category_percentage = data.category_percentage;
+
+      for (var entry in data.data) {
+        var p = Math.round(data.data[entry] * 1000) / 10;
+        sum+=p;
+        data_arr.push('使用者 '+(parseInt(entry)+1));
+        data_arr2.push(p);
+      }
+      data_arr.push('訪客');
+      data_arr2.push(100-sum);
+      console.log(data_arr);
+
+      var coloR = [];
+      for (var i in data_arr) {
+     
+        coloR.push(dynamicColors());
+      }
+      var ctx = $("#myChart");
+      var myDoughnutChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+              data: data_arr2,
+              backgroundColor: coloR
+          }],
+
+          // These labels appear in the legend and in the tooltips when hovering different arcs
+          labels: data_arr,
+          
+        },
+        
+      });
+      $('#myChart')
+        .popup({
+          popup: '.flowing'
+        })
+      ;
+      $("#myChart").click(function(evt) {
+        var activePoints = myDoughnutChart.getElementsAtEvent(evt);
+        if (activePoints[0]) {
+          var chartData = activePoints[0]['_chart'].config.data;
+          var idx = activePoints[0]['_index'];
+
+          var label = chartData.labels[idx];
+          var value = chartData.datasets[0].data[idx];
+
+          var index = parseInt(label.substr(4))
+          if(!index) index = category_percentage.length-1
+          else index = index - 1;
+          console.log(category_percentage[index]);
+          var total=0;
+          for(var i in category_percentage[index]){
+            total=total+category_percentage[index][i]
+          }
+          console.log(category_percentage[index]['藝文']/total);
+          $('.ui.modal > .header').text(label + ' 走訪類別比例');
+          $('.ui.red').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['藝文'])/total));
+          $('.ui.blue').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['景觀'])/total));
+          $('.ui.orange').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['古蹟'])/total));
+          $('.ui.green').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['行政單位'])/total));
+          
+          $('.ui.modal')
+            .modal('show')
+          ;
+
+          //$('.flowing').popup();
+        }
+      });
+      
+    });
+
     var section_offset = [
       $('#section-1').offset().top,
+      $('#section-11').offset().top,
       $('#section-2').offset().top,
       $('#section-3').offset().top,
       $('#section-4').offset().top
     ]
-    // $('a[href^="#"]').on('click', function(event) {
     
-    //     var target = $( $(this).attr('href') );
-
-    //     if( target.length ) {
-    //         event.preventDefault();
-            
-    //         $('html, body').animate({
-    //             scrollTop: target.offset().top
-    //         }, 500);
-    //     }
-
-    // });
-   
     $('#menu-item-1').click(function(){
       $('body').animate({scrollTop: section_offset[0]}, 500);
       
     });
-    $('#menu-item-2').click(function(){
+    $('#menu-item-11').click(function(){
       $('body').animate({scrollTop: section_offset[1]}, 500);
+      
+    });
+    $('#menu-item-2').click(function(){
+      $('body').animate({scrollTop: section_offset[2]}, 500);
     
     });
     $('#menu-item-3').click(function(){
-      $('body').animate({scrollTop: section_offset[2]}, 500);
-
-    });
-    $('#menu-item-4').click(function(){
       $('body').animate({scrollTop: section_offset[3]}, 500);
 
     });
+    $('#menu-item-4').click(function(){
+      $('body').animate({scrollTop: section_offset[4]}, 500);
+
+    });
+
+    $.ajax({
+      type: "POST",
+      url: '/users/get_user_web_screenshot/',
+      data: {
+        'email': 'jeff1jeffo@gmail.com'
+      },
+      success: function (data) {
+        
+        console.log('SC: ', data);
+      },
+      dataType: 'json'
+    });
+
   });
   window.CSRF_TOKEN = "{{ csrf_token }}"
-
-  // jQuery(document).ready(function($) {
-
-  //   $body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');// 这行是 Opera 的补丁, 少了它 Opera 是直接用跳的而且画面闪烁 by willin
-
-  //   // $('#menu-item-1').click(function(){
-  //   //   $('body').animate({scrollTop: $('#section-1').offset().top}, 700);
-      
-  //   // });
-  //   // $('#menu-item-2').click(function(){
-  //   //   $('body').animate({scrollTop: $('#section-2').offset().top+$('#section-1').offset().top}, 700);
-    
-  //   // });
-  //   // $('#menu-item-3').click(function(){
-  //   //   $('body').animate({scrollTop: $('#section-3').offset().top-$('#section-2').offset().top}, 700);
-
-  //   // });
-  //   // $('#menu-item-4').click(function(){
-  //   //   $('body').animate({scrollTop: $('#section-4').offset().top-$('#section-3').offset().top}, 700);
-
-  //   // });
-    
-    
-
-
-  // });
   
 </script>
 
@@ -136,6 +210,9 @@ crossorigin="anonymous"></script>
     <div class="ui large secondary menu">
       <div id="menu-item-1">
         <a href="#section-1" class="item">即時熱點</a>
+      </div>
+      <div id="menu-item-11">
+        <a href="#section-11" class="item">Beacon使用統計</a>
       </div>
       <div id="menu-item-2">
         <a href="#section-2" class="item">熱門站點</a>
@@ -173,14 +250,61 @@ crossorigin="anonymous"></script>
     </div>
 
   </div>
+
   <div id="section-1" class="ui vertical stripe segment">
     <div class="ui middle aligned stackable grid container">
       <div class="row">
-        <h2 class="ui header">即時iBeacon偵測統計熱點圖</h2>
+        <h2 class="ui header five wide column">即時iBeacon偵測統計熱點圖</h2>
+        <div class="ui circular button icon one wide column"  data-tooltip="可參考熱區圖，選擇熱門區域iBeacon，加入校園活動訊息推播！" data-position="right center">
+            <i class="large info circle icon"></i>
+          </div>
       </div>
       <button id="btn_show_marker" class="ui button one wide" type="button">顯示站點圖釘</button>
       <div class="row" style="height: 800px;width: 1200px;">
         <div id="mapid"></div>
+      </div>
+    </div>
+    
+  </div>
+  
+  <div id="section-11" class="ui vertical stripe segment">
+     
+    <div class="ui middle aligned stackable equal width grid container">
+      <div class="row">
+          <div class="six wide column">
+            <h2 class="ui header">Beacon使用統計</h2>
+          </div>
+          <div class="column">
+            <h2 class="ui header">使用者分佈比例(%)</h2>
+          </div>
+      </div>
+      
+      <div class="center aligned row">
+        <div class="six wide column">
+          <div class="ui  statistics">
+            <div class="ui statistic">
+              <div class="label">
+                總偵測次數
+              </div>
+              <div class="total value">
+                
+              </div>
+            </div>
+            <div class="ui statistic">
+              <div class="label">
+                今日累計偵測次數
+              </div>
+              <div class="today value">
+                
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        <div class="column" style="height: 400px;">
+            <canvas id="myChart"></canvas>
+        </div>
+        
       </div>
     </div>
   </div>
@@ -197,12 +321,11 @@ crossorigin="anonymous"></script>
           <h3 class="ui header">TOP1</h3>
           <h3 class="ui header">{{top3_stations.0.name}}</h3>
           <p>偵測次數： {{top3_stations.0.count}} 次</p>
-          <!-- <h3 class="ui header">We Make Bananas That Can Dance</h3>
-          <p>Yes that's right, you thought it was the stuff of dreams, but even bananas can be bioengineered.</p> -->
-        </div>
+         </div>
         <div class="six wide right floated column">
           <img src="https://smartcampus.csie.ncku.edu.tw/{{top3_stations.0.image}}" class="ui large bordered rounded image">
         </div>
+        
       </div>
       <!-- <div class="row">
         <div class="center aligned column">
@@ -347,5 +470,59 @@ crossorigin="anonymous"></script>
       </div>
     </div>
   </div> 
+
+  <div class="ui flowing popup bottom center transition hidden" >
+      <div class="ui three column bottom center aligned grid">
+        <div class="column">
+          <h4 class="ui content">點選不同區塊</h4>
+          <p>可察看使用者細節</p>
+          
+        </div>
+       
+      </div>
+    </div>
+  <div class="ui basic modal">
+    <div class="ui header">
+      Proportion
+    </div>
+    <div class="content">
+        <div class="ui inverted segment">
+          <div class="label cat1">藝文</div>
+          <div class="ui large red inverted progress">
+            
+            <div class="bar">
+              <div class="progress" style="background-color: transparent !important;"></div>
+            </div>  
+          </div>
+          <div class="label cat2">景觀</div>
+          <div class="ui large blue inverted progress">
+            
+            <div class="bar">
+              <div class="progress" style="background-color: transparent !important;"></div>
+            </div>
+          </div>
+          <div class="label cat3">古蹟</div>
+          <div class="ui large orange inverted progress">
+            
+            <div class="bar">
+              <div class="progress" style="background-color: transparent !important;"></div>
+            </div>
+          </div>
+          <div class="label cat4">行政單位</div>
+          <div class="ui large green inverted progress">
+            <div class="bar">
+              <div class="progress" style="background-color: transparent !important;"></div>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="actions">
+      <div class="ui green ok inverted button">
+        <i class="checkmark icon"></i>
+        Close
+      </div>
+    </div>
+  </div>
 </div>
+
 {% endblock %}

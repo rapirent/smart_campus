@@ -1,0 +1,100 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}UsertMap{% endblock %}
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+  
+  <style>
+    body {
+      background-color: black;
+    }
+    #mapid {height:720px;width: 1200px;  z-index:1;}
+  </style>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.2.13/dist/components/visibility.js"></script>
+
+  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+  <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+
+{% endblock %}
+{% block nav %}
+{% endblock %}
+
+{% block content %}
+<script
+src="https://code.jquery.com/jquery-3.1.1.min.js"
+integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+crossorigin="anonymous"></script>
+
+<script>
+  var category_percentage;
+  $(document).ready(function() {
+    var mymap = L.map('mapid').setView([22.998684, 120.218724], 17);
+    baseMaps = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+      maxZoom: 22,
+      id: 'mapbox.streets',
+      accessToken: 'pk.eyJ1Ijoiam9ubmUyNjAiLCJhIjoiY2owbmFncmdwMDAwMzJxbnZxMm85eDdtYSJ9.WsKUG0wpHZHUJ0oAWJOqLg'
+    }).addTo(mymap);
+
+
+    var addressPoints = []
+    var beacon_marker_data;
+    var markerGroup = L.layerGroup();
+    $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_data/', function (data) {
+      //data is the JSON string
+      var records = data.data;//_with_each_detection_cnt;
+      for (var entry in records){
+        if (entry.count != 0) {
+          addressPoints.push([records[entry].lat.toString(), records[entry].lng.toString()])
+        }
+      }
+     // console.log(addressPoints);
+      //console.log(data.top3_stations);
+      var heat1 = L.heatLayer(addressPoints,{minOpacity:0.5, radius:15, blur:8, gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}});
+      heat1.addTo(mymap);
+
+      beacon_marker_data = data.data_with_each_detection_cnt;
+      for (var entry in beacon_marker_data){
+          var marker = L.marker([beacon_marker_data[entry].lat.toString(), beacon_marker_data[entry].lng.toString()]).addTo(markerGroup)
+              .bindPopup( beacon_marker_data[entry].beacon_id+"<br>偵測次數：" + beacon_marker_data[entry].count +"<br><a href=/stations/new/ target='_blank'>新增推播點</a>");
+      }
+    });
+    var pathGroup = L.layerGroup().addTo(mymap);
+    //console.log({{path}});
+    L.polyline({{path}}, {color: 'black', smoothFactor: 10, weight:6, opacity: 0.6}).addTo(pathGroup);
+            
+  });
+  
+</script>
+
+<!-- Sidebar Menu
+<div class="ui vertical inverted sidebar menu">
+  <a class="active item">Home</a>
+  <a class="item">Work</a>
+  <a class="item">Company</a>
+  <a class="item">Careers</a>
+  <a class="item">Login</a>
+  <a class="item">Signup</a>
+</div>
+-->
+
+<!-- Page Contents -->
+<!-- <div class="pusher"> -->
+  
+
+  
+      <div class="row"  style="height: 700px;width: 1300px;">
+        <div id="mapid"></div>
+      </div>
+
+  
+  
+<!-- </div> -->
+
+{% endblock %}
