@@ -18,7 +18,7 @@ baseMaps2 = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?ac
 var addressPoints = []
 var beacon_marker_data;
 var markerGroup = L.layerGroup();
-$.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_data/', function (data) {
+$.getJSON('/smart_campus/get_beacon_detect_data/', function (data) {
   //data is the JSON string
   var records = data.data;//_with_each_detection_cnt;
   for (var entry in records) {
@@ -26,8 +26,8 @@ $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detec
       addressPoints.push([records[entry].lat.toString(), records[entry].lng.toString()])
     }
   }
-  console.log(addressPoints);
-  console.log(data.top3_stations);
+  //console.log(addressPoints);
+  //console.log(data.top3_stations);
   var heat1 = L.heatLayer(addressPoints, { minOpacity: 0.5, radius: 15, blur: 8, gradient: { 0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red' } });
   heat1.addTo(mymap);
 
@@ -136,7 +136,7 @@ function changeDate(val) {
       'csrfmiddlewaretoken': window.CSRF_TOKEN
     },
     success: function (data) {
-      console.log(data.data);
+      //console.log(data.data);
       all_user_data = data.data;
       for (var index in all_user_data) {
         latlng_users[index] = [];
@@ -156,7 +156,7 @@ function changeDate(val) {
             var latlng = [data_in_minutes[entry].lat, data_in_minutes[entry].lng];
             latlng_users[index] = latlng_users[index].slice(latlng_users[index].length - 1);
             latlng_users[index].push(latlng);
-            console.log(latlng_users[index]);
+            //console.log(latlng_users[index]);
             //console.log(latlng);
             L.circleMarker(latlng, {
               radius: 8,

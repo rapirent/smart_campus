@@ -82,7 +82,7 @@ crossorigin="anonymous"></script>
 
    
     
-    $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_percentage_by_user/', function (data) {
+    $.getJSON('/smart_campus/get_beacon_detect_percentage_by_user/', function (data) {
       var sum=0;
       $('.ui.statistic > .total').text(data.total);
       $('.ui.statistic > .today').text(data.today_total);
