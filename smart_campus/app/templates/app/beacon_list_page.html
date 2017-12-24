@@ -1,0 +1,87 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/search.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+    <div class="ui items">
+      <div class="item">
+        <div class="ui search" id="search" >
+          <div class="ui icon input">
+            <input name="name" type="text" id="searchBeacon" placeholder="請輸入beacon ID" valeu="">
+            <i class="search link icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <table class="ui selectable celled striped table">
+      <thead>
+        <tr class="center aligned">
+          <th>名稱</th>
+          <th>Beacon ID</th>
+          <th>選項</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if beacons %}
+          {% for beacon in beacons %}
+            <tr class="center aligned">
+              <td class="collapsing">{{ beacon.name }}</td>
+              <td class="collapsing">{{ beacon.beacon_id }}</td>
+              <td class="collapsing">
+                <div class="ui mini buttons">
+                  <a class="ui basic green floated button" href="{% url 'Beacon Edit Page' beacon.beacon_id %}">修改</a>
+                  <a class="ui basic red floated button" href="{% url 'Beacon Delete Page' beacon.beacon_id %}">刪除</a>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% endif %}
+      </tbody>
+      <tfoot>
+        {% if beacons.has_other_pages %}
+          <tr class="center aligned collapsing">
+            <th colspan="3">
+              <div class="ui pagination menu">
+                {% if beacons.has_previous %}
+                  <a class="icon item" href="?page={{ beacons.previous_page_number }}">
+                    <i class="left chevron icon"></i>
+                  </a>
+                {% endif %}
+                {% for page in beacons.paginator.page_range %}
+                  {% if beacons.number == page %}
+                    <div class="active item">{{ page }}</div>
+                  {% else %}
+                    <a class="item" href="?page={{ page }}">{{ page }}</a>
+                  {% endif %}
+                {% endfor %}
+                {% if beacons.has_next %}
+                  <a class="icon item" href="?page={{ beacons.next_page_number }}">
+                    <i class="right chevron icon"></i>
+                  </a>
+                {% endif %}
+              </div>
+            </th>
+          </tr>
+        {% endif %}
+      </tfoot>
+    </table>
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Beacon Add Page' %}">
+        新增Beacon
+        <i class="add icon"></i>
+      </a>
+  </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{% static 'app/js/beacon_search.js' %}"></script>
+{% endblock %}

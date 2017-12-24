@@ -1,0 +1,40 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/list.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned text container">
+    {% include 'marco/form_message_marco.html' with messages=messages %}
+    {% if rewards %}
+      {% for reward in rewards %}
+        <div class="ui cards">
+          <div class="ui centered card">
+            <div class="image">
+              <img src="{{ reward.image.url }}">
+            </div>
+            <div class="content">
+              <div class="header">
+                {{ reward.name }}
+              </div>
+            </div>
+            <div class="ui two bottom attached buttons">
+              <a class="ui basic green left floated button" href="{% url 'Reward Edit Page' reward.id %}">修改</a>
+              <a class="ui basic red right floated button" href="{% url 'Reward Delete Page' reward.id %}">刪除</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+    <div class="ui horizontal divider">
+      OR
+    </div>
+    <a class="ui teal labeled icon button" href="{% url 'Reward Add Page' %}">
+      新增收藏品
+      <i class="add icon"></i>
+    </a>
+  </div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% for field in form %}
+  {% if field.errors %}
+    <div class="ui negative message">
+      {% for error in field.errors %}
+        <li>{{ field.label }}: {{ error|escape }}</li>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endfor %}

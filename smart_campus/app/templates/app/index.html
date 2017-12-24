@@ -1,0 +1,82 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/index.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui borderless center aligned container">
+    <div class="ui grid">
+      <div class="three column row">
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Station List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/station.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              站點及通知
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'TravelPlan List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/travelplan.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              行程路線
+            </div>
+          </a>
+        </div>
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Question List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/question.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              問題挑戰
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="three column row">
+        <div class="column">
+          <a class="ui raised link centered card" id="marginCard" href="{% url 'Manager List Page' %}">
+            <div class="image">
+              <img class="ui small image" src="{% static 'app/icon/manager.jpg' %}">
+            </div>
+            <div class="ui bottom" style="color:#008080; text-decoration:none;">
+              使用者
+            </div>
+          </a>
+        </div>
+        {% if request.user.is_administrator %}
+          <div class="column">
+            <a class="ui raised link centered card" id="marginCard" href="{% url 'Reward List Page' %}">
+              <div class="image">
+                <img class="ui small image" src="{% static 'app/icon/reward.jpg' %}">
+              </div>
+              <div class="ui bottom" style="color:#008080; text-decoration:none;">
+                收藏品
+              </div>
+            </a>
+          </div>
+        {% endif %}
+        {% if request.user.is_administrator %}
+          <div class="column">
+            <a class="ui raised link centered card" id="marginCard" href="{% url 'Beacon List Page' %}">
+              <div class="image">
+                <img class="ui small image" src="{% static 'app/icon/beacon.jpg' %}">
+              </div>
+              <div class="ui bottom" style="color:#008080; text-decoration:none;">
+                Beacon
+              </div>
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

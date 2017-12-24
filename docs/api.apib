@@ -1,0 +1,358 @@
+FORMAT: 1A
+HOST: https://smartcampus.csie.ncku.edu.tw/smart_campus
+
+# smartccampus
+
+smartcampus is a simple API allowing smartcampus mobile application to update the informations.
+
+
+
+## signup an user [/signup]
+
+### signup [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="password"
+
+            $password
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="nickname"
+
+            $nickname
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
++ Response 201 (text/plain)
+
+        Registration succeeded!
+
++ Response 400 (text/plain)
+
+        Invalid email address.
+
++ Response 400 (text/plain)
+
+        Either email or password input is missing.
+
++ Response 400 (text/plain)
+
+        The email is already taken, try another!
+
+## login as an user [/login]
+
+### login [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="password"
+
+            $password
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 200 (application/json)
+
+        {
+            'message': 'Login succeeded',
+            'data' : {
+                'nickname': $nickname,
+                'experience_point': $experience_point,
+                'coins': $earned_coins,
+                'rewards': $reward.id,
+                'favorite_stations': $station.id
+            }
+        }
+
++ Response 401 (text/plain)
+
+        Login failed
+
+## logout [/logout]
+
+### logout [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 200 (text/plain)
+
+        Logout succeeded
+
++ Response 404 (text/plain)
+
+        User does not exist
+
+## Get all rewards [/get_all_rewards]
+
+### get_all_rewards [GET]
+
++ Response 200 (application/json)
+
+        {
+            {
+                'id': $rewward.id,
+                'name': $reward.name,
+                'image_url': $url
+            }, {
+                'id': $rewward.id,
+                'name': $reward.name,
+                'image_url': $url
+            }, ...
+        }
+
+## Get all stations [/get_all_stations]
+
+### get_all_stations [GET]
+
++ Response 200 (application/json)
+
+        {
+            'id': $station.id,
+            'name': $statione.name,
+            'content': $station.content,
+            'category' $station.category,
+            'location': $station.location,
+            'rewards': list of reward.id
+            'image': {
+                'primary': url,
+                'others': list of the other image url
+            }
+        }
+
+## Get linked stations of specific beacon [/get_linked_stations]
+
+### get_linked_stations [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="beacon_id"
+
+            $beacon_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 200 (application/json)
+
+        {
+            list of station.id
+        }
+
++ Response 404 (text/plain)
+
+        No match station
+
+## Update user's coin [/update_user_coin]
+
+### update_user_coin [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="coins"
+
+            $coins
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 404 (text/plain)
+
+        Either user does not exist or coins input is not given
+
++ Response 400 (text/plain)
+
+        Invalid input of coins
+
++ Response 200 (application/json)
+
+        {
+            'message':  'Coins record of {0} update succeed',
+            'data': {
+                'coins': $user.earned_coins
+            }
+        }
+
+## Update user's experience point [/update_user_experience_point]
+
+### update_user_experience_point [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="experience_point"
+
+            $experience_point
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 404 (text/plain)
+
+        Either user does not exist or experience_point input is not given
+
++ Response 400 (text/plain)
+
+        Invalid input of experience point
+
++ Response 200 (application/json)
+
+            {
+                'message': 'Experience point record of {0} update succeed',
+                'data': {
+                    'experience_point': $user.experience_point
+                }
+            }
+
+## Add a reward to user [/add_user_reward]
+
+### add_user_reward [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="reward_id"
+
+            $reward_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 404 (text/plain)
+
+        Either user or reward does not exist.
+
++ Response 400 (text/plain)
+
+        Add user reward failed.
+
++ Response 200 (text/plain)
+
+        Create Succeeded
+
+## Add a station to user's favorite stations list [/add_user_favorite_stations]
+
+### add_user_favorite_stations [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="station_id"
+
+            $station_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 404 (text/plain)
+
+        Either user or station does not exist
+
++ Response 200 (application/json)
+
+        {
+            'message': 'Favorite stations update succeed',
+            'stations': list of station.id
+        }
+
+## Remove a station from user's favorite stations list [/remove_user_favorite_stations]
+
+### remove_user_favorite_stations [POST]
+
++ Request (multipart/form-data, boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW)
+
+    + Headers
+
+            Content-Length: $requestlen
+
+    + Body
+
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="station_id"
+
+            $station_id
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+            Content-Disposition: form-data; name="email"
+
+            $email
+            ------WebKitFormBoundary7MA4YWxkTrZu0gW
+
++ Response 404 (text/plain)
+
+        Either user or station does not exist
+
++ Response 200 (application/json)
+
+        {
+            'message': 'Favorite stations update succeed',
+            'stations': list of station.id
+        }

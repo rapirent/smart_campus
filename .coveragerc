@@ -1,0 +1,6 @@
+[run]
+omit =
+    env/*
+    venv/*
+    */virtualenv/*
+    */tests/*

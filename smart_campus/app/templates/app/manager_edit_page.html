@@ -1,0 +1,72 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui text container">
+    <form class="ui big borderless form" action="" method="POST" id="manager_form">
+      {% csrf_token %}
+      <div class="required eight wide field">
+        <label>管理者Email</label>
+        <input type="text" name="email" placeholder="Email" value="{{ form_data.email }}" readonly="">
+      </div>
+      <div class="required five wide field">
+        <label>管理者權限</label>
+        <div class="ui selection dropdown">
+          <input type="hidden" name="role" value="{{ form_data.role.id }}">
+          <i class="dropdown icon"></i>
+          <div class="default text">請選擇權限...</div>
+          <div class="menu">
+            {% if roles %}
+              {% for role in roles %}
+                <div class="item" value="{{ role.id }}" data-value="{{ role.id }}">
+                  {{ role.name }}
+                </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>管理者群組</label>
+        <div class="ui selection dropdown">
+          <input type="hidden" name="group" value="{{ form_data.group.id }}">
+          <i class="dropdown icon"></i>
+          <div class="default text">請選擇群組...</div>
+          <div class="menu">
+            {% if groups %}
+              {% for group in groups %}
+              <div class="item" value="{{ group.id }}" data-value="{{ group.id }}">
+                {{ group.name }}
+              </div>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="field five wide field">
+        <label>暱稱</label>
+        <input type="text" name="nickname" value="{{ form_data.nickname }}">
+      </div>
+      <div class="five wide field">
+        <label>新密碼</label>
+        <input type="password" name="password" placeholder="密碼">
+      </div>
+      <div class="five wide field">
+        <label>請再輸入一次新密碼</label>
+        <input type="password" name="password2" placeholder="請再輸入一次密碼">
+      </div>
+      <button class="ui submit teal button" type="submit">儲存</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{% static 'app/js/manager_edit_page.js' %}"></script>
+{% endblock %}

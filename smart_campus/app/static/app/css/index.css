@@ -1,0 +1,13 @@
+.ui.borderless.center.aligned.container {
+  margin-bottom: 1em;
+  display: block;
+}
+
+.three.column.row {
+  margin: 0em auto;
+  margin-bottom: 2em;
+}
+
+#marginCard {
+  max-width: 150px;
+}

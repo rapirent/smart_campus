@@ -1,0 +1,138 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.css">
+  <link rel="stylesheet" type="text/css" href="{% static "app/css/edit.css" %}">
+{% endblock %}
+
+{% block content %}
+  <div class="ui container">
+    <form class="ui centered big form" method="POST" enctype="multipart/form-data" id="station_form">
+      {% include 'marco/form_error_macro.html' with form=form %}
+      {% csrf_token %}
+      <div class="fields">
+        <div class="required field">
+          <label>名稱</label>
+          <input id="name" name="name" type="text" placeholder="站點名稱" value="{{ form.cleaned_data.name }}">
+        </div>
+
+        <div class="required field">
+          <label>類別</label>
+          <div class="ui selection dropdown">
+            <input type="hidden" name="category">
+            <i class="dropdown icon"></i>
+            <div class="default text">請選擇類別...</div>
+            <div class="menu">
+              {% if categories %}
+                {% for category in categories %}
+                  <div class="item" value="{{ category.name }}" data-value="{{ category.id }}">
+                    {{ category.name }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="required field">
+          <label>管理群組</label>
+          <div class="ui selection dropdown">
+            <input type="hidden" name="owner_group">
+            <i class="dropdown icon"></i>
+            <div class="default text">請選擇群組...</div>
+            <div class="menu">
+              {% if user_groups %}
+                {% for user_group in user_groups %}
+                  <div class="item" value="{{ user_group.name }}" data-value="{{ user_group.id }}">
+                    {{ user_group.name }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <hr>
+
+      <div class="field">
+        <label>推播內容</label>
+        <input id="x" type="hidden" name="content">
+        <trix-editor form="station_form" input="x"></trix-editor>
+      </div>
+      <hr>
+
+      <div class="five wide field">
+        <label>圖片上傳</label>
+        <div id="uiAddImage">
+          <div class="ui action input">
+            <input type="text" placeholder="img 1" readonly="">
+            <input id="img1" name="img1" type="file" accept="image/*" style="display: none;">
+            <div class="ui icon button">
+              <i class="attach icon"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grouped fields">
+        <label>選擇主要照片</label>
+        <div class="field">
+          <div class="ui radio checkbox">
+            <input type="radio" name="main_img_num" id="radios-1" value="1" checked="">
+            <label>圖片1</label>
+          </div>
+        </div>
+      </div>
+      <button type="button" id="addimage" name="btn_addimage" class="btn btn-danger" onclick="">新增照片欄位</button>
+      <hr>
+      <div class="four wide column centered field">
+        <label>Beacon位置一覽(請點選beacon)</label>
+        <div id="map" style="height:400px;width:600px"></div>
+      </div>
+      <div class="field">
+        <input id="selectbasic" type="text" name="beacon" placeholder="請於地圖點選" readonly="" value="{{ form.cleaned_data.beacon }}">
+      </div>
+      <hr>
+      <div class="required field">
+        <label>站點位置(預設為Beacon位置)</label>
+        <div class="required three wide field">
+          <label>緯度</label>
+          <input id="lat_input" name="lat" type="number" step="any" placeholder="緯度" class="form-control input-md" value="{{ form.cleaned_data.lat }}">
+        </div>
+        <div class="required three wide field">
+          <label>經度</label>
+          <input id="lng_input" name="lng" type="number" step="any" placeholder="經度" class="form-control input-md" value="{{ form.cleaned_data.lng }}">
+        </div>
+      </div>
+      <button class="ui fluid teal submit button" type="submit">加入站點</button>
+      <div class="ui error message"></div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script>
+    var location_arr = [];
+
+    {% if beacons %}
+      {% for beacon in beacons %}
+        location_arr.push(['{{ beacon.name }}', {{ beacon.location.y }}, {{ beacon.location.x }}])
+      {% endfor %}
+    {% endif %}
+
+    var MAX_IMGS = {{ max_imgs }};
+    $(document).ready(function () {
+      const element = document.querySelector("trix-editor");
+      element.editor.setSelectedRange([0, 0]);
+      element.editor.insertHTML( '{{ form.cleaned_data.content|safe|escape }}' );
+    })
+  </script>
+  <script type="text/javascript" src="{% static 'app/js/station.js' %}"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAiIZ8KVmbarK__OmCfefXwySbsAQb-JiM&callback=initMap" async defer></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/trix/0.11.0/trix.js"></script>
+  <script type="text/javascript" src="{% static 'app/js/station_add_page.js' %}"></script>
+{% endblock %}
