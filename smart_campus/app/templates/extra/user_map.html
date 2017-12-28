@@ -46,7 +46,7 @@ crossorigin="anonymous"></script>
     var addressPoints = []
     var beacon_marker_data;
     var markerGroup = L.layerGroup();
-    $.getJSON('http://' + $(location).attr('host') + '/smart_campus/get_beacon_detect_data/', function (data) {
+    $.getJSON('/smart_campus/get_beacon_detect_data/', function (data) {
       //data is the JSON string
       var records = data.data;//_with_each_detection_cnt;
       for (var entry in records){
@@ -54,7 +54,7 @@ crossorigin="anonymous"></script>
           addressPoints.push([records[entry].lat.toString(), records[entry].lng.toString()])
         }
       }
-     // console.log(addressPoints);
+      // console.log(addressPoints);
       //console.log(data.top3_stations);
       var heat1 = L.heatLayer(addressPoints,{minOpacity:0.5, radius:15, blur:8, gradient: {0.4: 'blue', 0.6: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red'}});
       heat1.addTo(mymap);
