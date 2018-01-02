@@ -1764,10 +1764,10 @@ def get_beacon_detect_percentage_by_user(request):
 
 
 @csrf_exempt
-@require_POST
+@require_GET
 def get_user_web_screenshot(request):
 
-    user = User.objects.filter(email=request.POST.get('email')).first()
+    user = User.objects.filter(email=request.GET.get('email')).first()
 
     if not user:
         return HttpResponse('User not exist', status=404)
@@ -1786,12 +1786,11 @@ def get_user_web_screenshot(request):
     url = 'http://{0}/users/{1}/today_view/'.format(domain, user.email)
     browser.get(url)
 
-    sleep(3)
+    sleep(5)
     img_base64 = browser.get_screenshot_as_base64()
-    # print(img_base64)
+
     with open('{}/images/screenshot/{}.png'.format(settings.MEDIA_ROOT, user.email), "wb") as fh:
         fh.write(base64.b64decode(img_base64))
-        print('IMAGE saved')
 
     browser.close()
     display.stop()
