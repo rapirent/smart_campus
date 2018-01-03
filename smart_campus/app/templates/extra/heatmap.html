@@ -145,7 +145,7 @@ crossorigin="anonymous"></script>
           $('.ui.red').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['藝文'])/total));
           $('.ui.blue').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['景觀'])/total));
           $('.ui.orange').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['古蹟'])/total));
-          $('.ui.green').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['行政單位'])/total));
+          $('.ui.green').progress('set progress', Math.floor(100 * parseFloat(category_percentage[index]['行政教學'])/total));
           
           $('.ui.modal')
             .modal('show')
@@ -185,9 +185,9 @@ crossorigin="anonymous"></script>
       $('body').animate({scrollTop: section_offset[4]}, 500);
 
     });
-
+    /*
     $.ajax({
-      type: "POST",
+      type: "GET",
       url: '/users/get_user_web_screenshot/',
       data: {
         'email': 'jeff1jeffo@gmail.com'
@@ -198,6 +198,7 @@ crossorigin="anonymous"></script>
       },
       dataType: 'json'
     });
+    */
 
   });
   window.CSRF_TOKEN = "{{ csrf_token }}"
@@ -508,7 +509,7 @@ crossorigin="anonymous"></script>
               <div class="progress" style="background-color: transparent !important;"></div>
             </div>
           </div>
-          <div class="label cat4">行政單位</div>
+          <div class="label cat4">行政教學</div>
           <div class="ui large green inverted progress">
             <div class="bar">
               <div class="progress" style="background-color: transparent !important;"></div>
