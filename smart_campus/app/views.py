@@ -1839,11 +1839,11 @@ def get_zapper_web_screenshot(request):
     chrome_options.add_argument('--no-sandbox')
     browser = webdriver.Chrome(
         executable_path='/usr/local/bin/chromedriver', chrome_options=chrome_options)
-    browser.set_window_size(1100, 1100)
+    browser.set_window_size(900, 700)
     browser.implicitly_wait(10)
 
     browser.get('https://mosquitokiller.csie.ncku.edu.tw/zapperTown/index.html')
-
+    browser.execute_script("$('h1').text('');$('#container').attr('style','width: 880px;');")
     sleep(1)
     img_base64 = browser.get_screenshot_as_base64()
 
