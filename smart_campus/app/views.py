@@ -138,6 +138,7 @@ def login(request):
     if user is not None:
         auth.login(request, user)
         user_data = {
+            'email': user_email,
             'nickname': user.nickname,
             'experience_point': user.experience_point,
             'coins': user.earned_coins,
