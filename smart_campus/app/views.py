@@ -1826,3 +1826,34 @@ def user_view_today_page(request, pk):
     ]
 
     return render(request, 'extra/user_map.html', {'path': path_array})
+
+
+@csrf_exempt
+@require_GET
+def get_zapper_web_screenshot(request):
+
+    display = Display(visible=0)
+    display.start()
+
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    browser = webdriver.Chrome(
+        executable_path='/usr/local/bin/chromedriver', chrome_options=chrome_options)
+    browser.set_window_size(1100, 1100)
+    browser.implicitly_wait(10)
+
+    browser.get('https://mosquitokiller.csie.ncku.edu.tw/zapperTown/index.html')
+
+    sleep(1)
+    img_base64 = browser.get_screenshot_as_base64()
+
+    with open('{}/images/screenshot/zapper.png'.format(settings.MEDIA_ROOT), "wb") as fh:
+        fh.write(base64.b64decode(img_base64))
+
+    browser.close()
+    display.stop()
+
+    domain = request.get_host()
+    image_url = 'http://{}/media/images/screenshot/zapper.png'.format(domain)
+
+    return JsonResponse(data={'image_url': image_url}, status=200)

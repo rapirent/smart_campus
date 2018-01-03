@@ -116,7 +116,8 @@ urlpatterns = [
 
     url(r'^users/(?P<pk>[^/]+)/today_view/$', app.views.user_view_today_page,
         name='User Today View Page'),
-    url(r'^users/get_user_web_screenshot/$', app.views.get_user_web_screenshot)
+    url(r'^users/get_user_web_screenshot/$', app.views.get_user_web_screenshot),
+    url(r'^zapper/get_web_screenshot/$', app.views.get_zapper_web_screenshot)
 ]
 
 if settings.DEBUG:
