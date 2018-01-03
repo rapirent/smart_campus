@@ -4,7 +4,13 @@ class corsMiddleware(object):
 
     def __call__(self, request):
         response = self.get_response(request)
-        if request.path_info == '/users/get_user_web_screenshot/':
+        allowed_API = [
+            '/users/get_user_web_screenshot/',
+            '/smart_campus/login/',
+            '/smart_campus/logout/',
+            '/smart_campus/signup/',
+        ]
+        if request.path_info in allowed_API:
             response["Access-Control-Allow-Origin"] = "*"
 
         return response
