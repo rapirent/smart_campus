@@ -98,10 +98,30 @@ crossorigin="anonymous"></script>
       data_arr2.push(100-sum);
       console.log(data_arr);
 
+      var color_arr = [
+        '#4f87cd',
+        '#35919e', 
+        '#4d45b9', 
+        '#46b871', 
+        '#b8467e', 
+        '#ee86ba', 
+        '#6e6094', 
+        '#bced51', 
+        '#dea577', 
+        '#dd753d', 
+        '#ea5a5a', 
+        '#c59562', 
+        '#b38451', 
+        '#9d51b3', 
+        '#509b4e', 
+        '#b351ab'
+      ];
       var coloR = [];
       for (var i in data_arr) {
-     
-        coloR.push(dynamicColors());
+        //console.log(i);
+        var index = i % color_arr.length;
+        //console.log(color_arr.length);
+        coloR.push(color_arr[index]);
       }
       var ctx = $("#myChart");
       var myDoughnutChart = new Chart(ctx, {
@@ -109,7 +129,7 @@ crossorigin="anonymous"></script>
         data: {
           datasets: [{
               data: data_arr2,
-              backgroundColor: coloR
+              backgroundColor: color_arr
           }],
 
           // These labels appear in the legend and in the tooltips when hovering different arcs
