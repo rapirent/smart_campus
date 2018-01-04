@@ -15,7 +15,7 @@ baseMaps2 = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?ac
   accessToken: 'pk.eyJ1Ijoiam9ubmUyNjAiLCJhIjoiY2owbmFncmdwMDAwMzJxbnZxMm85eDdtYSJ9.WsKUG0wpHZHUJ0oAWJOqLg'
 }).addTo(mymap2);
 
-var addressPoints = []
+var addressPoints = [];
 var beacon_marker_data;
 var markerGroup = L.layerGroup();
 $.getJSON('/smart_campus/get_beacon_detect_data/', function (data) {
@@ -150,36 +150,41 @@ function changeDate(val) {
         $('#date').text(current_day.getFullYear() + '-' + (current_day.getMonth() + 1) + '-' + current_day.getDate() + '    \n' + current_display_hour + ' 點 ' + current_display_minute + ' 分');
         for (var index in all_user_data) {
           current_day_data = all_user_data[index];
+          var temp_minute = current_display_minute;
+          for (var ii=0; ii < 15; ii++) {
+            for (var entry in current_day_data[current_display_hour][temp_minute]) {
+              data_in_minutes = current_day_data[current_display_hour][temp_minute];
+              var latlng = [data_in_minutes[entry].lat, data_in_minutes[entry].lng];
+              latlng_users[index] = latlng_users[index].slice(latlng_users[index].length - 1);
+              latlng_users[index].push(latlng);
+              //console.log(latlng_users[index]);
+              //console.log(latlng);
+              /*
+              L.circleMarker(latlng, {
+                radius: 8,
+                fillColor: path_colors[index],
+                color: "#000",
+                weight: 1,
+                opacity: 0.5,
+                fillOpacity: 0.5
+              }).addTo(pointGroup);*/
 
-          for (var entry in current_day_data[current_display_hour][current_display_minute]) {
-            data_in_minutes = current_day_data[current_display_hour][current_display_minute];
-            var latlng = [data_in_minutes[entry].lat, data_in_minutes[entry].lng];
-            latlng_users[index] = latlng_users[index].slice(latlng_users[index].length - 1);
-            latlng_users[index].push(latlng);
-            //console.log(latlng_users[index]);
-            //console.log(latlng);
-            L.circleMarker(latlng, {
-              radius: 8,
-              fillColor: path_colors[index],
-              color: "#000",
-              weight: 1,
-              opacity: 0.5,
-              fillOpacity: 0.5
-            }).addTo(pointGroup);
+              //L.polyline(latlng_users[index], { color: path_colors[index], smoothFactor: 10, weight: 2, opacity: 0.6 }).addTo(pathGroup);
+              var heat1 = L.heatLayer(latlng_users[index], { minOpacity: 0.5, radius: 15, blur: 8, gradient: { 0.2: 'blue', 0.45: 'cyan', 0.7: 'lime', 0.8: 'yellow', 1: 'red' } });
+              heat1.addTo(pointGroup);
 
-            L.polyline(latlng_users[index], { color: path_colors[index], smoothFactor: 10, weight: 2, opacity: 0.6 }).addTo(pathGroup);
-
-
+            }
+            temp_minute = (temp_minute + 1);
           }
         }
-        current_display_minute = (current_display_minute + 1) % 60;
+        current_display_minute = (current_display_minute + 15) % 60;
         if (current_display_minute == 0) {
           current_display_hour = (current_display_hour + 1) % 24;
           if (current_display_hour == 0) {
             pointGroup.clearLayers();
           }
         }
-      }, 250);
+      }, 500);
 
 
     },
